@@ -369,7 +369,7 @@
     <!-- TOAST NOTIFICATION -->
     <div id="toast" class="fixed bottom-5 right-5 bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-semibold hidden shadow-2xl z-50"></div>
 
-    <!-- ===================== INSUFFICIENT FUNDS MODAL (YANGI) ===================== -->
+    <!-- ===================== INSUFFICIENT FUNDS MODAL ===================== -->
     <div id="insufficientModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.8);backdrop-filter:blur(8px)">
         <div class="card-bg rounded-2xl w-full max-w-md shadow-2xl border border-slate-700 overflow-hidden">
             <div class="bg-gradient-to-r from-amber-600 to-red-600 px-6 py-5">
@@ -778,7 +778,7 @@
             `}).join('');
         }
 
-        // ============ YANGILANGAN: buyTutor — endi balansdan yechiladi ============
+        // ============ buyTutor — endi balansdan yechiladi ============
         function buyTutor(id) {
             if (!db.currentUser) return openAuthModal();
 
@@ -846,7 +846,7 @@
             navigateTo('profile');
             setTimeout(() => openPaymentModal('topup', null), 300);
         }
-        // ============ /YANGILANGAN buyTutor ============
+        // ============ /buyTutor ============
 
         // RENDER MY COURSES
         function renderMyCourses() {
@@ -1229,6 +1229,7 @@
             u.balance = 0; saveDb(); renderAdminUsers(); toast("Balans nol qilindi!");
         }
 
+        // ============ TUZATILGAN: addTutor — unikal ID, endi hech narsani o'chirmaydi ============
         function addTutor() {
             const name = document.getElementById('newTutorName').value.trim();
             const img = document.getElementById('newTutorImg').value.trim();
@@ -1238,8 +1239,11 @@
 
             if(!name || !price) return alert("Ma'lumotlarni to'liq kiriting!");
 
+            // Unikal ID — vaqtga asoslangan, mavjud ID bilan hech qachon to'qnashmaydi
+            const newId = 'tut-' + Date.now();
+
             db.tutors.push({
-                id: 'tut-' + (db.tutors.length + 1),
+                id: newId,
                 name,
                 img: img || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop',
                 price,
@@ -1251,7 +1255,13 @@
             saveDb();
             toast("Yangi repetitor qo'shildi!");
             renderAdminTutorsList();
+
+            // Formani tozalash
+            document.getElementById('newTutorName').value = '';
+            document.getElementById('newTutorImg').value = '';
+            document.getElementById('newTutorPrice').value = '';
         }
+        // ============ /addTutor ============
 
         function renderAdminTutorsList() {
             document.getElementById('adminTutorsList').innerHTML = db.tutors.map(t => `
@@ -1318,7 +1328,7 @@
             document.getElementById('profBalance').innerText = db.currentUser.balance.toLocaleString() + " so'm";
         }
 
-        // =================== FAKE PAYMENT SYSTEM (endilikda faqat to'ldirish uchun) ===================
+        // =================== FAKE PAYMENT SYSTEM ===================
 
         let _payMode = 'topup';
         let _payTutorId = null;
@@ -1420,8 +1430,6 @@
                     document.getElementById('paySuccessMsg').textContent =
                         `Balansingizga ${amount.toLocaleString()} so'm qo'shildi. Joriy balans: ${db.currentUser.balance.toLocaleString()} so'm`;
                 } else {
-                    // Bu holat endi ishlatilmaydi (buyTutor balansdan yechadi),
-                    // lekin kodda qolib ketgan bo'lsa — zaxira variant sifatida ishlaydi
                     const tutor = db.tutors.find(t => t.id === _payTutorId);
                     if (!tutor) return;
                     if(!db.currentUser.tutorsBought) db.currentUser.tutorsBought = [];
