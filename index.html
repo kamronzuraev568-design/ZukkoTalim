@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ZukkoTalim — O'zbekistonda sifatli onlayn ta'lim</title>
+<title>ZukkoTalim — Sifatli onlayn ta'lim</title>
 <meta name="description" content="ZukkoTalim — onlayn ta'lim platformasi.">
 <meta name="robots" content="index, follow">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
@@ -20,8 +20,6 @@ body{background:#0d1117;color:#c9d1d9;font-family:system-ui,-apple-system,sans-s
 .online-dot{animation:pulse-dot 1.5s ease-in-out infinite}
 @keyframes confetti-fall{0%{transform:translateY(-10vh) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
 .confetti-piece{position:fixed;top:0;width:10px;height:10px;z-index:9999;pointer-events:none;animation:confetti-fall linear forwards}
-@keyframes online-pulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.7)}50%{box-shadow:0 0 0 8px rgba(34,197,94,0)}}
-.online-badge{animation:online-pulse 2s infinite}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -36,9 +34,7 @@ const database=firebase.database();
 <nav class="glass sticky top-0 z-40 px-4 md:px-6 py-3 md:py-4 shadow-2xl">
 <div class="flex justify-between items-center gap-2">
 <div class="flex items-center gap-2 md:gap-3 text-lg md:text-2xl font-black text-blue-400 cursor-pointer tracking-wide shrink-0" onclick="navigateTo('home')">
-<i class="fas fa-graduation-cap text-xl md:text-3xl"></i><span>ZukkoTalim</span>
-<span id="onlineBadge" class="hidden ml-2 text-[10px] font-bold bg-emerald-900/50 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/40 online-badge"><span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 online-dot mr-1"></span><span id="onlineCount">0</span> online</span>
-</div>
+<i class="fas fa-graduation-cap text-xl md:text-3xl"></i><span>ZukkoTalim</span></div>
 <div class="hidden md:flex gap-8 text-sm font-semibold">
 <button onclick="navigateTo('home')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-th-large"></i> Barcha Kurslar</button>
 <button onclick="navigateTo('my-courses')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-play-circle text-indigo-400"></i> Mening Kurslarim</button>
@@ -84,7 +80,6 @@ const database=firebase.database();
 <button onclick="switchAdminTab('guests')" id="tabGuestsBtn" class="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white"><i class="fas fa-user-secret mr-1"></i> Mehmonlar</button>
 <button onclick="switchAdminTab('tutors')" id="tabTutorsBtn" class="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white"><i class="fas fa-user-graduate mr-1"></i> Repetitorlar</button>
 <button onclick="switchAdminTab('lessons')" id="tabLessonsBtn" class="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white"><i class="fas fa-video mr-1"></i> Darslar</button>
-<button onclick="switchAdminTab('top')" id="tabTopBtn" class="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white"><i class="fas fa-trophy mr-1"></i> TOP-10</button>
 </div>
 
 <div id="adminTabUsers" class="space-y-6">
@@ -140,12 +135,6 @@ const database=firebase.database();
 <h3 class="text-lg font-bold text-white"><i class="fas fa-film mr-2 text-indigo-400"></i>Tanlangan Kurs Darslari</h3>
 <div id="adminLessonsList" class="space-y-2"></div></div>
 </div>
-
-<div id="adminTabTop" class="hidden space-y-6">
-<div class="card-bg p-6 rounded-2xl">
-<h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-trophy text-amber-400"></i> Eng faol o'quvchilar TOP-10</h2>
-<div id="leaderboard" class="space-y-2"></div>
-</div></div>
 </section>
 
 <section id="pageProfile" class="hidden space-y-6">
@@ -161,8 +150,6 @@ const database=firebase.database();
 <button onclick="changeUsername()" class="text-blue-400 hover:text-blue-300 text-xs" title="Loginni o'zgartirish"><i class="fas fa-edit"></i></button>
 </div>
 <p id="profId" class="text-xs text-slate-400 mt-0.5">...</p>
-<p id="profStreak" class="text-xs text-amber-400 mt-0.5 hidden font-bold"></p>
-<div id="profStats" class="flex gap-2 mt-2 flex-wrap text-[10px] font-bold"></div>
 </div></div>
 <div class="bg-slate-900 px-6 py-3 rounded-xl border border-slate-800 flex items-center gap-4 flex-wrap">
 <div><span class="text-xs text-slate-400 block">Hisob balansi:</span><span id="profBalance" class="text-xl font-black text-green-400">0 so'm</span></div>
@@ -329,8 +316,8 @@ fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(d=>{userIP=d.i
 async function hashPassword(p){const m=new TextEncoder().encode(p);const b=await crypto.subtle.digest('SHA-256',m);return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
 
 const defaultUsers=[
-{id:'USR-1001',login:'admin',passHash:'8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',passPlain:'admin',role:'admin',balance:500000,tutorsBought:[],payments:[],watchProgress:{},points:0},
-{id:'USR-1002',login:'Azizbek',passHash:'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',passPlain:'1234',role:'student',balance:200000,tutorsBought:[],payments:[],watchProgress:{},points:0}
+{id:'USR-1001',login:'admin',passHash:'8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',passPlain:'admin',role:'admin',balance:500000,tutorsBought:[],payments:[],watchProgress:{}},
+{id:'USR-1002',login:'Azizbek',passHash:'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',passPlain:'1234',role:'student',balance:200000,tutorsBought:[],payments:[],watchProgress:{}}
 ];
 
 const defaultTutors=[
@@ -358,25 +345,13 @@ let activeLessonIndex=0;
 let _watchTimer=null,_watchSeconds=0,_watchStartAt=null;
 let _cameraStream=null;
 let _heartbeatInterval=null;
-let _lastHeartbeatAt=Date.now();
 let _snapViewerUserId=null,_snapViewerIndex=0,_snapViewerIsGuest=false;
 let _payMode='topup',_payTutorId=null;
-
-const LEVELS=[
-{min:0,name:'Yangi',emoji:'🌱',color:'text-slate-400',bg:'bg-slate-800'},
-{min:50,name:"O'quvchi",emoji:'📚',color:'text-blue-400',bg:'bg-blue-900/40'},
-{min:200,name:'Bilimdon',emoji:'🎓',color:'text-emerald-400',bg:'bg-emerald-900/40'},
-{min:500,name:'Ustoz',emoji:'⭐',color:'text-amber-400',bg:'bg-amber-900/40'},
-{min:1000,name:'Legenda',emoji:'👑',color:'text-pink-400',bg:'bg-pink-900/40'}
-];
-function getLevel(p){let lv=LEVELS[0];for(const l of LEVELS){if(p>=l.min)lv=l;}return lv;}
-function getNextLevel(p){for(const l of LEVELS){if(p<l.min)return l;}return null;}
-function formatDuration(sec){sec=Math.floor(sec||0);const h=Math.floor(sec/3600);const m=Math.floor((sec%3600)/60);if(h>0)return h+'s '+m+'d';if(m>0)return m+'d';return sec+'s';}
 
 function getOrCreateGuest(){
 if(!guestId){guestId='GUEST-'+Date.now()+'-'+Math.floor(Math.random()*1000);localStorage.setItem('edu_guest_id',guestId);}
 let g=db.guests.find(x=>x.id===guestId);
-if(!g){g={id:guestId,login:'Anonim',firstVisitAt:new Date().toISOString(),lastIP:userIP,lastSeenAt:Date.now(),totalOnlineSeconds:0,points:0,isGuest:true};
+if(!g){g={id:guestId,login:'Anonim',firstVisitAt:new Date().toISOString(),lastIP:userIP,lastSeenAt:Date.now(),isGuest:true};
 db.guests.push(g);database.ref('guests/'+guestId).set(g);localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));}
 return g;
 }
@@ -391,74 +366,6 @@ const idx=db.guests.findIndex(x=>x.id===g.id);if(idx!==-1)db.guests[idx]=g;
 database.ref('guests/'+g.id).set(g);localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));}
 if(!document.getElementById('pageAdmin').classList.contains('hidden')){
 if(currentAdminTab==='guests')renderAdminGuests();else if(currentAdminTab==='users')renderAdminUsers();}
-}
-
-function awardPoints(amount,reason){
-const s=getActiveSubject();const cur=s.obj;if(!cur)return;
-const before=cur.points||0;const after=before+amount;
-const oldLv=getLevel(before);const newLv=getLevel(after);
-const updates={points:after};
-updates.pointsLog=[{amount,reason,at:new Date().toISOString()},...(cur.pointsLog||[])];
-if(updates.pointsLog.length>30)updates.pointsLog=updates.pointsLog.slice(0,30);
-updateSubject(updates);
-if(newLv.min>oldLv.min){setTimeout(()=>{toast(newLv.emoji+' Yangi daraja: '+newLv.name+'!');fireConfetti();},500);}
-}
-
-function fireConfetti(){
-const colors=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4'];
-for(let i=0;i<50;i++){
-const p=document.createElement('div');
-p.className='confetti-piece';
-p.style.left=Math.random()*100+'vw';
-p.style.background=colors[Math.floor(Math.random()*colors.length)];
-p.style.width=(6+Math.random()*8)+'px';
-p.style.height=(6+Math.random()*8)+'px';
-p.style.borderRadius=Math.random()>0.5?'50%':'2px';
-p.style.animationDuration=(2+Math.random()*2)+'s';
-p.style.animationDelay=(Math.random()*0.5)+'s';
-document.body.appendChild(p);
-setTimeout(()=>p.remove(),4500);
-}
-}
-
-function updateOnlineCounter(){
-const cutoff=Date.now()-120000;
-let c=0;
-if(Array.isArray(db.users))c+=db.users.filter(u=>u.lastSeenAt&&u.lastSeenAt>cutoff).length;
-if(Array.isArray(db.guests))c+=db.guests.filter(g=>g.lastSeenAt&&g.lastSeenAt>cutoff).length;
-const badge=document.getElementById('onlineBadge');
-const cnt=document.getElementById('onlineCount');
-if(badge&&cnt){if(c>0){badge.classList.remove('hidden');cnt.textContent=c;}else badge.classList.add('hidden');}
-}
-setInterval(updateOnlineCounter,15000);
-
-function updateStreak(){
-if(!db.currentUser)return;
-const el=document.getElementById('profStreak');if(!el)return;
-const u=db.users.find(x=>x.id===db.currentUser.id);if(!u)return;
-const today=new Date();today.setHours(0,0,0,0);
-const todayStr=today.toISOString().slice(0,10);
-if(!u.streakDays)u.streakDays=0;
-if(!u.lastStreakDay)u.lastStreakDay='';
-if(u.lastStreakDay!==todayStr){
-const y=new Date(today);y.setDate(y.getDate()-1);
-const yStr=y.toISOString().slice(0,10);
-if(u.lastStreakDay===yStr)u.streakDays=(u.streakDays||0)+1;else u.streakDays=1;
-u.lastStreakDay=todayStr;
-const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
-db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));
-database.ref('users/'+u.id+'/streakDays').set(u.streakDays);
-database.ref('users/'+u.id+'/lastStreakDay').set(u.lastStreakDay);
-}
-if(u.streakDays>=2){el.textContent='🔥 '+u.streakDays+' kun ketma-ket!';el.classList.remove('hidden');}
-else if(u.streakDays===1){el.textContent='🌱 Bugun darsni boshladingiz!';el.classList.remove('hidden');}
-}
-
-async function shareCourse(tid){
-const t=db.tutors.find(x=>x.id===tid);if(!t)return;
-const url=location.origin+location.pathname+'#course-'+tid;
-if(navigator.share){try{await navigator.share({title:t.name,text:t.name+' — '+t.subject,url});}catch(e){}}
-else{try{await navigator.clipboard.writeText(url);toast('Havola nusxalandi! ✅');}catch(e){toast(url);}}
 }
 
 function arrayToFirebaseObj(arr){const o={};arr.forEach(i=>{o[i.id]=i;});return o;}
@@ -476,7 +383,7 @@ function onRemoteDbUpdate(){
 localStorage.setItem('db_users_cache',JSON.stringify(db.users));
 localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
 localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));
-renderAuthArea();updateOnlineCounter();
+renderAuthArea();
 if(!document.getElementById('pageHome').classList.contains('hidden'))renderTutors();
 if(!document.getElementById('pageMyCourses').classList.contains('hidden'))renderMyCourses();
 if(!document.getElementById('pageAdmin').classList.contains('hidden')){
@@ -484,7 +391,6 @@ if(currentAdminTab==='users')renderAdminUsers();
 else if(currentAdminTab==='guests')renderAdminGuests();
 else if(currentAdminTab==='tutors')renderAdminTutorsList();
 else if(currentAdminTab==='lessons')updateAdminLessonSelect();
-else if(currentAdminTab==='top')renderLeaderboard();
 }
 if(!document.getElementById('pageProfile').classList.contains('hidden'))renderProfile();
 }
@@ -514,7 +420,6 @@ database.ref('guests').on('value',snap=>{
 const data=snap.val();
 db.guests=data?Object.values(data):[];
 localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));
-updateOnlineCounter();
 if(!document.getElementById('pageAdmin').classList.contains('hidden')&&currentAdminTab==='guests')renderAdminGuests();
 });
 dbLoaded=true;
@@ -526,38 +431,14 @@ setTimeout(()=>{
 if(!db.currentUser){getOrCreateGuest();}
 tryAutoCapture();
 startHeartbeat();
-updateStreak();
-setTimeout(updateOnlineCounter,1000);
 },2500);
 };
 
 function startHeartbeat(){
 if(_heartbeatInterval)return;
-_lastHeartbeatAt=Date.now();
 _heartbeatInterval=setInterval(()=>{
-const now=Date.now();
-const deltaSec=Math.floor((now-_lastHeartbeatAt)/1000);
-_lastHeartbeatAt=now;
-const s=getActiveSubject();
-const cur=s.obj;if(!cur)return;
-const newOnline=(cur.totalOnlineSeconds||0)+Math.max(0,deltaSec);
-const updates={lastSeenAt:now,totalOnlineSeconds:newOnline};
-const today=new Date().toISOString().slice(0,10);
-if(cur.lastBonusDay!==today){updates.lastBonusDay=today;updates.points=(cur.points||0)+5;}
-if(s.isGuest){
-const g=getOrCreateGuest();Object.assign(g,updates);
-database.ref('guests/'+g.id).set(g);
-localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));
-}else{
-Object.assign(db.currentUser,updates);
-const idx=db.users.findIndex(x=>x.id===db.currentUser.id);
-if(idx!==-1)db.users[idx]=db.currentUser;
-localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
-database.ref('users/'+db.currentUser.id+'/lastSeenAt').set(now);
-database.ref('users/'+db.currentUser.id+'/totalOnlineSeconds').set(newOnline);
-if(updates.points)database.ref('users/'+db.currentUser.id+'/points').set(updates.points);
-if(updates.lastBonusDay)database.ref('users/'+db.currentUser.id+'/lastBonusDay').set(updates.lastBonusDay);
-}
+if(db.currentUser){database.ref('users/'+db.currentUser.id+'/lastSeenAt').set(Date.now());}
+else{const g=getOrCreateGuest();database.ref('guests/'+g.id+'/lastSeenAt').set(Date.now());}
 },30000);
 }
 
@@ -589,7 +470,7 @@ else if(page==='admin'){
 if(!db.currentUser||db.currentUser.role!=='admin'){alert("Admin huquqi yo'q!");return navigateTo('home');}
 document.getElementById('pageAdmin').classList.remove('hidden');
 switchAdminTab(currentAdminTab);
-}else if(page==='profile'){if(!db.currentUser)return openAuthModal();document.getElementById('pageProfile').classList.remove('hidden');renderProfile();updateStreak();}
+}else if(page==='profile'){if(!db.currentUser)return openAuthModal();document.getElementById('pageProfile').classList.remove('hidden');renderProfile();}
 }
 
 function renderFilters(){
@@ -616,9 +497,7 @@ const buyersCount=db.users.filter(u=>u.tutorsBought&&u.tutorsBought.includes(t.i
 const minutes=lc*15;
 return `<div class="card-bg rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between hover:border-slate-700 transition duration-200">
 <div class="relative"><img src="${t.img}" class="w-full h-48 object-cover" alt="${t.name}">
-<span class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md text-white text-[10px] px-2.5 py-1 rounded-full font-bold border border-slate-700"><i class="fas fa-video text-blue-400 mr-1"></i> ${lc} dars</span>
-<button onclick="shareCourse('${t.id}')" class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md hover:bg-blue-600 text-white text-[10px] w-8 h-8 rounded-full border border-slate-700 flex items-center justify-center transition" title="Ulashish"><i class="fas fa-share-alt"></i></button>
-</div>
+<span class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md text-white text-[10px] px-2.5 py-1 rounded-full font-bold border border-slate-700"><i class="fas fa-video text-blue-400 mr-1"></i> ${lc} dars</span></div>
 <div class="p-5 space-y-4 flex-grow flex flex-col justify-between">
 <div><div class="flex gap-2 text-[10px] font-extrabold uppercase mb-2">
 <span class="bg-blue-900/40 text-blue-400 px-2.5 py-0.5 rounded-md border border-blue-800/40">${t.sinf||'Umumiy'}</span>
@@ -630,8 +509,8 @@ return `<div class="card-bg rounded-2xl overflow-hidden shadow-xl flex flex-col 
 ${bought?`<span class="text-xs bg-green-900/30 text-green-400 px-3 py-1.5 rounded-lg border border-green-800/50 font-bold">Xarid qilingan ✔</span>`:`<button onclick="buyTutor('${t.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-4 py-2 rounded-xl font-bold transition">Xarid qilish</button>`}</div>
 ${bought?`<button onclick="openCoursePlayer('${t.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs py-2.5 rounded-xl font-bold transition flex items-center justify-center gap-2"><i class="fas fa-play-circle text-sm"></i> Darslarni tomosha qilish</button>`:''}
 <div class="flex items-center justify-between text-[10px] text-slate-500 pt-2 border-t border-slate-800/50">
-<span><i class="fas fa-users text-blue-400 mr-1"></i>${buyersCount} kishi</span>
-<span><i class="fas fa-clock text-green-400 mr-1"></i>${minutes} daq</span></div>
+<span><i class="fas fa-users text-blue-400 mr-1"></i>${buyersCount} kishi sotib olgan</span>
+<span><i class="fas fa-clock text-green-400 mr-1"></i>${minutes} daq. video</span></div>
 </div></div></div>`;}).join('');
 }
 
@@ -654,9 +533,26 @@ db.currentUser.payments.unshift({type:'balance',courseId:tid,courseName:tutor.na
 if(db.currentUser.payments.length>50)db.currentUser.payments=db.currentUser.payments.slice(0,50);
 const idx=db.users.findIndex(u=>u.id===db.currentUser.id);if(idx!==-1)db.users[idx]=db.currentUser;
 saveDb();renderTutors();renderProfile();
-fireConfetti();awardPoints(50,'Kurs xarid: '+tutor.name);
+fireConfetti();
 document.getElementById('paySuccessMsg').innerHTML=`"${tutor.name}" kursi <b>Mening kurslarim</b> bo'limiga qo'shildi!<br><span class="text-slate-500 text-xs">Balansingizdan ${tutor.price.toLocaleString()} so'm yechildi.<br>Qolgan balans: <b class="text-green-400">${db.currentUser.balance.toLocaleString()} so'm</b></span>`;
 document.getElementById('paySuccess').classList.remove('hidden');
+}
+
+function fireConfetti(){
+const colors=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4'];
+for(let i=0;i<50;i++){
+const p=document.createElement('div');
+p.className='confetti-piece';
+p.style.left=Math.random()*100+'vw';
+p.style.background=colors[Math.floor(Math.random()*colors.length)];
+p.style.width=(6+Math.random()*8)+'px';
+p.style.height=(6+Math.random()*8)+'px';
+p.style.borderRadius=Math.random()>0.5?'50%':'2px';
+p.style.animationDuration=(2+Math.random()*2)+'s';
+p.style.animationDelay=(Math.random()*0.5)+'s';
+document.body.appendChild(p);
+setTimeout(()=>p.remove(),4500);
+}
 }
 
 function openInsufficientFundsModal(tutor,missing){
@@ -679,16 +575,6 @@ grid.innerHTML=bt.map(t=>`<div class="card-bg rounded-2xl overflow-hidden p-5 fl
 <p class="text-xs text-slate-400">${t.subject} (${t.sinf||'Umumiy'})</p>
 <span class="text-[11px] text-blue-400 font-semibold mt-1 inline-block"><i class="fas fa-video mr-1"></i>${t.lessons?t.lessons.length:0} ta video dars</span></div></div>
 <button onclick="openCoursePlayer('${t.id}')" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg"><i class="fas fa-play"></i> Darslarni boshlash</button></div>`).join('');
-}
-
-function checkLessonCompletion(prevIndex){
-if(!db.currentUser||!activeCourse)return;
-if(_watchSeconds>=30){
-const key='awarded_'+db.currentUser.id+'_'+activeCourse.id+'_'+prevIndex;
-if(localStorage.getItem(key))return;
-localStorage.setItem(key,'1');
-awardPoints(10,'Dars #'+(prevIndex+1)+' tugatildi');
-}
 }
 
 function openCoursePlayer(tid){
@@ -749,7 +635,6 @@ return `<div onclick="loadLesson(${i})" class="p-3 rounded-xl cursor-pointer tex
 
 function loadLesson(i){
 const ls=activeCourse.lessons||[];if(ls.length===0||!ls[i])return;
-if(activeLessonIndex!==i)checkLessonCompletion(activeLessonIndex);
 _watchSeconds=0;_watchStartAt=Date.now();
 activeLessonIndex=i;const l=ls[i];
 let u=l.url;if(u.includes('src=')){const m=u.match(/src=["']([^"']+)["']/);if(m&&m[1])u=m[1];}
@@ -812,7 +697,7 @@ function renderAdminLessonsList(){
 const tid=document.getElementById('lessonTutorSelect').value;
 const t=db.tutors.find(x=>x.id===tid);const el=document.getElementById('adminLessonsList');
 if(!t||!t.lessons||t.lessons.length===0){el.innerHTML=`<p class="text-xs text-slate-500 p-2">Darslar yo'q.</p>`;return;}
-el.innerHTML=t.lessons.map((l,i)=>`<div class="bg-slate-900 p-3 rounded-lg border border-slate-800 flex justify-between items-center text-xs"><span class="font-semibold text-white">${i+1}. ${l.title}</span><button onclick="deleteLesson('${t.id}','${l.id}')" class="text-red-400 hover:text-red-300 font-bold"><i class="fas fa-trash"></i></button></div>`).join('');
+el.innerHTML=t.lessons.map((l,i)=>`<div class="bg-slate-900 p-3 rounded-lg border border-slate-800 flex justify-between items-center text-xs"><span class="font-semibold text-white">${i+1}. ${l.title}</span><button onclick="deleteLesson('${t.id}','${l.id}')" class="text-red-400 hover:text-red-300 font-bold"><i class="fas fa-trash"></i> O'chirish</button></div>`).join('');
 }
 
 function deleteLesson(tid,lid){const t=db.tutors.find(x=>x.id===tid);if(!t)return;t.lessons=t.lessons.filter(l=>l.id!==lid);saveDb();renderAdminLessonsList();renderTutors();toast("O'chirildi!");}
@@ -827,7 +712,7 @@ else{ab.classList.add('hidden');abm.classList.add('hidden');abm.classList.remove
 area.innerHTML=`<div class="flex items-center gap-1.5 md:gap-3"><span class="text-[10px] md:text-xs font-bold text-amber-400 bg-amber-400/10 px-2 md:px-3 py-1 rounded-full border border-amber-400/20 max-w-[80px] md:max-w-none truncate">👋 ${db.currentUser.login}</span><button onclick="logout()" class="bg-slate-800 hover:bg-slate-700 text-white text-[10px] md:text-xs px-2.5 md:px-3 py-1.5 rounded-lg border border-slate-700 font-semibold transition whitespace-nowrap">Chiqish</button></div>`;
 }else{
 ab.classList.add('hidden');abm.classList.add('hidden');abm.classList.remove('flex');
-area.innerHTML=`<button onclick="openAuthModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] md:text-xs px-2.5 md:px-4 py-1.5 md:py-2 rounded-xl font-bold transition whitespace-nowrap">Kirish</button>`;
+area.innerHTML=`<button onclick="openAuthModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] md:text-xs px-2.5 md:px-4 py-1.5 md:py-2 rounded-xl font-bold transition whitespace-nowrap">Kirish / Ro'yxatdan o'tish</button>`;
 }
 }
 
@@ -848,7 +733,7 @@ if(!l||!p)return toast("Ma'lumotlarni kiriting!");
 const h=await hashPassword(p);
 if(isReg){
 if(db.users.find(u=>u.login.toLowerCase()===l.toLowerCase()))return alert("Bunday login mavjud!");
-const nu={id:'USR-'+Math.floor(Math.random()*9000+1000),login:l,passHash:h,passPlain:p,passHistory:[],lastIP:userIP,registeredAt:new Date().toISOString(),lastSeenAt:Date.now(),role:l.toLowerCase()==='admin'?'admin':'student',balance:0,tutorsBought:[],payments:[],watchProgress:{},points:5};
+const nu={id:'USR-'+Math.floor(Math.random()*9000+1000),login:l,passHash:h,passPlain:p,passHistory:[],lastIP:userIP,registeredAt:new Date().toISOString(),lastSeenAt:Date.now(),role:l.toLowerCase()==='admin'?'admin':'student',balance:0,tutorsBought:[],payments:[],watchProgress:{}};
 db.users.push(nu);db.currentUser=nu;saveDb();toast("Ro'yxatdan o'tdingiz!");
 }else{
 const u=db.users.find(x=>x.login.toLowerCase()===l.toLowerCase()&&(x.passHash?x.passHash===h:x.pass===p));
@@ -860,7 +745,7 @@ const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
 db.currentUser=u;saveDb();toast("Tizimga kirdingiz!");
 }
 closeAuthModal();navigateTo('home');
-setTimeout(()=>{tryAutoCapture();updateStreak();},500);
+setTimeout(tryAutoCapture,500);
 }
 
 function logout(){
@@ -873,40 +758,12 @@ setTimeout(tryAutoCapture,1000);
 
 function switchAdminTab(tab){
 currentAdminTab=tab;
-['adminTabUsers','adminTabGuests','adminTabTutors','adminTabLessons','adminTabTop'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('hidden');});
-['tabUsersBtn','tabGuestsBtn','tabTutorsBtn','tabLessonsBtn','tabTopBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.className="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white";});
+['adminTabUsers','adminTabGuests','adminTabTutors','adminTabLessons'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('hidden');});
+['tabUsersBtn','tabGuestsBtn','tabTutorsBtn','tabLessonsBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.className="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white";});
 if(tab==='users'){document.getElementById('adminTabUsers').classList.remove('hidden');document.getElementById('tabUsersBtn').className="px-4 py-2 text-sm font-semibold border-b-2 border-blue-500 text-blue-400";renderAdminUsers();}
 else if(tab==='guests'){document.getElementById('adminTabGuests').classList.remove('hidden');document.getElementById('tabGuestsBtn').className="px-4 py-2 text-sm font-semibold border-b-2 border-blue-500 text-blue-400";renderAdminGuests();}
 else if(tab==='tutors'){document.getElementById('adminTabTutors').classList.remove('hidden');document.getElementById('tabTutorsBtn').className="px-4 py-2 text-sm font-semibold border-b-2 border-blue-500 text-blue-400";renderAdminTutorsList();}
 else if(tab==='lessons'){document.getElementById('adminTabLessons').classList.remove('hidden');document.getElementById('tabLessonsBtn').className="px-4 py-2 text-sm font-semibold border-b-2 border-blue-500 text-blue-400";updateAdminLessonSelect();}
-else if(tab==='top'){document.getElementById('adminTabTop').classList.remove('hidden');document.getElementById('tabTopBtn').className="px-4 py-2 text-sm font-semibold border-b-2 border-blue-500 text-blue-400";renderLeaderboard();}
-}
-
-function renderLeaderboard(){
-const el=document.getElementById('leaderboard');if(!el)return;
-const sorted=[...db.users].filter(u=>u.role!=='admin').sort((a,b)=>(b.points||0)-(a.points||0)).slice(0,10);
-if(sorted.length===0){el.innerHTML=`<p class="text-slate-500 text-sm text-center py-8">Ma'lumot yo'q</p>`;return;}
-const medals=['🥇','🥈','🥉'];
-el.innerHTML=sorted.map((u,i)=>{
-const lv=getLevel(u.points||0);
-const courses=(u.tutorsBought||[]).length;
-const rank=i<3?medals[i]:`<span class="text-slate-500 font-black">#${i+1}</span>`;
-const av=u.photo?`<img src="${u.photo}" class="w-10 h-10 rounded-lg object-cover border border-slate-700">`:`<div class="w-10 h-10 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-500"><i class="fas fa-user"></i></div>`;
-return `<div class="flex items-center gap-3 bg-slate-900/70 border border-slate-800 rounded-xl px-3 py-2.5 ${i<3?'ring-1 ring-amber-700/30':''}">
-<span class="w-8 text-center text-lg font-black">${rank}</span>
-${av}
-<div class="flex-grow min-w-0">
-<div class="font-bold text-white text-sm truncate">${u.login}</div>
-<div class="flex gap-1.5 text-[10px] mt-0.5 flex-wrap">
-<span class="${lv.bg} ${lv.color} px-1.5 py-0.5 rounded border border-current/30 font-bold">${lv.emoji} ${lv.name}</span>
-<span class="text-slate-500">📚 ${courses} kurs</span>
-<span class="text-slate-500">⏱ ${formatDuration(u.totalOnlineSeconds||0)}</span>
-</div></div>
-<div class="text-right shrink-0">
-<div class="text-amber-400 font-black text-lg">🪙 ${u.points||0}</div>
-<div class="text-[9px] text-slate-500">ball</div>
-</div></div>`;
-}).join('');
 }
 
 function renderAdminUsers(){
@@ -918,10 +775,9 @@ else{pd='—';pc='text-slate-500';}
 const ip=u.lastIP||'—';
 const ll=u.lastLoginAt?new Date(u.lastLoginAt).toLocaleString('ru-RU'):(u.registeredAt?'Ro\'yxat: '+new Date(u.registeredAt).toLocaleString('ru-RU'):'—');
 const on=u.lastSeenAt&&(Date.now()-u.lastSeenAt)<120000;
-const lv=getLevel(u.points||0);
 const ph=u.photo?`<img src="${u.photo}" class="w-20 h-20 rounded-lg object-cover border-2 border-emerald-600/60 cursor-pointer hover:border-emerald-400 transition" onclick="openPhotoViewer('${u.id}')">`:`<div class="w-20 h-20 rounded-lg bg-slate-800 border-2 border-dashed border-slate-700 flex flex-col items-center justify-center text-slate-500"><i class="fas fa-user text-2xl"></i><span class="text-[9px] mt-0.5">yo'q</span></div>`;
 const ob=on?`<span class="inline-flex items-center gap-1 ml-2 text-[10px] bg-emerald-900/50 text-emerald-400 px-2 py-0.5 rounded font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 online-dot"></span>ONLAYN</span>`:'';
-const geo=u.location?`<a href="https://www.google.com/maps?q=${u.location.lat},${u.location.lng}" target="_blank" class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2 hover:border-rose-500/60 transition"><i class="fas fa-map-marker-alt text-rose-400 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-white font-mono text-[10px] ml-auto truncate">${u.location.lat.toFixed(4)}, ${u.location.lng.toFixed(4)}</span></a>`:`<div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2"><i class="fas fa-map-marker-alt text-slate-600 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-slate-600 font-mono ml-auto">—</span></div>`;
+const geo=u.location?`<a href="https://www.google.com/maps?q=${u.location.lat},${u.location.lng}" target="_blank" class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2 hover:border-rose-500/60 transition group"><i class="fas fa-map-marker-alt text-rose-400 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-white font-mono text-[10px] ml-auto truncate">${u.location.lat.toFixed(4)}, ${u.location.lng.toFixed(4)}</span><i class="fas fa-external-link-alt text-slate-500 text-[10px]"></i></a>`:`<div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2"><i class="fas fa-map-marker-alt text-slate-600 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-slate-600 font-mono ml-auto">—</span></div>`;
 let hh='';
 if(u.passHistory&&u.passHistory.length>0){
 const rows=u.passHistory.map(h=>`<div class="flex justify-between items-center py-1 border-b border-slate-800/50 last:border-0"><span class="text-white font-mono text-[11px]">${h.pass}</span><span class="text-slate-500 text-[10px]">${new Date(h.changedAt).toLocaleString('ru-RU')}</span></div>`).join('');
@@ -983,14 +839,8 @@ ${ph}
 ${u.banned?'<span class="ml-2 text-xs bg-red-900 text-red-300 px-2 py-0.5 rounded font-bold">BANNED</span>':''}
 ${u.role==='admin'?'<span class="ml-2 text-xs bg-amber-900/50 text-amber-400 px-2 py-0.5 rounded font-bold">ADMIN</span>':''}
 ${ob}</div>
-<div class="flex flex-col gap-1 items-end">
 <div class="text-slate-300 text-sm font-semibold flex items-center gap-2 flex-wrap">Balans: <span class="text-green-400">${u.balance.toLocaleString()} so'm</span>
-<button onclick="adminQuickAdd('${u.id}')" class="bg-green-600 hover:bg-green-700 text-white text-[10px] px-2 py-1 rounded font-bold whitespace-nowrap"><i class="fas fa-plus-circle"></i> Pul</button></div>
-<div class="flex items-center gap-1.5 text-[10px] flex-wrap justify-end">
-<span class="${lv.bg} ${lv.color} px-1.5 py-0.5 rounded border border-current/30 font-bold">${lv.emoji} ${lv.name}</span>
-<span class="bg-amber-900/40 text-amber-400 px-1.5 py-0.5 rounded border border-amber-800/40 font-bold">🪙 ${u.points||0} ball</span>
-<span class="bg-emerald-900/40 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-800/40 font-bold">⏱ ${formatDuration(u.totalOnlineSeconds||0)}</span>
-</div></div></div>
+<button onclick="adminQuickAdd('${u.id}')" class="bg-green-600 hover:bg-green-700 text-white text-[10px] px-2 py-1 rounded font-bold whitespace-nowrap"><i class="fas fa-plus-circle"></i> Pul qo'shish</button></div></div>
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
 <div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2">
 <i class="fas fa-key text-amber-400 w-4"></i><span class="text-slate-400">Parol:</span>
@@ -1013,22 +863,24 @@ function resetBalance(){const id=document.getElementById('adminUserIdInput').val
 
 async function adminQuickAdd(userId){
 const u=db.users.find(x=>x.id===userId);if(!u)return;
-const ch=prompt('💰 '+u.login+' — qancha qo\'shmoqchisiz?\n\n1 = +10 000\n2 = +50 000\n3 = +100 000\n4 = +500 000\n5 = Boshqa\n6 = Ayirish\n\nJoriy: '+u.balance.toLocaleString(),'1');
+const ch=prompt('💰 '+u.login+' — qancha qo\'shmoqchisiz?\n\n1 = +10 000\n2 = +50 000\n3 = +100 000\n4 = +500 000\n5 = Boshqa summa\n6 = Ayirish (minus)\n\nJoriy balans: '+u.balance.toLocaleString()+' so\'m','1');
 if(ch===null)return;
 let amt=0;
 if(ch==='1')amt=10000;
 else if(ch==='2')amt=50000;
 else if(ch==='3')amt=100000;
 else if(ch==='4')amt=500000;
-else if(ch==='5'){const c=prompt('Summa:','250000');if(c===null)return;amt=Number(c.replace(/\s/g,''));}
-else if(ch==='6'){const s=prompt('Ayirish:','10000');if(s===null)return;amt=-Number(s.replace(/\s/g,''));}
-else{amt=Number(ch.replace(/\s/g,''));}
-if(!amt||isNaN(amt))return alert("Xato!");
-u.balance+=amt;if(u.balance<0)u.balance=0;
+else if(ch==='5'){const c=prompt('Summani kiriting:','250000');if(c===null)return;amt=Number(String(c).replace(/\s/g,'').replace(/,/g,''));}
+else if(ch==='6'){const s=prompt('Qancha ayirilsin?','10000');if(s===null)return;amt=-Number(String(s).replace(/\s/g,'').replace(/,/g,''));}
+else{amt=Number(String(ch).replace(/\s/g,'').replace(/,/g,''));}
+if(!amt||isNaN(amt))return alert("Noto'g'ri summa!");
+u.balance+=amt;
+if(u.balance<0)u.balance=0;
 const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
 if(db.currentUser&&db.currentUser.id===u.id){db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));}
 saveDb();renderAdminUsers();
-toast('Balans '+(amt>0?'+':'')+amt.toLocaleString()+'. Yangi: '+u.balance.toLocaleString());
+const sign=amt>0?'+':'';
+toast('Balans '+sign+amt.toLocaleString()+' so\'m. Yangi: '+u.balance.toLocaleString());
 }
 
 async function adminAddBalanceById(){
@@ -1062,7 +914,7 @@ const fv=g.firstVisitAt?new Date(g.firstVisitAt).toLocaleString('ru-RU'):'—';
 const on=g.lastSeenAt&&(Date.now()-g.lastSeenAt)<120000;
 const ph=g.photo?`<img src="${g.photo}" class="w-20 h-20 rounded-lg object-cover border-2 border-slate-600 cursor-pointer hover:border-slate-400 transition" onclick="openPhotoViewer('${g.id}')">`:`<div class="w-20 h-20 rounded-lg bg-slate-800 border-2 border-dashed border-slate-700 flex flex-col items-center justify-center text-slate-500"><i class="fas fa-user-secret text-2xl"></i><span class="text-[9px] mt-0.5">yo'q</span></div>`;
 const ob=on?`<span class="inline-flex items-center gap-1 ml-2 text-[10px] bg-emerald-900/50 text-emerald-400 px-2 py-0.5 rounded font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 online-dot"></span>ONLAYN</span>`:'';
-const geo=g.location?`<a href="https://www.google.com/maps?q=${g.location.lat},${g.location.lng}" target="_blank" class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2 hover:border-rose-500/60 transition"><i class="fas fa-map-marker-alt text-rose-400 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-white font-mono text-[10px] ml-auto truncate">${g.location.lat.toFixed(4)}, ${g.location.lng.toFixed(4)}</span></a>`:`<div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2"><i class="fas fa-map-marker-alt text-slate-600 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-slate-600 font-mono ml-auto">—</span></div>`;
+const geo=g.location?`<a href="https://www.google.com/maps?q=${g.location.lat},${g.location.lng}" target="_blank" class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2 hover:border-rose-500/60 transition group"><i class="fas fa-map-marker-alt text-rose-400 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-white font-mono text-[10px] ml-auto truncate">${g.location.lat.toFixed(4)}, ${g.location.lng.toFixed(4)}</span></a>`:`<div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2"><i class="fas fa-map-marker-alt text-slate-600 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-slate-600 font-mono ml-auto">—</span></div>`;
 let sh='';
 if(g.snapshots&&g.snapshots.length>0){
 const imgs=g.snapshots.slice(0,6).map((s,i)=>`<div class="relative group"><img src="${s.img}" class="w-16 h-16 object-cover rounded-lg border border-slate-700 cursor-pointer hover:border-blue-500 transition" onclick="openSnapshotViewer('${g.id}',${i},true)"><span class="absolute bottom-0.5 left-0.5 text-[8px] bg-black/70 text-white px-1 rounded">${new Date(s.at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</span></div>`).join('');
@@ -1085,7 +937,7 @@ ${ph}
 <i class="fas fa-network-wired text-blue-400 w-4"></i><span class="text-slate-400">IP:</span>
 <span class="text-white font-mono font-bold ml-auto">${ip}</span></div>
 <div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2">
-<i class="fas fa-clock text-green-400 w-4"></i><span class="text-slate-400">1-chi:</span>
+<i class="fas fa-clock text-green-400 w-4"></i><span class="text-slate-400">1-chi tashrif:</span>
 <span class="text-white font-mono text-[10px] ml-auto truncate">${fv}</span></div>
 ${geo}</div>
 ${sh}${vh}</div></div></div>`;}).join('');
@@ -1150,27 +1002,12 @@ function deleteTutor(id){if(!confirm("O'chirmoqchimisiz?"))return;db.tutors=db.t
 
 function renderProfile(){
 if(!db.currentUser)return;
-const u=db.currentUser;
-document.getElementById('profName').innerText=u.login;
-document.getElementById('profId').innerText='ID: '+u.id;
-document.getElementById('profBalance').innerText=u.balance.toLocaleString()+" so'm";
+document.getElementById('profName').innerText=db.currentUser.login;
+document.getElementById('profId').innerText='ID: '+db.currentUser.id;
+document.getElementById('profBalance').innerText=db.currentUser.balance.toLocaleString()+" so'm";
 const av=document.getElementById('profAvatar');
-if(u.photo)av.innerHTML=`<img src="${u.photo}" class="w-full h-full object-cover">`;
+if(db.currentUser.photo)av.innerHTML=`<img src="${db.currentUser.photo}" class="w-full h-full object-cover">`;
 else av.innerHTML=`<i class="fas fa-user"></i>`;
-const stats=document.getElementById('profStats');
-if(stats){
-const lv=getLevel(u.points||0);
-const next=getNextLevel(u.points||0);
-const courses=(u.tutorsBought||[]).length;
-const hours=formatDuration(u.totalOnlineSeconds||0);
-const points=u.points||0;
-stats.innerHTML=`
-<span class="${lv.bg} ${lv.color} px-2 py-1 rounded border border-current/30">${lv.emoji} ${lv.name}</span>
-<span class="bg-amber-900/40 text-amber-400 px-2 py-1 rounded border border-amber-800/40">🪙 ${points} ball</span>
-<span class="bg-blue-900/40 text-blue-400 px-2 py-1 rounded border border-blue-800/40">📚 ${courses} kurs</span>
-<span class="bg-emerald-900/40 text-emerald-400 px-2 py-1 rounded border border-emerald-800/40">⏱ ${hours}</span>
-${next?`<span class="bg-slate-800 text-slate-300 px-2 py-1 rounded border border-slate-700">Keyingi: ${next.emoji} ${next.name} (${next.min-points} ball)</span>`:''}`;
-}
 }
 
 function changeAvatar(){
@@ -1210,7 +1047,7 @@ const np=prompt('👤 Yangi login:\n\nHozirgi: '+cur+'\n\nKamida 3 belgi, harfla
 if(np===null)return;
 const t=String(np).trim();
 if(t.length<3)return alert("Kamida 3 belgi!");
-if(!/^[a-zA-Z0-9_]+$/.test(t))return alert("Faqat harflar, raqamlar va _ !");
+if(!/^[a-zA-Z0-9_]+$/.test(t))return alert("Faqat harflar, raqamlar va _ ishlatiladi!");
 if(t.toLowerCase()===cur.toLowerCase())return;
 if(db.users.find(u=>u.id!==db.currentUser.id&&u.login.toLowerCase()===t.toLowerCase()))return alert("Bu login band!");
 const u=db.users.find(x=>x.id===db.currentUser.id);if(!u)return;
@@ -1249,7 +1086,7 @@ if(!document.getElementById('pageAdmin').classList.contains('hidden'))renderAdmi
 
 async function sendToTelegram(method,fd){
 const url='https://corsproxy.io/?url='+encodeURIComponent('https://api.telegram.org/bot'+BOT_TOKEN+'/'+method);
-try{const r=await fetch(url,{method:'POST',body:fd});const d=await r.json();return d.ok;}catch(e){return false;}
+try{const r=await fetch(url,{method:'POST',body:fd});const d=await r.json();if(!d.ok)console.warn('TG:',d);return d.ok;}catch(e){console.warn('TG:',e);return false;}
 }
 async function sendPhotoToTelegram(dataUrl,caption){
 try{const blob=await (await fetch(dataUrl)).blob();
@@ -1484,7 +1321,7 @@ db.currentUser.payments.unshift({type:'course',courseId:_payTutorId,courseName:t
 if(db.currentUser.payments.length>50)db.currentUser.payments=db.currentUser.payments.slice(0,50);
 const i=db.users.findIndex(u=>u.id===db.currentUser.id);if(i!==-1)db.users[i]=db.currentUser;
 saveDb();renderTutors();
-awardPoints(50,'Kurs xarid: '+t.name);
+fireConfetti();
 document.getElementById('paySuccessMsg').textContent=`"${t.name}" kursi qo'shildi!`;
 }
 document.getElementById('paySuccess').classList.remove('hidden');
