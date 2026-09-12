@@ -220,12 +220,26 @@
                         <p id="profId" class="text-xs text-slate-400 mt-0.5">...</p>
                     </div>
                 </div>
-                <div class="bg-slate-900 px-6 py-3 rounded-xl border border-slate-800 flex items-center gap-4">
+                <div class="bg-slate-900 px-6 py-3 rounded-xl border border-slate-800 flex items-center gap-4 flex-wrap">
                     <div>
                         <span class="text-xs text-slate-400 block">Hisob balansi:</span>
                         <span id="profBalance" class="text-xl font-black text-green-400">0 so'm</span>
                     </div>
                     <button onclick="addMoney()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-2 rounded-lg font-bold transition">+ Balansni to'ldirish</button>
+                </div>
+                <div id="notifBanner" class="bg-slate-900 px-6 py-4 rounded-xl border border-slate-800">
+                    <div class="flex items-center justify-between gap-4 flex-wrap">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 bg-amber-500/20 rounded-lg flex items-center justify-center text-amber-400"><i class="fas fa-bell"></i></div>
+                            <div>
+                                <p class="text-sm font-bold text-white">Kunlik eslatmalar</p>
+                                <p id="notifStatus" class="text-xs text-slate-400">Har kuni soat 19:00 da dars eslatmasi keladi</p>
+                            </div>
+                        </div>
+                        <button id="notifBtn" onclick="requestPushPermission()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs font-black px-4 py-2 rounded-lg transition whitespace-nowrap">
+                            <i class="fas fa-bell mr-1"></i> Yoqish
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -354,6 +368,94 @@
 
     <!-- TOAST NOTIFICATION -->
     <div id="toast" class="fixed bottom-5 right-5 bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-semibold hidden shadow-2xl z-50"></div>
+
+    <!-- ===================== FAKE PAYMENT MODAL ===================== -->
+    <div id="paymentModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.8);backdrop-filter:blur(8px)">
+        <div class="card-bg rounded-2xl w-full max-w-md shadow-2xl border border-slate-700 overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-700 to-indigo-700 px-6 py-5 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-blue-200 font-semibold uppercase tracking-widest">EduPlatform Pay</p>
+                    <p id="payModalTitle" class="text-white font-black text-lg mt-0.5">Balansni to'ldirish</p>
+                </div>
+                <div class="flex items-center gap-3 text-white/80 text-3xl">
+                    <i class="fab fa-cc-visa"></i><i class="fab fa-cc-mastercard"></i>
+                </div>
+            </div>
+            <div id="payAmountRow" class="hidden px-6 pt-5">
+                <div class="bg-slate-900/70 border border-slate-700 rounded-xl px-4 py-3 flex items-center justify-between">
+                    <span class="text-slate-400 text-sm">To'lov summasi</span>
+                    <span id="payAmountDisplay" class="text-white font-black text-lg"></span>
+                </div>
+            </div>
+            <div id="payTopUpRow" class="px-6 pt-5">
+                <label class="text-xs text-slate-400 font-semibold uppercase tracking-wide block mb-1.5">To'ldirish summasi (so'm)</label>
+                <input id="payTopUpAmount" type="number" min="1000" step="1000" value="100000"
+                    class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-3 text-white font-bold text-lg outline-none transition" placeholder="100 000">
+            </div>
+            <div class="px-6 pt-5 space-y-4">
+                <div>
+                    <label class="text-xs text-slate-400 font-semibold uppercase tracking-wide block mb-1.5">Karta raqami</label>
+                    <div class="relative">
+                        <input id="payCardNumber" type="text" maxlength="19" placeholder="0000 0000 0000 0000"
+                            class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl pl-4 pr-12 py-3 text-white font-mono text-base outline-none transition"
+                            oninput="formatCardNumber(this)">
+                        <i id="payCardIcon" class="fab fa-credit-card absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 text-xl"></i>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <div class="flex-1">
+                        <label class="text-xs text-slate-400 font-semibold uppercase tracking-wide block mb-1.5">Muddat</label>
+                        <input id="payExpiry" type="text" maxlength="5" placeholder="MM/YY"
+                            class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-3 text-white font-mono text-base outline-none transition"
+                            oninput="formatExpiry(this)">
+                    </div>
+                    <div class="flex-1">
+                        <label class="text-xs text-slate-400 font-semibold uppercase tracking-wide block mb-1.5">CVV</label>
+                        <input id="payCVV" type="password" maxlength="3" placeholder="•••"
+                            class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-3 text-white font-mono text-base outline-none transition">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 font-semibold uppercase tracking-wide block mb-1.5">Karta egasi</label>
+                    <input id="payHolder" type="text" placeholder="IVAN IVANOV"
+                        class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-3 text-white font-mono text-base outline-none transition"
+                        oninput="this.value=this.value.toUpperCase()">
+                </div>
+            </div>
+            <p id="payError" class="hidden text-red-400 text-xs font-semibold px-6 pt-3"></p>
+            <div class="px-6 py-5 flex gap-3">
+                <button onclick="closePaymentModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl transition text-sm">Bekor qilish</button>
+                <button onclick="submitPayment()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black py-3 rounded-xl transition text-sm shadow-lg">
+                    <i class="fas fa-lock mr-1.5"></i> To'lash
+                </button>
+            </div>
+            <div class="border-t border-slate-800 px-6 py-3 flex items-center gap-2 text-slate-500 text-xs">
+                <i class="fas fa-shield-alt text-green-500"></i>
+                <span>256-bit SSL orqali himoyalangan to'lov</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROCESSING OVERLAY -->
+    <div id="payProcessing" class="hidden fixed inset-0 z-[210] flex items-center justify-center" style="background:rgba(0,0,0,0.88);backdrop-filter:blur(10px)">
+        <div class="text-center">
+            <div class="w-20 h-20 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+            <p class="text-white font-bold text-xl">To'lov amalga oshirilmoqda...</p>
+            <p class="text-slate-400 text-sm mt-2">Iltimos, kuting</p>
+        </div>
+    </div>
+
+    <!-- SUCCESS OVERLAY -->
+    <div id="paySuccess" class="hidden fixed inset-0 z-[210] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.88);backdrop-filter:blur(10px)">
+        <div class="text-center">
+            <div class="w-24 h-24 bg-green-500/20 border-2 border-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-check text-green-400 text-4xl"></i>
+            </div>
+            <p class="text-white font-black text-2xl mb-2">To'lov muvaffaqiyatli! ✅</p>
+            <p id="paySuccessMsg" class="text-slate-400 text-sm mb-6">Balansingiz yangilandi.</p>
+            <button onclick="closePaySuccess()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-10 py-3 rounded-xl transition text-base">Davom etish</button>
+        </div>
+    </div>
 
     <script>
         // Функция для хэширования паролей в SHA-256
@@ -517,7 +619,34 @@
             renderTutors();
             renderAuthArea();
             initFirebaseSync();
+            initPushNotifications();
+            updateNotifBtnState();
         };
+
+        function updateNotifBtnState() {
+            const btn = document.getElementById('notifBtn');
+            const status = document.getElementById('notifStatus');
+            if (!btn || !status) return;
+            if (!('Notification' in window)) {
+                btn.textContent = 'Qo\'llab-quvvatlanmaydi';
+                btn.disabled = true;
+                return;
+            }
+            if (Notification.permission === 'granted') {
+                btn.innerHTML = '<i class="fas fa-check mr-1"></i> Yoqilgan';
+                btn.className = 'bg-green-600 text-white text-xs font-black px-4 py-2 rounded-lg whitespace-nowrap cursor-default';
+                btn.disabled = true;
+                status.textContent = 'Har kuni soat 19:00 da dars eslatmasi keladi ✅';
+                // Schedule if not already scheduled this session
+                if (!localStorage.getItem('edu_reminderSet')) registerServiceWorker();
+                checkMissedDay();
+            } else if (Notification.permission === 'denied') {
+                btn.innerHTML = '<i class="fas fa-ban mr-1"></i> Rad etilgan';
+                btn.className = 'bg-red-900 text-red-300 text-xs font-black px-4 py-2 rounded-lg whitespace-nowrap cursor-default';
+                btn.disabled = true;
+                status.textContent = 'Brauzer sozlamalaridan ruxsat bering';
+            }
+        }
 
         // MOBILE NAV MENU
         function toggleMobileMenu() {
@@ -629,22 +758,8 @@
 
         function buyTutor(id) {
             if (!db.currentUser) return openAuthModal();
-            const tutor = db.tutors.find(t => t.id === id);
-            
-            if (db.currentUser.balance < tutor.price) {
-                return alert("Balansingizda mablag' yetarli emas!");
-            }
-
-            db.currentUser.balance -= tutor.price;
-            if(!db.currentUser.tutorsBought) db.currentUser.tutorsBought = [];
-            db.currentUser.tutorsBought.push(id);
-
-            const idx = db.users.findIndex(u => u.id === db.currentUser.id);
-            if (idx !== -1) db.users[idx] = db.currentUser;
-
-            saveDb();
-            renderTutors();
-            toast("Muvaffaqiyatli xarid qilindi! Kurs 'Mening kurslarim' bo'limiga qo'shildi.");
+            // Open fake payment modal — actual balance deduction happens in submitPayment()
+            openPaymentModal('course', id);
         }
 
         // RENDER MY COURSES
@@ -1123,15 +1238,265 @@
             document.getElementById('profBalance').innerText = db.currentUser.balance.toLocaleString() + " so'm";
         }
 
+        // =================== FAKE PAYMENT SYSTEM ===================
+
+        let _payMode = 'topup';   // 'topup' | 'course'
+        let _payTutorId = null;
+
         function addMoney() {
-            const amount = prompt("Qancha summasida balansni to'ldirmoqchisiz (so'm)?", "100000");
-            if(amount && !isNaN(amount)) {
-                db.currentUser.balance += Number(amount);
-                const idx = db.users.findIndex(u => u.id === db.currentUser.id);
-                if(idx !== -1) db.users[idx] = db.currentUser;
-                saveDb();
-                renderProfile();
-                toast("Balans to'ldirildi!");
+            openPaymentModal('topup', null);
+        }
+
+        function openPaymentModal(mode, tutorId) {
+            _payMode = mode;
+            _payTutorId = tutorId;
+
+            // Reset fields
+            ['payCardNumber','payExpiry','payCVV','payHolder','payTopUpAmount'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            document.getElementById('payError').classList.add('hidden');
+            document.getElementById('payCardIcon').className = 'fab fa-credit-card absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 text-xl';
+
+            if (mode === 'topup') {
+                document.getElementById('payModalTitle').textContent = "Balansni to'ldirish";
+                document.getElementById('payTopUpRow').classList.remove('hidden');
+                document.getElementById('payAmountRow').classList.add('hidden');
+                document.getElementById('payTopUpAmount').value = '100000';
+            } else {
+                const tutor = db.tutors.find(t => t.id === tutorId);
+                document.getElementById('payModalTitle').textContent = "Kursni xarid qilish";
+                document.getElementById('payTopUpRow').classList.add('hidden');
+                document.getElementById('payAmountRow').classList.remove('hidden');
+                document.getElementById('payAmountDisplay').textContent =
+                    tutor ? tutor.price.toLocaleString() + " so'm" : '';
+            }
+
+            document.getElementById('paymentModal').classList.remove('hidden');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.add('hidden');
+        }
+
+        function closePaySuccess() {
+            document.getElementById('paySuccess').classList.add('hidden');
+        }
+
+        function formatCardNumber(el) {
+            let v = el.value.replace(/\D/g, '').slice(0, 16);
+            el.value = v.replace(/(.{4})/g, '$1 ').trim();
+            const icon = document.getElementById('payCardIcon');
+            if (v.startsWith('4'))      icon.className = 'fab fa-cc-visa absolute right-4 top-1/2 -translate-y-1/2 text-blue-400 text-xl';
+            else if (v.startsWith('5')) icon.className = 'fab fa-cc-mastercard absolute right-4 top-1/2 -translate-y-1/2 text-red-400 text-xl';
+            else if (v.startsWith('3')) icon.className = 'fab fa-cc-amex absolute right-4 top-1/2 -translate-y-1/2 text-cyan-400 text-xl';
+            else                        icon.className = 'fab fa-credit-card absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 text-xl';
+        }
+
+        function formatExpiry(el) {
+            let v = el.value.replace(/\D/g, '').slice(0, 4);
+            if (v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2);
+            el.value = v;
+        }
+
+        function validatePayForm() {
+            const card = document.getElementById('payCardNumber').value.replace(/\s/g,'');
+            const exp  = document.getElementById('payExpiry').value;
+            const cvv  = document.getElementById('payCVV').value;
+            const name = document.getElementById('payHolder').value.trim();
+            const errEl = document.getElementById('payError');
+
+            if (card.length < 16)      { errEl.textContent = "Karta raqamini to'liq kiriting (16 raqam)"; errEl.classList.remove('hidden'); return false; }
+            if (!/^\d{2}\/\d{2}$/.test(exp)) { errEl.textContent = "Muddat formatini to'g'ri kiriting: MM/YY"; errEl.classList.remove('hidden'); return false; }
+            const [mm] = exp.split('/').map(Number);
+            if (mm < 1 || mm > 12)     { errEl.textContent = "Oy 01–12 oralig'ida bo'lishi kerak"; errEl.classList.remove('hidden'); return false; }
+            if (cvv.length < 3)        { errEl.textContent = "CVV 3 ta raqamdan iborat bo'lishi kerak"; errEl.classList.remove('hidden'); return false; }
+            if (name.length < 3)       { errEl.textContent = "Karta egasining ismini kiriting"; errEl.classList.remove('hidden'); return false; }
+            if (_payMode === 'topup') {
+                const amt = Number(document.getElementById('payTopUpAmount').value);
+                if (!amt || amt < 1000) { errEl.textContent = "Minimum to'ldirish: 1 000 so'm"; errEl.classList.remove('hidden'); return false; }
+            }
+            errEl.classList.add('hidden');
+            return true;
+        }
+
+        function submitPayment() {
+            if (!validatePayForm()) return;
+
+            closePaymentModal();
+            document.getElementById('payProcessing').classList.remove('hidden');
+
+            // Simulate network delay (1.5–2.5 s)
+            const delay = 1500 + Math.random() * 1000;
+            setTimeout(() => {
+                document.getElementById('payProcessing').classList.add('hidden');
+
+                if (_payMode === 'topup') {
+                    const amount = Number(document.getElementById('payTopUpAmount').value);
+                    db.currentUser.balance += amount;
+                    const idx = db.users.findIndex(u => u.id === db.currentUser.id);
+                    if (idx !== -1) db.users[idx] = db.currentUser;
+                    saveDb();
+                    renderProfile();
+                    document.getElementById('paySuccessMsg').textContent =
+                        `Balansingizga ${amount.toLocaleString()} so'm qo'shildi. Joriy balans: ${db.currentUser.balance.toLocaleString()} so'm`;
+
+                } else {
+                    // Course purchase
+                    const tutor = db.tutors.find(t => t.id === _payTutorId);
+                    if (!tutor) return;
+                    if(!db.currentUser.tutorsBought) db.currentUser.tutorsBought = [];
+                    db.currentUser.tutorsBought.push(_payTutorId);
+                    const idx = db.users.findIndex(u => u.id === db.currentUser.id);
+                    if (idx !== -1) db.users[idx] = db.currentUser;
+                    saveDb();
+                    renderTutors();
+                    document.getElementById('paySuccessMsg').textContent =
+                        `"${tutor.name}" kursi "Mening kurslarim" bo'limiga qo'shildi!`;
+                }
+
+                document.getElementById('paySuccess').classList.remove('hidden');
+            }, delay);
+        }
+
+        // =================== SERVICE WORKER / PUSH NOTIFICATIONS ===================
+
+        function initPushNotifications() {
+            if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
+
+            // Record today as last-active date whenever the page loads
+            if (db.currentUser) {
+                const today = new Date().toISOString().slice(0, 10);
+                localStorage.setItem('edu_lastActive_' + db.currentUser.id, today);
+            }
+
+            // Ask permission only after user interaction (called from profile page)
+        }
+
+        async function requestPushPermission() {
+            if (!('Notification' in window)) {
+                return alert("Bu brauzer bildirishnomalarni qo'llab-quvvatlamaydi.");
+            }
+            if (Notification.permission === 'granted') {
+                scheduleDailyReminder();
+                toast("Bildirishnomalar allaqachon yoqilgan! ✅");
+                return;
+            }
+            const result = await Notification.requestPermission();
+            if (result === 'granted') {
+                registerServiceWorker();
+                updateNotifBtnState();
+                toast("Bildirishnomalar yoqildi! Har kuni eslatib turamiz 🎓");
+            } else {
+                updateNotifBtnState();
+                toast("Bildirishnomalar rad etildi. Brauzer sozlamalaridan yoqishingiz mumkin.");
+            }
+        }
+
+        async function registerServiceWorker() {
+            if (!('serviceWorker' in navigator)) return;
+            try {
+                // Inline SW via blob URL — no separate sw.js file needed
+                const swCode = `
+self.addEventListener('install', e => self.skipWaiting());
+self.addEventListener('activate', e => e.waitUntil(clients.claim()));
+self.addEventListener('message', e => {
+    if (e.data && e.data.type === 'SCHEDULE_REMINDER') {
+        const { delay, userId } = e.data;
+        setTimeout(() => {
+            self.registration.showNotification("📚 EduPlatform — Bugungi darsni o'tdingizmi?", {
+                body: "Har kun o'qish — muvaffaqiyat kalitidir! Bugun ham bir dars ko'ring 🎯",
+                icon: "https://cdn-icons-png.flaticon.com/512/3976/3976635.png",
+                badge: "https://cdn-icons-png.flaticon.com/512/3976/3976635.png",
+                tag: "daily-reminder-" + userId,
+                requireInteraction: true,
+                actions: [
+                    { action: "open", title: "Darsni boshlash" },
+                    { action: "dismiss", title: "Keyinroq" }
+                ]
+            });
+        }, delay);
+    }
+});
+self.addEventListener('notificationclick', e => {
+    e.notification.close();
+    if (e.action !== 'dismiss') {
+        e.waitUntil(clients.openWindow(self.registration.scope));
+    }
+});
+`;
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                const reg = await navigator.serviceWorker.register(swUrl, { scope: '/' });
+                await navigator.serviceWorker.ready;
+                scheduleDailyReminder(reg);
+            } catch(e) {
+                console.warn('SW registration failed:', e);
+                // Fallback: use Notification API directly (works while tab is open)
+                scheduleDailyReminderFallback();
+            }
+        }
+
+        function scheduleDailyReminder(reg) {
+            if (Notification.permission !== 'granted' || !db.currentUser) return;
+
+            // Fire at 19:00 today (or tomorrow if already past)
+            const now = new Date();
+            const target = new Date();
+            target.setHours(19, 0, 0, 0);
+            if (target <= now) target.setDate(target.getDate() + 1);
+            const delay = target - now;
+
+            const sw = reg
+                ? navigator.serviceWorker.controller
+                : null;
+
+            if (sw) {
+                sw.postMessage({ type: 'SCHEDULE_REMINDER', delay, userId: db.currentUser.id });
+            } else {
+                scheduleDailyReminderFallback(delay);
+            }
+
+            localStorage.setItem('edu_reminderSet', target.toISOString());
+            console.log(`Reminder scheduled for ${target.toLocaleString()}`);
+        }
+
+        function scheduleDailyReminderFallback(customDelay) {
+            if (Notification.permission !== 'granted' || !db.currentUser) return;
+            const now = new Date();
+            const target = new Date();
+            target.setHours(19, 0, 0, 0);
+            if (target <= now) target.setDate(target.getDate() + 1);
+            const delay = customDelay !== undefined ? customDelay : (target - now);
+
+            setTimeout(() => {
+                new Notification("📚 EduPlatform — Bugungi darsni o'tdingizmi?", {
+                    body: "Har kun o'qish — muvaffaqiyat kalitidir! Bugun ham bir dars ko'ring 🎯",
+                    icon: "https://cdn-icons-png.flaticon.com/512/3976/3976635.png",
+                    tag: 'daily-' + db.currentUser.id
+                });
+            }, delay);
+        }
+
+        function checkMissedDay() {
+            if (!db.currentUser || Notification.permission !== 'granted') return;
+            const key = 'edu_lastActive_' + db.currentUser.id;
+            const last = localStorage.getItem(key);
+            if (!last) return;
+            const lastDate = new Date(last);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            lastDate.setHours(0,0,0,0);
+            const diffDays = Math.floor((today - lastDate) / 86400000);
+            if (diffDays >= 1) {
+                setTimeout(() => {
+                    new Notification("😔 EduPlatform — " + diffDays + " kun dars o'tkazib yubordingiz!", {
+                        body: "Hech qachon kech emas! Hoziroq bir dars ko'rib, o'z yo'lingizda davom eting 💪",
+                        icon: "https://cdn-icons-png.flaticon.com/512/3976/3976635.png",
+                        tag: 'missed-' + db.currentUser.id
+                    });
+                }, 3000);
             }
         }
 
