@@ -15,6 +15,26 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #484f58; }
     </style>
+
+    <!-- FIREBASE SDK & CONFIGURATION -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDJIICaketn7Khrnl38_K-XYuC3bfaOYD8",
+            authDomain: "edu-platform-64953.firebaseapp.com",
+            databaseURL: "https://edu-platform-64953-default-rtdb.firebaseio.com",
+            projectId: "edu-platform-64953",
+            storageBucket: "edu-platform-64953.firebasestorage.app",
+            messagingSenderId: "986479470743",
+            appId: "1:986479470743:web:5e29214cc9595ae95c21d2",
+            measurementId: "G-XVCFTYCJDB"
+        };
+
+        // Инициализация Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+    </script>
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 
