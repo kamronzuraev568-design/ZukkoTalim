@@ -371,31 +371,126 @@
             }
         ];
 
+        // db.users / db.tutors are the SHARED state — they live in Firebase Realtime
+        // Database so every device (phone, computer, etc.) sees the same data.
+        // db.currentUser is only the LOCAL session (who is logged in on THIS device),
+        // so it stays in localStorage and is never written to Firebase.
         let db = {
-            users: JSON.parse(localStorage.getItem('db_users')) || defaultUsers,
-            tutors: JSON.parse(localStorage.getItem('db_tutors')) || defaultTutors,
+            users: JSON.parse(localStorage.getItem('db_users_cache')) || [],
+            tutors: JSON.parse(localStorage.getItem('db_tutors_cache')) || [],
             currentUser: JSON.parse(localStorage.getItem('db_currentUser')) || null
         };
 
         let selectedClass = 'Barcha sinflar';
         let selectedSubject = 'Barcha fanlar';
         let isReg = false;
+        let dbLoaded = false;
 
         // PLAYER STATE
         let activeCourse = null;
         let activeLessonIndex = 0;
 
+        // Firebase stores objects, not arrays — convert array <-> {id: item} map.
+        function arrayToFirebaseObj(arr) {
+            const obj = {};
+            arr.forEach(item => { obj[item.id] = item; });
+            return obj;
+        }
+
+        // Pushes the current in-memory lists to Firebase. This is the ONLY place
+        // that writes users/tutors, and every connected device (including the one
+        // that made the change) receives the update back through the 'value'
+        // listeners set up in initFirebaseSync().
         function saveDb() {
-            localStorage.setItem('db_users', JSON.stringify(db.users));
-            localStorage.setItem('db_tutors', JSON.stringify(db.tutors));
             localStorage.setItem('db_currentUser', JSON.stringify(db.currentUser));
+            database.ref('users').set(arrayToFirebaseObj(db.users));
+            database.ref('tutors').set(arrayToFirebaseObj(db.tutors));
+            // Local cache so the UI has something to show instantly on next load,
+            // before Firebase responds (e.g. slow/offline connection).
+            localStorage.setItem('db_users_cache', JSON.stringify(db.users));
+            localStorage.setItem('db_tutors_cache', JSON.stringify(db.tutors));
             renderAuthArea();
+        }
+
+        // Re-renders whatever section is currently on screen. Called whenever
+        // fresh data arrives from Firebase (our own writes, or changes made on
+        // another device).
+        function onRemoteDbUpdate() {
+            localStorage.setItem('db_users_cache', JSON.stringify(db.users));
+            localStorage.setItem('db_tutors_cache', JSON.stringify(db.tutors));
+
+            renderAuthArea();
+
+            if (!document.getElementById('pageHome').classList.contains('hidden')) {
+                renderTutors();
+            }
+            if (!document.getElementById('pageMyCourses').classList.contains('hidden')) {
+                renderMyCourses();
+            }
+            if (!document.getElementById('pageAdmin').classList.contains('hidden')) {
+                renderAdminUsers();
+                renderAdminTutorsList();
+                updateAdminLessonSelect();
+            }
+            if (!document.getElementById('pageProfile').classList.contains('hidden')) {
+                renderProfile();
+            }
+        }
+
+        function initFirebaseSync() {
+            // USERS — live sync
+            database.ref('users').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    db.users = Object.values(data);
+                } else if (!dbLoaded) {
+                    // Nothing in Firebase yet (first ever run) — seed it once.
+                    db.users = defaultUsers;
+                    database.ref('users').set(arrayToFirebaseObj(defaultUsers));
+                }
+
+                // Keep the logged-in session in sync with the shared data
+                // (e.g. balance changed or account banned on another device).
+                if (db.currentUser) {
+                    const fresh = db.users.find(u => u.id === db.currentUser.id);
+                    if (fresh) {
+                        db.currentUser = fresh;
+                        localStorage.setItem('db_currentUser', JSON.stringify(db.currentUser));
+                        if (fresh.banned) {
+                            alert("Akkauntingiz administrator tomonidan bloklandi!");
+                            logout();
+                            return;
+                        }
+                    } else {
+                        // Account no longer exists — force logout.
+                        db.currentUser = null;
+                        localStorage.removeItem('db_currentUser');
+                    }
+                }
+
+                onRemoteDbUpdate();
+            });
+
+            // TUTORS / COURSES — live sync
+            database.ref('tutors').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    db.tutors = Object.values(data);
+                } else if (!dbLoaded) {
+                    db.tutors = defaultTutors;
+                    database.ref('tutors').set(arrayToFirebaseObj(defaultTutors));
+                }
+                onRemoteDbUpdate();
+            });
+
+            dbLoaded = true;
         }
 
         window.onload = () => {
             renderFilters();
             renderTutors();
             renderAuthArea();
+            initFirebaseSync();
         };
 
         // NAVIGATION
