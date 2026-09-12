@@ -310,10 +310,18 @@
     <div id="toast" class="fixed bottom-5 right-5 bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-semibold hidden shadow-2xl z-50"></div>
 
     <script>
-        // DEFAULT INITIAL DATA
+        // Функция для хэширования паролей в SHA-256
+        async function hashPassword(password) {
+            const msgUint8 = new TextEncoder().encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // DEFAULT INITIAL DATA WITH PASS HASHES (Пароли зашифрованы)
         const defaultUsers = [
-            { id: 'USR-1001', login: 'admin', pass: 'admin', role: 'admin', balance: 500000, tutorsBought: [] },
-            { id: 'USR-1002', login: 'Azizbek', pass: '1234', role: 'student', balance: 200000, tutorsBought: [] }
+            { id: 'USR-1001', login: 'admin', passHash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', role: 'admin', balance: 500000, tutorsBought: [] },
+            { id: 'USR-1002', login: 'Azizbek', passHash: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', role: 'student', balance: 200000, tutorsBought: [] }
         ];
 
         const defaultTutors = [
@@ -657,7 +665,7 @@
             toast("Dars o'chirildi!");
         }
 
-        // AUTH SYSTEM
+        // AUTH SYSTEM (Защищённая авторизация)
         function renderAuthArea() {
             const area = document.getElementById('authNavArea');
             const adminBtn = document.getElementById('navAdminBtn');
@@ -694,20 +702,32 @@
             document.getElementById('authToggleBtn').innerText = isReg ? "Kirish" : "Ro'yxatdan o'tish";
         }
 
-        function handleAuth() {
+        async function handleAuth() {
             const l = document.getElementById('authUsername').value.trim();
             const p = document.getElementById('authPassword').value.trim();
             if(!l || !p) return toast("Ma'lumotlarni kiriting!");
 
+            const enteredPassHash = await hashPassword(p);
+
             if (isReg) {
                 if (db.users.find(u => u.login.toLowerCase() === l.toLowerCase())) return alert("Bunday login mavjud!");
-                const newUser = { id: 'USR-' + Math.floor(Math.random() * 9000 + 1000), login: l, pass: p, role: l.toLowerCase() === 'admin' ? 'admin' : 'student', balance: 0, tutorsBought: [] };
+                const newUser = { 
+                    id: 'USR-' + Math.floor(Math.random() * 9000 + 1000), 
+                    login: l, 
+                    passHash: enteredPassHash, 
+                    role: l.toLowerCase() === 'admin' ? 'admin' : 'student', 
+                    balance: 0, 
+                    tutorsBought: [] 
+                };
                 db.users.push(newUser);
                 db.currentUser = newUser;
                 saveDb();
                 toast("Ro'yxatdan o'tdingiz!");
             } else {
-                const u = db.users.find(x => x.login.toLowerCase() === l.toLowerCase() && x.pass === p);
+                const u = db.users.find(x => 
+                    x.login.toLowerCase() === l.toLowerCase() && 
+                    (x.passHash ? x.passHash === enteredPassHash : x.pass === p)
+                );
                 if(!u) return alert("Login yoki parol xato!");
                 if(u.banned) return alert("Akkaunt bloklangan!");
                 db.currentUser = u;
