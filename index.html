@@ -185,9 +185,20 @@
                             <select id="lessonTutorSelect" onchange="renderAdminLessonsList()" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500"></select>
                         </div>
                         <input type="text" id="newLessonTitle" placeholder="Dars Nomi (Masalan: 1-Dars. Alphabet & Phonetics)" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
-                        <input type="text" id="newLessonUrl" placeholder="Vimeo Link / Embed Code (Masalan: https://player.vimeo.com/video/1226105435)" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
+                        <input type="text" id="newLessonUrl" placeholder="YouTube / Vimeo link (watch?v=, youtu.be/, embed/...)" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
                     </div>
                     <button onclick="addLessonToTutor()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm transition"><i class="fas fa-plus mr-1"></i> Darsni Qo'shish</button>
+                </div>
+
+                <div class="card-bg p-6 rounded-xl space-y-4 border border-indigo-800/40">
+                    <h3 class="text-lg font-bold text-white"><i class="fas fa-layer-group mr-2 text-emerald-400"></i>Ko'p Darslarni Birdan Qo'shish (100+ dars)</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Har bir qatorga bitta dars: <b class="text-slate-300">Dars nomi | YouTube yoki Vimeo link</b> ko'rinishida yozing (ajratuvchi — <code class="bg-slate-900 px-1 rounded">|</code> belgisi).<br>
+                        Masalan:<br>
+                        <code class="block bg-slate-900 p-2 rounded mt-1 text-slate-400">1-Dars. Kirish | https://youtu.be/dQw4w9WgXcQ<br>2-Dars. Sonlar | https://www.youtube.com/watch?v=abc12345678</code>
+                    </p>
+                    <textarea id="bulkLessonsInput" rows="8" placeholder="1-Dars. Nomi | https://youtu.be/VIDEO_ID&#10;2-Dars. Nomi | https://youtu.be/VIDEO_ID2&#10;..." class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white font-mono focus:outline-none focus:border-emerald-500"></textarea>
+                    <button onclick="addLessonsBulk()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm transition"><i class="fas fa-layer-group mr-1"></i> Barchasini Qo'shish</button>
                 </div>
 
                 <div class="card-bg p-6 rounded-xl space-y-4">
@@ -243,7 +254,7 @@
                 <!-- Video Screen -->
                 <div class="lg:w-3/4 bg-black flex flex-col justify-center items-center relative p-2">
                     <div class="w-full h-full rounded-xl overflow-hidden shadow-2xl relative aspect-video max-h-[70vh]">
-                        <iframe id="mainVimeoIframe" src="" class="w-full h-full border-0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+                        <iframe id="mainVimeoIframe" src="" class="w-full h-full border-0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
                     </div>
                     <div class="w-full mt-3 px-2 flex justify-between items-center text-xs text-slate-400">
                         <span id="currentLessonTitleDisplay" class="font-bold text-white text-sm">1-Dars</span>
@@ -747,6 +758,29 @@
         }
 
         // ADMIN LESSON MANAGEMENT (100+ Lessons)
+
+        // Converts any YouTube link format (watch?v=, youtu.be/, shorts/, or an
+        // already-pasted <iframe> embed code) into a clean embeddable URL.
+        // Vimeo links / embed codes are left as before (loadLesson() already
+        // knows how to pull src="..." out of a pasted iframe).
+        function normalizeVideoUrl(raw) {
+            let url = raw.trim();
+
+            const srcMatch = url.match(/src=["']([^"']+)["']/);
+            if (srcMatch && srcMatch[1]) url = srcMatch[1];
+
+            let ytId = null;
+            let m;
+            if ((m = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/))) ytId = m[1];
+            else if ((m = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/))) ytId = m[1];
+            else if ((m = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/))) ytId = m[1];
+            else if ((m = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/))) ytId = m[1];
+
+            if (ytId) return `https://www.youtube.com/embed/${ytId}`;
+
+            return url;
+        }
+
         function updateAdminLessonSelect() {
             const select = document.getElementById('lessonTutorSelect');
             select.innerHTML = db.tutors.map(t => `<option value="${t.id}">${t.name} (${t.subject})</option>`).join('');
@@ -756,9 +790,9 @@
         function addLessonToTutor() {
             const tutorId = document.getElementById('lessonTutorSelect').value;
             const title = document.getElementById('newLessonTitle').value.trim();
-            const url = document.getElementById('newLessonUrl').value.trim();
+            const rawUrl = document.getElementById('newLessonUrl').value.trim();
 
-            if(!title || !url) return alert("Dars nomi va Vimeo havolasini kiriting!");
+            if(!title || !rawUrl) return alert("Dars nomi va video havolasini kiriting!");
 
             const tutor = db.tutors.find(t => t.id === tutorId);
             if(!tutor) return;
@@ -768,7 +802,7 @@
             tutor.lessons.push({
                 id: 'les-' + Date.now(),
                 title,
-                url
+                url: normalizeVideoUrl(rawUrl)
             });
 
             saveDb();
@@ -778,6 +812,49 @@
 
             document.getElementById('newLessonTitle').value = '';
             document.getElementById('newLessonUrl').value = '';
+        }
+
+        // Bulk-add: paste up to hundreds of lines like
+        // "1-Dars. Nomi | https://youtu.be/VIDEO_ID" and add them all at once.
+        function addLessonsBulk() {
+            const tutorId = document.getElementById('lessonTutorSelect').value;
+            const tutor = db.tutors.find(t => t.id === tutorId);
+            if(!tutor) return alert("Avval repetitorni tanlang!");
+
+            const raw = document.getElementById('bulkLessonsInput').value;
+            const lines = raw.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+            if(lines.length === 0) return alert("Darslar ro'yxatini kiriting!");
+
+            if(!tutor.lessons) tutor.lessons = [];
+
+            let added = 0;
+            let skipped = 0;
+
+            lines.forEach((line, i) => {
+                const sepIndex = line.lastIndexOf('|');
+                if (sepIndex === -1) { skipped++; return; }
+
+                const title = line.slice(0, sepIndex).trim();
+                const rawUrl = line.slice(sepIndex + 1).trim();
+                if (!title || !rawUrl) { skipped++; return; }
+
+                tutor.lessons.push({
+                    id: 'les-' + Date.now() + '-' + i,
+                    title,
+                    url: normalizeVideoUrl(rawUrl)
+                });
+                added++;
+            });
+
+            if (added === 0) return alert("Birorta ham dars qo'shilmadi. Format: Nomi | Link");
+
+            saveDb();
+            renderAdminLessonsList();
+            renderTutors();
+            document.getElementById('bulkLessonsInput').value = '';
+
+            toast(`${added} ta dars qo'shildi${skipped > 0 ? `, ${skipped} qator noto'g'ri formatda o'tkazib yuborildi` : ''}!`);
         }
 
         function renderAdminLessonsList() {
