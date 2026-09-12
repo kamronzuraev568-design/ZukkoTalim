@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPlatform — O'quv platformasi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #0d1117; color: #c9d1d9; font-family: system-ui, -apple-system, sans-serif; }
+        .glass { background: rgba(22, 27, 34, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+        .card-bg { background-color: #161b22; border: 1px solid #30363d; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0d1117; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #484f58; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- NAVBAR -->
+    <nav class="glass sticky top-0 z-40 px-6 py-4 flex justify-between items-center shadow-2xl">
+        <div class="flex items-center gap-3 text-2xl font-black text-blue-400 cursor-pointer tracking-wide" onclick="navigateTo('home')">
+            <i class="fas fa-graduation-cap text-3xl"></i>
+            <span>EduPlatform</span>
+        </div>
+        
+        <div class="hidden md:flex gap-8 text-sm font-semibold">
+            <button onclick="navigateTo('home')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-th-large"></i> Barcha Kurslar</button>
+            <button onclick="navigateTo('my-courses')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-play-circle text-indigo-400"></i> Mening Kurslarim</button>
+            <button onclick="navigateTo('profile')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-user-circle"></i> Profilim</button>
+            <button id="navAdminBtn" onclick="navigateTo('admin')" class="hidden text-amber-400 hover:text-amber-300 font-bold transition flex items-center gap-2"><i class="fas fa-user-shield"></i> Admin Panel</button>
+        </div>
+
+        <div id="authNavArea" class="flex items-center gap-4"></div>
+    </nav>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+
+        <!-- PAGE: HOME / COURSES LIST -->
+        <section id="pageHome" class="space-y-8">
+            <div class="text-center py-10 rounded-2xl bg-gradient-to-r from-blue-900/30 via-slate-900 to-indigo-900/30 border border-slate-800 shadow-xl">
+                <h1 class="text-3xl md:text-5xl font-black text-white mb-3">Sifatli Ta'lim va Video Darslar</h1>
+                <p class="text-slate-400 max-w-2xl mx-auto text-sm md:text-base">O'zingizga mos repetitor va kurslarni tanlang, xarid qiling va istalgan vaqtda video darslarni tomosha qiling!</p>
+            </div>
+
+            <!-- FILTERS -->
+            <div class="space-y-4 card-bg p-5 rounded-2xl shadow-md">
+                <div>
+                    <span class="text-xs text-slate-400 block mb-2 font-bold uppercase tracking-wider">📌 Sinf bo'yicha filter:</span>
+                    <div id="classFilters" class="flex flex-wrap gap-2"></div>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-400 block mb-2 font-bold uppercase tracking-wider">📚 Fan bo'yicha filter:</span>
+                    <div id="subjectFilters" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+
+            <!-- TUTORS GRID -->
+            <div>
+                <h2 class="text-2xl font-bold mb-6 text-white flex items-center gap-2"><i class="fas fa-chalkboard-teacher text-blue-400"></i> Mavjud Repetitorlar va Kurslar</h2>
+                <div id="tutorsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+            </div>
+        </section>
+
+        <!-- PAGE: MY COURSES -->
+        <section id="pageMyCourses" class="hidden space-y-6">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fas fa-play-circle text-indigo-400"></i> Mening Kurslarim</h1>
+                    <p class="text-xs text-slate-400 mt-1">Siz xarid qilgan barcha repetitorlik kurslari va ularning video darslari</p>
+                </div>
+            </div>
+            <div id="myCoursesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+        <!-- PAGE: ADMIN PANEL -->
+        <section id="pageAdmin" class="hidden space-y-6">
+            <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                <i class="fas fa-cog text-amber-400"></i> Boshqaruv Paneli
+            </h1>
+
+            <div class="flex gap-4 border-b border-slate-800 pb-2">
+                <button onclick="switchAdminTab('users')" id="tabUsersBtn" class="px-4 py-2 text-sm font-semibold border-b-2 border-blue-500 text-blue-400">
+                    <i class="fas fa-users mr-1"></i> Foydalanuvchilar
+                </button>
+                <button onclick="switchAdminTab('tutors')" id="tabTutorsBtn" class="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white">
+                    <i class="fas fa-user-graduate mr-1"></i> Repetitorlar
+                </button>
+                <button onclick="switchAdminTab('lessons')" id="tabLessonsBtn" class="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white">
+                    <i class="fas fa-video mr-1"></i> Darslar (100+ Dars qo'shish)
+                </button>
+            </div>
+
+            <!-- TAB: USERS -->
+            <div id="adminTabUsers" class="space-y-6">
+                <div class="card-bg p-4 rounded-xl flex flex-wrap gap-3 items-center">
+                    <input type="text" id="adminUserIdInput" placeholder="Foydalanuvchi ID (Masalan: USR-1002)" class="bg-slate-900 border border-slate-700 px-4 py-2 rounded-lg text-sm flex-grow focus:outline-none focus:border-blue-500">
+                    <button onclick="banUser()" class="bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2 rounded-lg font-bold transition">Ban qilish</button>
+                    <button onclick="unbanUser()" class="bg-slate-700 hover:bg-slate-600 text-white text-sm px-4 py-2 rounded-lg font-bold transition">Bandan yechish</button>
+                    <button onclick="resetBalance()" class="bg-amber-600 hover:bg-amber-700 text-slate-900 text-sm px-4 py-2 rounded-lg font-bold transition">Balansni nol qilish</button>
+                </div>
+                <div id="adminUsersList" class="space-y-3"></div>
+            </div>
+
+            <!-- TAB: TUTORS -->
+            <div id="adminTabTutors" class="hidden space-y-6">
+                <div class="card-bg p-6 rounded-xl space-y-4">
+                    <h3 class="text-lg font-bold text-white"><i class="fas fa-user-plus mr-2 text-green-400"></i>Yangi Repetitor Qo'shish</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" id="newTutorName" placeholder="Ism Familiya (Masalan: Jasur M.)" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
+                        <input type="text" id="newTutorImg" placeholder="Rasm URL" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
+                        <input type="number" id="newTutorPrice" placeholder="Narxi (so'm)" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
+                        <select id="newTutorSinf" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300">
+                            <option value="Umumiy">Umumiy (Barchaga)</option>
+                            <option value="5-sinf">5-sinf</option>
+                            <option value="6-sinf">6-sinf</option>
+                            <option value="7-sinf">7-sinf</option>
+                            <option value="8-sinf">8-sinf</option>
+                            <option value="9-sinf">9-sinf</option>
+                            <option value="10-sinf">10-sinf</option>
+                            <option value="11-sinf">11-sinf</option>
+                        </select>
+                        <select id="newTutorFan" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300 col-span-1 md:col-span-2">
+                            <option value="Ingliz tili">Ingliz tili</option>
+                            <option value="Matematika">Matematika</option>
+                            <option value="Fizika">Fizika</option>
+                            <option value="Informatika">Informatika</option>
+                            <option value="Kimyo">Kimyo</option>
+                            <option value="Tarix">Tarix</option>
+                        </select>
+                    </div>
+                    <button onclick="addTutor()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm transition">Qo'shish</button>
+                </div>
+
+                <div class="card-bg p-6 rounded-xl space-y-4">
+                    <h3 class="text-lg font-bold text-white"><i class="fas fa-list mr-2"></i>Mavjud Repetitorlar Ro'yxati</h3>
+                    <div id="adminTutorsList" class="space-y-3"></div>
+                </div>
+            </div>
+
+            <!-- TAB: LESSONS MANAGEMENT (100+ Lessons) -->
+            <div id="adminTabLessons" class="hidden space-y-6">
+                <div class="card-bg p-6 rounded-xl space-y-4">
+                    <h3 class="text-lg font-bold text-white"><i class="fas fa-plus-circle text-blue-400 mr-2"></i>Kursga Yangi Video Dars Qo'shish</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="col-span-1 md:col-span-2">
+                            <label class="text-xs text-slate-400 block mb-1">Repetitorni (Kursni) tanlang:</label>
+                            <select id="lessonTutorSelect" onchange="renderAdminLessonsList()" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500"></select>
+                        </div>
+                        <input type="text" id="newLessonTitle" placeholder="Dars Nomi (Masalan: 1-Dars. Alphabet & Phonetics)" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
+                        <input type="text" id="newLessonUrl" placeholder="Vimeo Link / Embed Code (Masalan: https://player.vimeo.com/video/1226105435)" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
+                    </div>
+                    <button onclick="addLessonToTutor()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm transition"><i class="fas fa-plus mr-1"></i> Darsni Qo'shish</button>
+                </div>
+
+                <div class="card-bg p-6 rounded-xl space-y-4">
+                    <h3 class="text-lg font-bold text-white"><i class="fas fa-film mr-2 text-indigo-400"></i>Tanlangan Kurs Darslari Ro'yxati</h3>
+                    <div id="adminLessonsList" class="space-y-2"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE: PROFILE -->
+        <section id="pageProfile" class="hidden space-y-6">
+            <div class="card-bg p-6 rounded-2xl flex flex-wrap justify-between items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-full bg-blue-600/30 border border-blue-500 flex items-center justify-center text-blue-400 text-2xl font-bold">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <h1 id="profName" class="text-2xl font-bold text-white">...</h1>
+                        <p id="profId" class="text-xs text-slate-400 mt-0.5">...</p>
+                    </div>
+                </div>
+                <div class="bg-slate-900 px-6 py-3 rounded-xl border border-slate-800 flex items-center gap-4">
+                    <div>
+                        <span class="text-xs text-slate-400 block">Hisob balansi:</span>
+                        <span id="profBalance" class="text-xl font-black text-green-400">0 so'm</span>
+                    </div>
+                    <button onclick="addMoney()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-2 rounded-lg font-bold transition">+ Balansni to'ldirish</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- COURSE PLAYER MODAL (100+ LESSONS PLAYLIST) -->
+    <div id="coursePlayerModal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-2 md:p-6 z-50">
+        <div class="card-bg w-full max-w-6xl h-[90vh] rounded-2xl flex flex-col overflow-hidden relative border border-slate-800 shadow-2xl">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <span class="bg-blue-600/20 text-blue-400 p-2 rounded-lg text-sm"><i class="fas fa-play-circle"></i></span>
+                    <div>
+                        <h3 id="modalCourseTitle" class="text-base md:text-lg font-bold text-white leading-tight">Kurs Nomi</h3>
+                        <p id="modalLessonCounter" class="text-xs text-slate-400">Dars 1 / 10</p>
+                    </div>
+                </div>
+                <button onclick="closeCoursePlayer()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2">
+                    <i class="fas fa-times"></i> Yopish
+                </button>
+            </div>
+
+            <!-- Player & Playlist Layout -->
+            <div class="flex-grow flex flex-col lg:flex-row overflow-hidden">
+                <!-- Video Screen -->
+                <div class="lg:w-3/4 bg-black flex flex-col justify-center items-center relative p-2">
+                    <div class="w-full h-full rounded-xl overflow-hidden shadow-2xl relative aspect-video max-h-[70vh]">
+                        <iframe id="mainVimeoIframe" src="" class="w-full h-full border-0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="w-full mt-3 px-2 flex justify-between items-center text-xs text-slate-400">
+                        <span id="currentLessonTitleDisplay" class="font-bold text-white text-sm">1-Dars</span>
+                        <div class="flex gap-2">
+                            <button onclick="prevLesson()" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded font-semibold"><i class="fas fa-chevron-left mr-1"></i> Oldingisi</button>
+                            <button onclick="nextLesson()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded font-semibold">Keyingisi <i class="fas fa-chevron-right ml-1"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Playlist Sidebar -->
+                <div class="lg:w-1/4 bg-slate-900/90 border-t lg:border-t-0 lg:border-l border-slate-800 flex flex-col h-full">
+                    <div class="p-4 border-b border-slate-800 bg-slate-900/50 flex justify-between items-center">
+                        <h4 class="font-bold text-sm text-white flex items-center gap-2"><i class="fas fa-list-ul text-blue-400"></i> Darslar ro'yxati</h4>
+                        <span id="playlistTotalBadge" class="text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full font-bold">0 dars</span>
+                    </div>
+                    <div id="coursePlaylist" class="flex-grow overflow-y-auto p-3 space-y-2 custom-scrollbar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT TUTOR MODAL -->
+    <div id="editTutorModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="card-bg w-full max-w-lg p-6 rounded-2xl space-y-4 relative">
+            <button onclick="closeEditModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+            <h2 class="text-xl font-bold text-white text-center"><i class="fas fa-user-edit mr-2"></i>Repetitorni Tahrirlash</h2>
+            
+            <input type="hidden" id="editTutorId">
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs text-slate-400">Ism Familiya</label>
+                    <input type="text" id="editTutorName" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400">Rasm URL</label>
+                    <input type="text" id="editTutorImg" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs text-slate-400">Narxi (so'm)</label>
+                        <input type="number" id="editTutorPrice" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400">Sinf</label>
+                        <select id="editTutorSinf" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300 focus:outline-none focus:border-blue-500">
+                            <option value="Umumiy">Umumiy (Barchaga)</option>
+                            <option value="5-sinf">5-sinf</option>
+                            <option value="6-sinf">6-sinf</option>
+                            <option value="7-sinf">7-sinf</option>
+                            <option value="8-sinf">8-sinf</option>
+                            <option value="9-sinf">9-sinf</option>
+                            <option value="10-sinf">10-sinf</option>
+                            <option value="11-sinf">11-sinf</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400">Fan</label>
+                    <select id="editTutorFan" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300 focus:outline-none focus:border-blue-500">
+                        <option value="Ingliz tili">Ingliz tili</option>
+                        <option value="Matematika">Matematika</option>
+                        <option value="Fizika">Fizika</option>
+                        <option value="Informatika">Informatika</option>
+                        <option value="Kimyo">Kimyo</option>
+                        <option value="Tarix">Tarix</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+                <button onclick="saveTutorEdit()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg text-sm transition">Saqlash</button>
+                <button onclick="closeEditModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-2.5 rounded-lg text-sm transition">Bekor qilish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUTH MODAL -->
+    <div id="authModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="card-bg w-full max-w-md p-6 rounded-2xl space-y-4 relative">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+            <h2 id="authTitle" class="text-xl font-bold text-white text-center">Tizimga kirish</h2>
+            
+            <div class="space-y-3">
+                <input type="text" id="authUsername" placeholder="Login" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500">
+                <input type="password" id="authPassword" placeholder="Parol" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500">
+            </div>
+
+            <button onclick="handleAuth()" id="authSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg text-sm transition">Kirish</button>
+            
+            <p class="text-xs text-center text-slate-400">
+                <span id="authToggleText">Akkauntingiz yo'qmi?</span> 
+                <button onclick="toggleAuthMode()" id="authToggleBtn" class="text-blue-400 font-bold underline ml-1">Ro'yxatdan o'tish</button>
+            </p>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-semibold hidden shadow-2xl z-50"></div>
+
+    <script>
+        // DEFAULT INITIAL DATA
+        const defaultUsers = [
+            { id: 'USR-1001', login: 'admin', pass: 'admin', role: 'admin', balance: 500000, tutorsBought: [] },
+            { id: 'USR-1002', login: 'Azizbek', pass: '1234', role: 'student', balance: 200000, tutorsBought: [] }
+        ];
+
+        const defaultTutors = [
+            { 
+                id: 'tut-1', 
+                name: 'Ibat', 
+                subject: 'Ingliz tili', 
+                sinf: 'Umumiy', 
+                price: 90000, 
+                img: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop',
+                lessons: [
+                    { id: 'l1', title: '1-Dars. English Alphabet & Pronunciation', url: 'https://player.vimeo.com/video/1226105435' },
+                    { id: 'l2', title: '2-Dars. Present Simple Tense', url: 'https://player.vimeo.com/video/1226105435' },
+                    { id: 'l3', title: '3-Dars. Basic Vocabulary & Greetings', url: 'https://player.vimeo.com/video/1226105435' }
+                ]
+            },
+            { 
+                id: 'tut-2', 
+                name: 'Jasur M.', 
+                subject: 'Matematika', 
+                sinf: '9-sinf', 
+                price: 110000, 
+                img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop',
+                lessons: [
+                    { id: 'l10', title: '1-Dars. Tenglamalar va tengsizliklar', url: 'https://player.vimeo.com/video/1226105435' }
+                ]
+            }
+        ];
+
+        let db = {
+            users: JSON.parse(localStorage.getItem('db_users')) || defaultUsers,
+            tutors: JSON.parse(localStorage.getItem('db_tutors')) || defaultTutors,
+            currentUser: JSON.parse(localStorage.getItem('db_currentUser')) || null
+        };
+
+        let selectedClass = 'Barcha sinflar';
+        let selectedSubject = 'Barcha fanlar';
+        let isReg = false;
+
+        // PLAYER STATE
+        let activeCourse = null;
+        let activeLessonIndex = 0;
+
+        function saveDb() {
+            localStorage.setItem('db_users', JSON.stringify(db.users));
+            localStorage.setItem('db_tutors', JSON.stringify(db.tutors));
+            localStorage.setItem('db_currentUser', JSON.stringify(db.currentUser));
+            renderAuthArea();
+        }
+
+        window.onload = () => {
+            renderFilters();
+            renderTutors();
+            renderAuthArea();
+        };
+
+        // NAVIGATION
+        function navigateTo(page) {
+            document.getElementById('pageHome').classList.add('hidden');
+            document.getElementById('pageMyCourses').classList.add('hidden');
+            document.getElementById('pageAdmin').classList.add('hidden');
+            document.getElementById('pageProfile').classList.add('hidden');
+
+            if (page === 'home') {
+                document.getElementById('pageHome').classList.remove('hidden');
+                renderTutors();
+            } else if (page === 'my-courses') {
+                if (!db.currentUser) return openAuthModal();
+                document.getElementById('pageMyCourses').classList.remove('hidden');
+                renderMyCourses();
+            } else if (page === 'admin') {
+                if (!db.currentUser || db.currentUser.role !== 'admin') {
+                    alert("Sizda admin huquqi yo'q!");
+                    return navigateTo('home');
+                }
+                document.getElementById('pageAdmin').classList.remove('hidden');
+                renderAdminUsers();
+                renderAdminTutorsList();
+                updateAdminLessonSelect();
+            } else if (page === 'profile') {
+                if (!db.currentUser) return openAuthModal();
+                document.getElementById('pageProfile').classList.remove('hidden');
+                renderProfile();
+            }
+        }
+
+        // FILTERS & COURSES RENDER
+        function renderFilters() {
+            const sinflar = ['Barcha sinflar', 'Umumiy', '5-sinf', '6-sinf', '7-sinf', '8-sinf', '9-sinf', '10-sinf', '11-sinf'];
+            const fanlar = ['Barcha fanlar', 'Ingliz tili', 'Matematika', 'Fizika', 'Informatika', 'Kimyo', 'Tarix'];
+
+            document.getElementById('classFilters').innerHTML = sinflar.map(s => `
+                <button onclick="setClassFilter('${s}')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition ${selectedClass === s ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">${s}</button>
+            `).join('');
+
+            document.getElementById('subjectFilters').innerHTML = fanlar.map(f => `
+                <button onclick="setSubjectFilter('${f}')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition ${selectedSubject === f ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">${f}</button>
+            `).join('');
+        }
+
+        function setClassFilter(val) { selectedClass = val; renderFilters(); renderTutors(); }
+        function setSubjectFilter(val) { selectedSubject = val; renderFilters(); renderTutors(); }
+
+        function renderTutors() {
+            const grid = document.getElementById('tutorsGrid');
+            const list = db.tutors.filter(t => {
+                const matchClass = selectedClass === 'Barcha sinflar' || t.sinf === selectedClass;
+                const matchSub = selectedSubject === 'Barcha fanlar' || t.subject === selectedSubject;
+                return matchClass && matchSub;
+            });
+
+            grid.innerHTML = list.map(t => {
+                const bought = db.currentUser && db.currentUser.tutorsBought && db.currentUser.tutorsBought.includes(t.id);
+                const lessonCount = t.lessons ? t.lessons.length : 0;
+
+                return `
+                <div class="card-bg rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between hover:border-slate-700 transition duration-200">
+                    <div class="relative">
+                        <img src="${t.img}" class="w-full h-48 object-cover" alt="${t.name}">
+                        <span class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md text-white text-[10px] px-2.5 py-1 rounded-full font-bold border border-slate-700">
+                            <i class="fas fa-video text-blue-400 mr-1"></i> ${lessonCount} dars
+                        </span>
+                    </div>
+                    <div class="p-5 space-y-4 flex-grow flex flex-col justify-between">
+                        <div>
+                            <div class="flex gap-2 text-[10px] font-extrabold uppercase mb-2">
+                                <span class="bg-blue-900/40 text-blue-400 px-2.5 py-0.5 rounded-md border border-blue-800/40">${t.sinf || 'Umumiy'}</span>
+                                <span class="bg-indigo-900/40 text-indigo-400 px-2.5 py-0.5 rounded-md border border-indigo-800/40">${t.subject}</span>
+                            </div>
+                            <h3 class="font-bold text-lg text-white">Repetitor: ${t.name}</h3>
+                        </div>
+                        <div class="space-y-3 pt-3 border-t border-slate-800">
+                            <div class="flex justify-between items-center">
+                                <span class="text-green-400 font-black text-base">${t.price.toLocaleString()} so'm</span>
+                                ${bought 
+                                    ? `<span class="text-xs bg-green-900/30 text-green-400 px-3 py-1.5 rounded-lg border border-green-800/50 font-bold">Xarid qilingan ✔</span>`
+                                    : `<button onclick="buyTutor('${t.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-4 py-2 rounded-xl font-bold transition">Xarid qilish</button>`
+                                }
+                            </div>
+                            ${bought ? `
+                                <button onclick="openCoursePlayer('${t.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs py-2.5 rounded-xl font-bold transition flex items-center justify-center gap-2">
+                                    <i class="fas fa-play-circle text-sm"></i> Darslarni tomosha qilish
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function buyTutor(id) {
+            if (!db.currentUser) return openAuthModal();
+            const tutor = db.tutors.find(t => t.id === id);
+            
+            if (db.currentUser.balance < tutor.price) {
+                return alert("Balansingizda mablag' yetarli emas!");
+            }
+
+            db.currentUser.balance -= tutor.price;
+            if(!db.currentUser.tutorsBought) db.currentUser.tutorsBought = [];
+            db.currentUser.tutorsBought.push(id);
+
+            const idx = db.users.findIndex(u => u.id === db.currentUser.id);
+            if (idx !== -1) db.users[idx] = db.currentUser;
+
+            saveDb();
+            renderTutors();
+            toast("Muvaffaqiyatli xarid qilindi! Kurs 'Mening kurslarim' bo'limiga qo'shildi.");
+        }
+
+        // RENDER MY COURSES
+        function renderMyCourses() {
+            const grid = document.getElementById('myCoursesGrid');
+            if(!db.currentUser) return;
+
+            const boughtTutors = db.tutors.filter(t => db.currentUser.tutorsBought && db.currentUser.tutorsBought.includes(t.id));
+
+            if(boughtTutors.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-12 text-center card-bg rounded-2xl">
+                        <i class="fas fa-book-open text-4xl text-slate-600 mb-3 block"></i>
+                        <p class="text-slate-400 font-semibold text-sm">Siz hali birorta ham kurs xarid qilmadingiz.</p>
+                        <button onclick="navigateTo('home')" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl">Barcha kurslarni ko'rish</button>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = boughtTutors.map(t => `
+                <div class="card-bg rounded-2xl overflow-hidden p-5 flex flex-col justify-between border border-slate-800 hover:border-slate-700 transition">
+                    <div class="flex gap-4 items-center mb-4">
+                        <img src="${t.img}" class="w-16 h-16 rounded-xl object-cover border border-slate-700">
+                        <div>
+                            <h4 class="font-bold text-white text-base">${t.name}</h4>
+                            <p class="text-xs text-slate-400">${t.subject} (${t.sinf || 'Umumiy'})</p>
+                            <span class="text-[11px] text-blue-400 font-semibold mt-1 inline-block"><i class="fas fa-video mr-1"></i>${t.lessons ? t.lessons.length : 0} ta video dars</span>
+                        </div>
+                    </div>
+                    <button onclick="openCoursePlayer('${t.id}')" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg">
+                        <i class="fas fa-play"></i> Darslarni boshlash
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // COURSE PLAYER WITH PLAYLIST (100+ LESSONS)
+        function openCoursePlayer(tutorId) {
+            const tutor = db.tutors.find(t => t.id === tutorId);
+            if(!tutor) return;
+
+            activeCourse = tutor;
+            activeLessonIndex = 0;
+
+            document.getElementById('modalCourseTitle').innerText = tutor.name + " — " + tutor.subject;
+            document.getElementById('coursePlayerModal').classList.remove('hidden');
+
+            renderPlaylist();
+            loadLesson(0);
+        }
+
+        function renderPlaylist() {
+            const playlistEl = document.getElementById('coursePlaylist');
+            const lessons = activeCourse.lessons || [];
+
+            document.getElementById('playlistTotalBadge').innerText = `${lessons.length} ta dars`;
+
+            if(lessons.length === 0) {
+                playlistEl.innerHTML = `<p class="text-xs text-slate-500 p-3 text-center">Ushbu kursga hali darslar yuklanmagan.</p>`;
+                return;
+            }
+
+            playlistEl.innerHTML = lessons.map((l, index) => {
+                const isActive = index === activeLessonIndex;
+                return `
+                    <div onclick="loadLesson(${index})" class="p-3 rounded-xl cursor-pointer text-xs transition flex items-center gap-3 ${isActive ? 'bg-blue-600 text-white font-bold shadow-lg' : 'bg-slate-800/60 hover:bg-slate-800 text-slate-300'}">
+                        <span class="w-6 h-6 rounded-full ${isActive ? 'bg-white/20 text-white' : 'bg-slate-700 text-slate-400'} flex items-center justify-center text-[10px] font-bold shrink-0">
+                            ${index + 1}
+                        </span>
+                        <span class="truncate flex-grow">${l.title}</span>
+                        ${isActive ? '<i class="fas fa-volume-up text-white"></i>' : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function loadLesson(index) {
+            const lessons = activeCourse.lessons || [];
+            if(lessons.length === 0 || !lessons[index]) return;
+
+            activeLessonIndex = index;
+            const lesson = lessons[index];
+
+            let rawUrl = lesson.url;
+            let srcUrl = rawUrl;
+            if (rawUrl.includes('src=')) {
+                const match = rawUrl.match(/src=["']([^"']+)["']/);
+                if (match && match[1]) srcUrl = match[1];
+            }
+
+            document.getElementById('mainVimeoIframe').src = srcUrl;
+            document.getElementById('modalLessonCounter').innerText = `Dars ${index + 1} / ${lessons.length}`;
+            document.getElementById('currentLessonTitleDisplay').innerText = lesson.title;
+
+            renderPlaylist();
+        }
+
+        function prevLesson() {
+            if(activeLessonIndex > 0) loadLesson(activeLessonIndex - 1);
+        }
+
+        function nextLesson() {
+            const lessons = activeCourse.lessons || [];
+            if(activeLessonIndex < lessons.length - 1) loadLesson(activeLessonIndex + 1);
+        }
+
+        function closeCoursePlayer() {
+            document.getElementById('mainVimeoIframe').src = "";
+            document.getElementById('coursePlayerModal').classList.add('hidden');
+        }
+
+        // ADMIN LESSON MANAGEMENT (100+ Lessons)
+        function updateAdminLessonSelect() {
+            const select = document.getElementById('lessonTutorSelect');
+            select.innerHTML = db.tutors.map(t => `<option value="${t.id}">${t.name} (${t.subject})</option>`).join('');
+            renderAdminLessonsList();
+        }
+
+        function addLessonToTutor() {
+            const tutorId = document.getElementById('lessonTutorSelect').value;
+            const title = document.getElementById('newLessonTitle').value.trim();
+            const url = document.getElementById('newLessonUrl').value.trim();
+
+            if(!title || !url) return alert("Dars nomi va Vimeo havolasini kiriting!");
+
+            const tutor = db.tutors.find(t => t.id === tutorId);
+            if(!tutor) return;
+
+            if(!tutor.lessons) tutor.lessons = [];
+
+            tutor.lessons.push({
+                id: 'les-' + Date.now(),
+                title,
+                url
+            });
+
+            saveDb();
+            renderAdminLessonsList();
+            renderTutors();
+            toast("Yangi dars muvaffaqiyatli qo'shildi!");
+
+            document.getElementById('newLessonTitle').value = '';
+            document.getElementById('newLessonUrl').value = '';
+        }
+
+        function renderAdminLessonsList() {
+            const tutorId = document.getElementById('lessonTutorSelect').value;
+            const tutor = db.tutors.find(t => t.id === tutorId);
+            const listEl = document.getElementById('adminLessonsList');
+
+            if(!tutor || !tutor.lessons || tutor.lessons.length === 0) {
+                listEl.innerHTML = `<p class="text-xs text-slate-500 p-2">Bu kursda hali darslar yo'q.</p>`;
+                return;
+            }
+
+            listEl.innerHTML = tutor.lessons.map((l, idx) => `
+                <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 flex justify-between items-center text-xs">
+                    <span class="font-semibold text-white">${idx + 1}. ${l.title}</span>
+                    <button onclick="deleteLesson('${tutor.id}', '${l.id}')" class="text-red-400 hover:text-red-300 font-bold"><i class="fas fa-trash"></i> O'chirish</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteLesson(tutorId, lessonId) {
+            const tutor = db.tutors.find(t => t.id === tutorId);
+            if(!tutor) return;
+
+            tutor.lessons = tutor.lessons.filter(l => l.id !== lessonId);
+            saveDb();
+            renderAdminLessonsList();
+            renderTutors();
+            toast("Dars o'chirildi!");
+        }
+
+        // AUTH SYSTEM
+        function renderAuthArea() {
+            const area = document.getElementById('authNavArea');
+            const adminBtn = document.getElementById('navAdminBtn');
+
+            if (db.currentUser) {
+                if (db.currentUser.role === 'admin') {
+                    adminBtn.classList.remove('hidden');
+                } else {
+                    adminBtn.classList.add('hidden');
+                }
+
+                area.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-bold text-amber-400 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/20">👋 ${db.currentUser.login}</span>
+                        <button onclick="logout()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs px-3 py-1.5 rounded-lg border border-slate-700 font-semibold transition">Chiqish</button>
+                    </div>
+                `;
+            } else {
+                adminBtn.classList.add('hidden');
+                area.innerHTML = `
+                    <button onclick="openAuthModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-4 py-2 rounded-xl font-bold transition">Kirish / Ro'yxatdan o'tish</button>
+                `;
+            }
+        }
+
+        function openAuthModal() { document.getElementById('authModal').classList.remove('hidden'); }
+        function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
+
+        function toggleAuthMode() {
+            isReg = !isReg;
+            document.getElementById('authTitle').innerText = isReg ? "Ro'yxatdan o'tish" : "Tizimga kirish";
+            document.getElementById('authSubmitBtn').innerText = isReg ? "Ro'yxatdan o'tish" : "Kirish";
+            document.getElementById('authToggleText').innerText = isReg ? "Akkauntingiz bormi?" : "Akkauntingiz yo'qmi?";
+            document.getElementById('authToggleBtn').innerText = isReg ? "Kirish" : "Ro'yxatdan o'tish";
+        }
+
+        function handleAuth() {
+            const l = document.getElementById('authUsername').value.trim();
+            const p = document.getElementById('authPassword').value.trim();
+            if(!l || !p) return toast("Ma'lumotlarni kiriting!");
+
+            if (isReg) {
+                if (db.users.find(u => u.login.toLowerCase() === l.toLowerCase())) return alert("Bunday login mavjud!");
+                const newUser = { id: 'USR-' + Math.floor(Math.random() * 9000 + 1000), login: l, pass: p, role: l.toLowerCase() === 'admin' ? 'admin' : 'student', balance: 0, tutorsBought: [] };
+                db.users.push(newUser);
+                db.currentUser = newUser;
+                saveDb();
+                toast("Ro'yxatdan o'tdingiz!");
+            } else {
+                const u = db.users.find(x => x.login.toLowerCase() === l.toLowerCase() && x.pass === p);
+                if(!u) return alert("Login yoki parol xato!");
+                if(u.banned) return alert("Akkaunt bloklangan!");
+                db.currentUser = u;
+                saveDb();
+                toast("Tizimga kirdingiz!");
+            }
+
+            closeAuthModal();
+            navigateTo('home');
+        }
+
+        function logout() {
+            db.currentUser = null;
+            localStorage.removeItem('db_currentUser');
+            renderAuthArea();
+            navigateTo('home');
+            toast("Tizimdan chiqdingiz!");
+        }
+
+        // ADMIN TAB SWITCHER
+        function switchAdminTab(tab) {
+            document.getElementById('adminTabUsers').classList.add('hidden');
+            document.getElementById('adminTabTutors').classList.add('hidden');
+            document.getElementById('adminTabLessons').classList.add('hidden');
+            
+            document.getElementById('tabUsersBtn').className = "px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white";
+            document.getElementById('tabTutorsBtn').className = "px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white";
+            document.getElementById('tabLessonsBtn').className = "px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white";
+
+            if(tab === 'users') {
+                document.getElementById('adminTabUsers').classList.remove('hidden');
+                document.getElementById('tabUsersBtn').className = "px-4 py-2 text-sm font-semibold border-b-2 border-blue-500 text-blue-400";
+                renderAdminUsers();
+            } else if(tab === 'tutors') {
+                document.getElementById('adminTabTutors').classList.remove('hidden');
+                document.getElementById('tabTutorsBtn').className = "px-4 py-2 text-sm font-semibold border-b-2 border-blue-500 text-blue-400";
+                renderAdminTutorsList();
+            } else if(tab === 'lessons') {
+                document.getElementById('adminTabLessons').classList.remove('hidden');
+                document.getElementById('tabLessonsBtn').className = "px-4 py-2 text-sm font-semibold border-b-2 border-blue-500 text-blue-400";
+                updateAdminLessonSelect();
+            }
+        }
+
+        function renderAdminUsers() {
+            document.getElementById('adminUsersList').innerHTML = db.users.map(u => `
+                <div class="card-bg p-4 rounded-xl flex justify-between items-center ${u.banned ? 'border-red-600/50 bg-red-950/10' : ''}">
+                    <div>
+                        <span class="font-bold text-white">${u.login}</span>
+                        <span class="text-xs text-slate-500 ml-2">(${u.id})</span>
+                        ${u.banned ? '<span class="ml-2 text-xs bg-red-900 text-red-300 px-2 py-0.5 rounded font-bold">BANNED</span>' : ''}
+                    </div>
+                    <div class="text-slate-300 text-sm font-semibold">Balans: <span class="text-green-400">${u.balance.toLocaleString()} so'm</span></div>
+                </div>
+            `).join('');
+        }
+
+        function banUser() {
+            const id = document.getElementById('adminUserIdInput').value.trim();
+            const u = db.users.find(x => x.id === id || x.login.toLowerCase() === id.toLowerCase());
+            if(!u) return alert("Foydalanuvchi topilmadi!");
+            u.banned = true; saveDb(); renderAdminUsers(); toast("Foydalanuvchi ban qilindi!");
+        }
+
+        function unbanUser() {
+            const id = document.getElementById('adminUserIdInput').value.trim();
+            const u = db.users.find(x => x.id === id || x.login.toLowerCase() === id.toLowerCase());
+            if(!u) return alert("Foydalanuvchi topilmadi!");
+            u.banned = false; saveDb(); renderAdminUsers(); toast("Ban olib tashlandi!");
+        }
+
+        function resetBalance() {
+            const id = document.getElementById('adminUserIdInput').value.trim();
+            const u = db.users.find(x => x.id === id || x.login.toLowerCase() === id.toLowerCase());
+            if(!u) return alert("Foydalanuvchi topilmadi!");
+            u.balance = 0; saveDb(); renderAdminUsers(); toast("Balans nol qilindi!");
+        }
+
+        function addTutor() {
+            const name = document.getElementById('newTutorName').value.trim();
+            const img = document.getElementById('newTutorImg').value.trim();
+            const price = Number(document.getElementById('newTutorPrice').value);
+            const sinf = document.getElementById('newTutorSinf').value;
+            const subject = document.getElementById('newTutorFan').value;
+
+            if(!name || !price) return alert("Ma'lumotlarni to'liq kiriting!");
+
+            db.tutors.push({
+                id: 'tut-' + (db.tutors.length + 1),
+                name,
+                img: img || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop',
+                price,
+                sinf,
+                subject,
+                lessons: []
+            });
+
+            saveDb();
+            toast("Yangi repetitor qo'shildi!");
+            renderAdminTutorsList();
+        }
+
+        function renderAdminTutorsList() {
+            document.getElementById('adminTutorsList').innerHTML = db.tutors.map(t => `
+                <div class="card-bg p-4 rounded-xl flex justify-between items-center gap-4">
+                    <div class="flex items-center gap-3">
+                        <img src="${t.img}" class="w-12 h-12 rounded-lg object-cover">
+                        <div>
+                            <h4 class="font-bold text-white text-sm">${t.name} <span class="text-xs text-slate-500">(${t.id})</span></h4>
+                            <p class="text-xs text-slate-400">${t.subject} • ${t.sinf} • <span class="text-green-400 font-bold">${t.price.toLocaleString()} so'm</span></p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openEditModal('${t.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold">Tahrirlash</button>
+                        <button onclick="deleteTutor('${t.id}')" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold">O'chirish</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openEditModal(id) {
+            const tutor = db.tutors.find(t => t.id === id);
+            if (!tutor) return;
+            document.getElementById('editTutorId').value = tutor.id;
+            document.getElementById('editTutorName').value = tutor.name || '';
+            document.getElementById('editTutorImg').value = tutor.img || '';
+            document.getElementById('editTutorPrice').value = tutor.price || '';
+            document.getElementById('editTutorSinf').value = tutor.sinf || 'Umumiy';
+            document.getElementById('editTutorFan').value = tutor.subject || 'Ingliz tili';
+            document.getElementById('editTutorModal').classList.remove('hidden');
+        }
+
+        function closeEditModal() { document.getElementById('editTutorModal').classList.add('hidden'); }
+
+        function saveTutorEdit() {
+            const id = document.getElementById('editTutorId').value;
+            const tutor = db.tutors.find(t => t.id === id);
+            if (!tutor) return;
+
+            tutor.name = document.getElementById('editTutorName').value.trim();
+            tutor.img = document.getElementById('editTutorImg').value.trim();
+            tutor.price = Number(document.getElementById('editTutorPrice').value);
+            tutor.sinf = document.getElementById('editTutorSinf').value;
+            tutor.subject = document.getElementById('editTutorFan').value;
+
+            saveDb();
+            renderAdminTutorsList();
+            renderTutors();
+            closeEditModal();
+            toast("Ma'lumotlar saqlandi!");
+        }
+
+        function deleteTutor(id) {
+            if(!confirm("Haqiqatan ham o'chirmoqchimisiz?")) return;
+            db.tutors = db.tutors.filter(t => t.id !== id);
+            saveDb();
+            renderAdminTutorsList();
+            toast("O'chirildi!");
+        }
+
+        function renderProfile() {
+            if(!db.currentUser) return;
+            document.getElementById('profName').innerText = db.currentUser.login;
+            document.getElementById('profId').innerText = 'ID: ' + db.currentUser.id;
+            document.getElementById('profBalance').innerText = db.currentUser.balance.toLocaleString() + " so'm";
+        }
+
+        function addMoney() {
+            const amount = prompt("Qancha summasida balansni to'ldirmoqchisiz (so'm)?", "100000");
+            if(amount && !isNaN(amount)) {
+                db.currentUser.balance += Number(amount);
+                const idx = db.users.findIndex(u => u.id === db.currentUser.id);
+                if(idx !== -1) db.users[idx] = db.currentUser;
+                saveDb();
+                renderProfile();
+                toast("Balans to'ldirildi!");
+            }
+        }
+
+        function toast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.remove('hidden');
+            setTimeout(() => t.classList.add('hidden'), 3000);
+        }
+    </script>
+</body>
+</html>
