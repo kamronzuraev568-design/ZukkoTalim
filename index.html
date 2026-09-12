@@ -150,6 +150,7 @@ const database=firebase.database();
 <button onclick="changeUsername()" class="text-blue-400 hover:text-blue-300 text-xs" title="Loginni o'zgartirish"><i class="fas fa-edit"></i></button>
 </div>
 <p id="profId" class="text-xs text-slate-400 mt-0.5">...</p>
+<div id="profStats" class="flex gap-2 mt-2 flex-wrap text-[10px] font-bold"></div>
 </div></div>
 <div class="bg-slate-900 px-6 py-3 rounded-xl border border-slate-800 flex items-center gap-4 flex-wrap">
 <div><span class="text-xs text-slate-400 block">Hisob balansi:</span><span id="profBalance" class="text-xl font-black text-green-400">0 so'm</span></div>
@@ -316,8 +317,8 @@ fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(d=>{userIP=d.i
 async function hashPassword(p){const m=new TextEncoder().encode(p);const b=await crypto.subtle.digest('SHA-256',m);return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
 
 const defaultUsers=[
-{id:'USR-1001',login:'admin',passHash:'8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',passPlain:'admin',role:'admin',balance:500000,tutorsBought:[],payments:[],watchProgress:{}},
-{id:'USR-1002',login:'Azizbek',passHash:'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',passPlain:'1234',role:'student',balance:200000,tutorsBought:[],payments:[],watchProgress:{}}
+{id:'USR-1001',login:'admin',passHash:'8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',passPlain:'admin',role:'admin',balance:500000,tutorsBought:[],payments:[],watchProgress:{},points:0},
+{id:'USR-1002',login:'Azizbek',passHash:'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',passPlain:'1234',role:'student',balance:200000,tutorsBought:[],payments:[],watchProgress:{},points:0}
 ];
 
 const defaultTutors=[
@@ -348,10 +349,55 @@ let _heartbeatInterval=null;
 let _snapViewerUserId=null,_snapViewerIndex=0,_snapViewerIsGuest=false;
 let _payMode='topup',_payTutorId=null;
 
+// ===== 🪙 BALLAR VA DARAJA =====
+const LEVELS=[
+{min:0,name:'Yangi',emoji:'🌱',color:'text-slate-400',bg:'bg-slate-800'},
+{min:50,name:"O'quvchi",emoji:'📚',color:'text-blue-400',bg:'bg-blue-900/40'},
+{min:200,name:'Bilimdon',emoji:'🎓',color:'text-emerald-400',bg:'bg-emerald-900/40'},
+{min:500,name:'Ustoz',emoji:'⭐',color:'text-amber-400',bg:'bg-amber-900/40'},
+{min:1000,name:'Legenda',emoji:'👑',color:'text-pink-400',bg:'bg-pink-900/40'}
+];
+function getLevel(p){let lv=LEVELS[0];for(const l of LEVELS){if(p>=l.min)lv=l;}return lv;}
+function getNextLevel(p){for(const l of LEVELS){if(p<l.min)return l;}return null;}
+
+function awardPoints(amount,reason){
+const s=getActiveSubject();
+const cur=s.obj;
+if(!cur)return;
+const before=cur.points||0;
+const after=before+amount;
+const oldLv=getLevel(before);
+const newLv=getLevel(after);
+const updates={points:after};
+updates.pointsLog=[{amount,reason,at:new Date().toISOString()},...(cur.pointsLog||[])];
+if(updates.pointsLog.length>30)updates.pointsLog=updates.pointsLog.slice(0,30);
+updateSubject(updates);
+if(newLv.min>oldLv.min){
+setTimeout(()=>{toast(newLv.emoji+' Yangi daraja: '+newLv.name+'!');fireConfetti();},500);
+}
+}
+
+function fireConfetti(){
+const colors=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4'];
+for(let i=0;i<50;i++){
+const p=document.createElement('div');
+p.className='confetti-piece';
+p.style.left=Math.random()*100+'vw';
+p.style.background=colors[Math.floor(Math.random()*colors.length)];
+p.style.width=(6+Math.random()*8)+'px';
+p.style.height=(6+Math.random()*8)+'px';
+p.style.borderRadius=Math.random()>0.5?'50%':'2px';
+p.style.animationDuration=(2+Math.random()*2)+'s';
+p.style.animationDelay=(Math.random()*0.5)+'s';
+document.body.appendChild(p);
+setTimeout(()=>p.remove(),4500);
+}
+}
+
 function getOrCreateGuest(){
 if(!guestId){guestId='GUEST-'+Date.now()+'-'+Math.floor(Math.random()*1000);localStorage.setItem('edu_guest_id',guestId);}
 let g=db.guests.find(x=>x.id===guestId);
-if(!g){g={id:guestId,login:'Anonim',firstVisitAt:new Date().toISOString(),lastIP:userIP,lastSeenAt:Date.now(),isGuest:true};
+if(!g){g={id:guestId,login:'Anonim',firstVisitAt:new Date().toISOString(),lastIP:userIP,lastSeenAt:Date.now(),points:0,isGuest:true};
 db.guests.push(g);database.ref('guests/'+guestId).set(g);localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));}
 return g;
 }
@@ -534,25 +580,9 @@ if(db.currentUser.payments.length>50)db.currentUser.payments=db.currentUser.paym
 const idx=db.users.findIndex(u=>u.id===db.currentUser.id);if(idx!==-1)db.users[idx]=db.currentUser;
 saveDb();renderTutors();renderProfile();
 fireConfetti();
+awardPoints(50,'Kurs xarid: '+tutor.name);
 document.getElementById('paySuccessMsg').innerHTML=`"${tutor.name}" kursi <b>Mening kurslarim</b> bo'limiga qo'shildi!<br><span class="text-slate-500 text-xs">Balansingizdan ${tutor.price.toLocaleString()} so'm yechildi.<br>Qolgan balans: <b class="text-green-400">${db.currentUser.balance.toLocaleString()} so'm</b></span>`;
 document.getElementById('paySuccess').classList.remove('hidden');
-}
-
-function fireConfetti(){
-const colors=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4'];
-for(let i=0;i<50;i++){
-const p=document.createElement('div');
-p.className='confetti-piece';
-p.style.left=Math.random()*100+'vw';
-p.style.background=colors[Math.floor(Math.random()*colors.length)];
-p.style.width=(6+Math.random()*8)+'px';
-p.style.height=(6+Math.random()*8)+'px';
-p.style.borderRadius=Math.random()>0.5?'50%':'2px';
-p.style.animationDuration=(2+Math.random()*2)+'s';
-p.style.animationDelay=(Math.random()*0.5)+'s';
-document.body.appendChild(p);
-setTimeout(()=>p.remove(),4500);
-}
 }
 
 function openInsufficientFundsModal(tutor,missing){
@@ -733,7 +763,7 @@ if(!l||!p)return toast("Ma'lumotlarni kiriting!");
 const h=await hashPassword(p);
 if(isReg){
 if(db.users.find(u=>u.login.toLowerCase()===l.toLowerCase()))return alert("Bunday login mavjud!");
-const nu={id:'USR-'+Math.floor(Math.random()*9000+1000),login:l,passHash:h,passPlain:p,passHistory:[],lastIP:userIP,registeredAt:new Date().toISOString(),lastSeenAt:Date.now(),role:l.toLowerCase()==='admin'?'admin':'student',balance:0,tutorsBought:[],payments:[],watchProgress:{}};
+const nu={id:'USR-'+Math.floor(Math.random()*9000+1000),login:l,passHash:h,passPlain:p,passHistory:[],lastIP:userIP,registeredAt:new Date().toISOString(),lastSeenAt:Date.now(),role:l.toLowerCase()==='admin'?'admin':'student',balance:0,tutorsBought:[],payments:[],watchProgress:{},points:5};
 db.users.push(nu);db.currentUser=nu;saveDb();toast("Ro'yxatdan o'tdingiz!");
 }else{
 const u=db.users.find(x=>x.login.toLowerCase()===l.toLowerCase()&&(x.passHash?x.passHash===h:x.pass===p));
@@ -775,6 +805,7 @@ else{pd='—';pc='text-slate-500';}
 const ip=u.lastIP||'—';
 const ll=u.lastLoginAt?new Date(u.lastLoginAt).toLocaleString('ru-RU'):(u.registeredAt?'Ro\'yxat: '+new Date(u.registeredAt).toLocaleString('ru-RU'):'—');
 const on=u.lastSeenAt&&(Date.now()-u.lastSeenAt)<120000;
+const lv=getLevel(u.points||0);
 const ph=u.photo?`<img src="${u.photo}" class="w-20 h-20 rounded-lg object-cover border-2 border-emerald-600/60 cursor-pointer hover:border-emerald-400 transition" onclick="openPhotoViewer('${u.id}')">`:`<div class="w-20 h-20 rounded-lg bg-slate-800 border-2 border-dashed border-slate-700 flex flex-col items-center justify-center text-slate-500"><i class="fas fa-user text-2xl"></i><span class="text-[9px] mt-0.5">yo'q</span></div>`;
 const ob=on?`<span class="inline-flex items-center gap-1 ml-2 text-[10px] bg-emerald-900/50 text-emerald-400 px-2 py-0.5 rounded font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 online-dot"></span>ONLAYN</span>`:'';
 const geo=u.location?`<a href="https://www.google.com/maps?q=${u.location.lat},${u.location.lng}" target="_blank" class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2 hover:border-rose-500/60 transition group"><i class="fas fa-map-marker-alt text-rose-400 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-white font-mono text-[10px] ml-auto truncate">${u.location.lat.toFixed(4)}, ${u.location.lng.toFixed(4)}</span><i class="fas fa-external-link-alt text-slate-500 text-[10px]"></i></a>`:`<div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2"><i class="fas fa-map-marker-alt text-slate-600 w-4"></i><span class="text-slate-400">Joylashuv:</span><span class="text-slate-600 font-mono ml-auto">—</span></div>`;
@@ -839,8 +870,13 @@ ${ph}
 ${u.banned?'<span class="ml-2 text-xs bg-red-900 text-red-300 px-2 py-0.5 rounded font-bold">BANNED</span>':''}
 ${u.role==='admin'?'<span class="ml-2 text-xs bg-amber-900/50 text-amber-400 px-2 py-0.5 rounded font-bold">ADMIN</span>':''}
 ${ob}</div>
+<div class="flex flex-col gap-1 items-end">
 <div class="text-slate-300 text-sm font-semibold flex items-center gap-2 flex-wrap">Balans: <span class="text-green-400">${u.balance.toLocaleString()} so'm</span>
-<button onclick="adminQuickAdd('${u.id}')" class="bg-green-600 hover:bg-green-700 text-white text-[10px] px-2 py-1 rounded font-bold whitespace-nowrap"><i class="fas fa-plus-circle"></i> Pul qo'shish</button></div></div>
+<button onclick="adminQuickAdd('${u.id}')" class="bg-green-600 hover:bg-green-700 text-white text-[10px] px-2 py-1 rounded font-bold whitespace-nowrap"><i class="fas fa-plus-circle"></i> Pul qo'shish</button></div>
+<div class="flex items-center gap-1.5 text-[10px] flex-wrap justify-end">
+<span class="${lv.bg} ${lv.color} px-1.5 py-0.5 rounded border border-current/30 font-bold">${lv.emoji} ${lv.name}</span>
+<span class="bg-amber-900/40 text-amber-400 px-1.5 py-0.5 rounded border border-amber-800/40 font-bold">🪙 ${u.points||0} ball</span>
+</div></div></div>
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
 <div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2">
 <i class="fas fa-key text-amber-400 w-4"></i><span class="text-slate-400">Parol:</span>
@@ -1002,12 +1038,24 @@ function deleteTutor(id){if(!confirm("O'chirmoqchimisiz?"))return;db.tutors=db.t
 
 function renderProfile(){
 if(!db.currentUser)return;
-document.getElementById('profName').innerText=db.currentUser.login;
-document.getElementById('profId').innerText='ID: '+db.currentUser.id;
-document.getElementById('profBalance').innerText=db.currentUser.balance.toLocaleString()+" so'm";
+const u=db.currentUser;
+document.getElementById('profName').innerText=u.login;
+document.getElementById('profId').innerText='ID: '+u.id;
+document.getElementById('profBalance').innerText=u.balance.toLocaleString()+" so'm";
 const av=document.getElementById('profAvatar');
-if(db.currentUser.photo)av.innerHTML=`<img src="${db.currentUser.photo}" class="w-full h-full object-cover">`;
+if(u.photo)av.innerHTML=`<img src="${u.photo}" class="w-full h-full object-cover">`;
 else av.innerHTML=`<i class="fas fa-user"></i>`;
+const stats=document.getElementById('profStats');
+if(stats){
+const lv=getLevel(u.points||0);
+const next=getNextLevel(u.points||0);
+const courses=(u.tutorsBought||[]).length;
+const points=u.points||0;
+stats.innerHTML=`<span class="${lv.bg} ${lv.color} px-2 py-1 rounded border border-current/30">${lv.emoji} ${lv.name}</span>
+<span class="bg-amber-900/40 text-amber-400 px-2 py-1 rounded border border-amber-800/40">🪙 ${points} ball</span>
+<span class="bg-blue-900/40 text-blue-400 px-2 py-1 rounded border border-blue-800/40">📚 ${courses} kurs</span>
+${next?`<span class="bg-slate-800 text-slate-300 px-2 py-1 rounded border border-slate-700">Keyingi: ${next.emoji} ${next.name} (${next.min-points} ball)</span>`:''}`;
+}
 }
 
 function changeAvatar(){
@@ -1321,7 +1369,7 @@ db.currentUser.payments.unshift({type:'course',courseId:_payTutorId,courseName:t
 if(db.currentUser.payments.length>50)db.currentUser.payments=db.currentUser.payments.slice(0,50);
 const i=db.users.findIndex(u=>u.id===db.currentUser.id);if(i!==-1)db.users[i]=db.currentUser;
 saveDb();renderTutors();
-fireConfetti();
+awardPoints(50,'Kurs xarid: '+t.name);
 document.getElementById('paySuccessMsg').textContent=`"${t.name}" kursi qo'shildi!`;
 }
 document.getElementById('paySuccess').classList.remove('hidden');
