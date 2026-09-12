@@ -296,7 +296,7 @@
         <div class="card-bg w-full max-w-lg p-6 rounded-2xl space-y-4 relative">
             <button onclick="closeEditModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
             <h2 class="text-xl font-bold text-white text-center"><i class="fas fa-user-edit mr-2"></i>Repetitorni Tahrirlash</h2>
-            
+
             <input type="hidden" id="editTutorId">
             <div class="space-y-3">
                 <div>
@@ -351,16 +351,16 @@
         <div class="card-bg w-full max-w-md p-6 rounded-2xl space-y-4 relative">
             <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
             <h2 id="authTitle" class="text-xl font-bold text-white text-center">Tizimga kirish</h2>
-            
+
             <div class="space-y-3">
                 <input type="text" id="authUsername" placeholder="Login" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500">
                 <input type="password" id="authPassword" placeholder="Parol" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500">
             </div>
 
             <button onclick="handleAuth()" id="authSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg text-sm transition">Kirish</button>
-            
+
             <p class="text-xs text-center text-slate-400">
-                <span id="authToggleText">Akkauntingiz yo'qmi?</span> 
+                <span id="authToggleText">Akkauntingiz yo'qmi?</span>
                 <button onclick="toggleAuthMode()" id="authToggleBtn" class="text-blue-400 font-bold underline ml-1">Ro'yxatdan o'tish</button>
             </p>
         </div>
@@ -368,6 +368,49 @@
 
     <!-- TOAST NOTIFICATION -->
     <div id="toast" class="fixed bottom-5 right-5 bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-semibold hidden shadow-2xl z-50"></div>
+
+    <!-- ===================== INSUFFICIENT FUNDS MODAL (YANGI) ===================== -->
+    <div id="insufficientModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.8);backdrop-filter:blur(8px)">
+        <div class="card-bg rounded-2xl w-full max-w-md shadow-2xl border border-slate-700 overflow-hidden">
+            <div class="bg-gradient-to-r from-amber-600 to-red-600 px-6 py-5">
+                <p class="text-xs text-amber-100 font-semibold uppercase tracking-widest">EduPlatform Pay</p>
+                <p class="text-white font-black text-lg mt-0.5 flex items-center gap-2">
+                    <i class="fas fa-exclamation-triangle"></i> Mablag' yetarli emas
+                </p>
+            </div>
+
+            <div class="px-6 py-5 space-y-3">
+                <div class="bg-slate-900/70 border border-slate-700 rounded-xl px-4 py-3 space-y-2">
+                    <div class="flex justify-between text-sm gap-3">
+                        <span class="text-slate-400 shrink-0">Kurs:</span>
+                        <span id="insufficientTutorName" class="text-white font-bold text-right truncate"></span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-slate-400">Narxi:</span>
+                        <span id="insufficientPrice" class="text-white font-bold"></span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-slate-400">Sizning balansingiz:</span>
+                        <span id="insufficientBalance" class="text-amber-400 font-bold"></span>
+                    </div>
+                    <div class="flex justify-between text-sm border-t border-slate-800 pt-2">
+                        <span class="text-slate-400">Yetmayapti:</span>
+                        <span id="insufficientMissing" class="text-red-400 font-bold"></span>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 text-center leading-relaxed">
+                    Kursni xarid qilish uchun avval balansingizni to'ldiring.
+                </p>
+            </div>
+
+            <div class="px-6 pb-5 flex gap-3">
+                <button onclick="closeInsufficientModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl transition text-sm">Bekor qilish</button>
+                <button onclick="goToTopUp()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black py-3 rounded-xl transition text-sm shadow-lg">
+                    <i class="fas fa-plus-circle mr-1.5"></i> Balansni to'ldirish
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- ===================== FAKE PAYMENT MODAL ===================== -->
     <div id="paymentModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.8);backdrop-filter:blur(8px)">
@@ -473,12 +516,12 @@
         ];
 
         const defaultTutors = [
-            { 
-                id: 'tut-1', 
-                name: 'Ibat', 
-                subject: 'Ingliz tili', 
-                sinf: 'Umumiy', 
-                price: 90000, 
+            {
+                id: 'tut-1',
+                name: 'Ibat',
+                subject: 'Ingliz tili',
+                sinf: 'Umumiy',
+                price: 90000,
                 img: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop',
                 lessons: [
                     { id: 'l1', title: '1-Dars. English Alphabet & Pronunciation', url: 'https://player.vimeo.com/video/1226105435' },
@@ -486,12 +529,12 @@
                     { id: 'l3', title: '3-Dars. Basic Vocabulary & Greetings', url: 'https://player.vimeo.com/video/1226105435' }
                 ]
             },
-            { 
-                id: 'tut-2', 
-                name: 'Jasur M.', 
-                subject: 'Matematika', 
-                sinf: '9-sinf', 
-                price: 110000, 
+            {
+                id: 'tut-2',
+                name: 'Jasur M.',
+                subject: 'Matematika',
+                sinf: '9-sinf',
+                price: 110000,
                 img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop',
                 lessons: [
                     { id: 'l10', title: '1-Dars. Tenglamalar va tengsizliklar', url: 'https://player.vimeo.com/video/1226105435' }
@@ -499,10 +542,6 @@
             }
         ];
 
-        // db.users / db.tutors are the SHARED state — they live in Firebase Realtime
-        // Database so every device (phone, computer, etc.) sees the same data.
-        // db.currentUser is only the LOCAL session (who is logged in on THIS device),
-        // so it stays in localStorage and is never written to Firebase.
         let db = {
             users: JSON.parse(localStorage.getItem('db_users_cache')) || [],
             tutors: JSON.parse(localStorage.getItem('db_tutors_cache')) || [],
@@ -518,31 +557,21 @@
         let activeCourse = null;
         let activeLessonIndex = 0;
 
-        // Firebase stores objects, not arrays — convert array <-> {id: item} map.
         function arrayToFirebaseObj(arr) {
             const obj = {};
             arr.forEach(item => { obj[item.id] = item; });
             return obj;
         }
 
-        // Pushes the current in-memory lists to Firebase. This is the ONLY place
-        // that writes users/tutors, and every connected device (including the one
-        // that made the change) receives the update back through the 'value'
-        // listeners set up in initFirebaseSync().
         function saveDb() {
             localStorage.setItem('db_currentUser', JSON.stringify(db.currentUser));
             database.ref('users').set(arrayToFirebaseObj(db.users));
             database.ref('tutors').set(arrayToFirebaseObj(db.tutors));
-            // Local cache so the UI has something to show instantly on next load,
-            // before Firebase responds (e.g. slow/offline connection).
             localStorage.setItem('db_users_cache', JSON.stringify(db.users));
             localStorage.setItem('db_tutors_cache', JSON.stringify(db.tutors));
             renderAuthArea();
         }
 
-        // Re-renders whatever section is currently on screen. Called whenever
-        // fresh data arrives from Firebase (our own writes, or changes made on
-        // another device).
         function onRemoteDbUpdate() {
             localStorage.setItem('db_users_cache', JSON.stringify(db.users));
             localStorage.setItem('db_tutors_cache', JSON.stringify(db.tutors));
@@ -566,19 +595,15 @@
         }
 
         function initFirebaseSync() {
-            // USERS — live sync
             database.ref('users').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     db.users = Object.values(data);
                 } else if (!dbLoaded) {
-                    // Nothing in Firebase yet (first ever run) — seed it once.
                     db.users = defaultUsers;
                     database.ref('users').set(arrayToFirebaseObj(defaultUsers));
                 }
 
-                // Keep the logged-in session in sync with the shared data
-                // (e.g. balance changed or account banned on another device).
                 if (db.currentUser) {
                     const fresh = db.users.find(u => u.id === db.currentUser.id);
                     if (fresh) {
@@ -590,7 +615,6 @@
                             return;
                         }
                     } else {
-                        // Account no longer exists — force logout.
                         db.currentUser = null;
                         localStorage.removeItem('db_currentUser');
                     }
@@ -599,7 +623,6 @@
                 onRemoteDbUpdate();
             });
 
-            // TUTORS / COURSES — live sync
             database.ref('tutors').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -637,7 +660,6 @@
                 btn.className = 'bg-green-600 text-white text-xs font-black px-4 py-2 rounded-lg whitespace-nowrap cursor-default';
                 btn.disabled = true;
                 status.textContent = 'Har kuni soat 19:00 da dars eslatmasi keladi ✅';
-                // Schedule if not already scheduled this session
                 if (!localStorage.getItem('edu_reminderSet')) registerServiceWorker();
                 checkMissedDay();
             } else if (Notification.permission === 'denied') {
@@ -740,7 +762,7 @@
                         <div class="space-y-3 pt-3 border-t border-slate-800">
                             <div class="flex justify-between items-center">
                                 <span class="text-green-400 font-black text-base">${t.price.toLocaleString()} so'm</span>
-                                ${bought 
+                                ${bought
                                     ? `<span class="text-xs bg-green-900/30 text-green-400 px-3 py-1.5 rounded-lg border border-green-800/50 font-bold">Xarid qilingan ✔</span>`
                                     : `<button onclick="buyTutor('${t.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-4 py-2 rounded-xl font-bold transition">Xarid qilish</button>`
                                 }
@@ -756,11 +778,75 @@
             `}).join('');
         }
 
+        // ============ YANGILANGAN: buyTutor — endi balansdan yechiladi ============
         function buyTutor(id) {
             if (!db.currentUser) return openAuthModal();
-            // Open fake payment modal — actual balance deduction happens in submitPayment()
-            openPaymentModal('course', id);
+
+            const tutor = db.tutors.find(t => t.id === id);
+            if (!tutor) return;
+
+            if (db.currentUser.tutorsBought && db.currentUser.tutorsBought.includes(id)) {
+                return toast("Siz bu kursni allaqachon xarid qilgansiz!");
+            }
+
+            if (db.currentUser.balance >= tutor.price) {
+                // Mablag' yetarli — balansdan yechamiz
+                purchaseFromBalance(id);
+            } else {
+                // Mablag' yetarli emas — to'ldirishni taklif qilamiz
+                const missing = tutor.price - db.currentUser.balance;
+                openInsufficientFundsModal(tutor, missing);
+            }
         }
+
+        // Balansdan xarid qilish (kartasiz)
+        function purchaseFromBalance(tutorId) {
+            const tutor = db.tutors.find(t => t.id === tutorId);
+            if (!tutor || !db.currentUser) return;
+
+            if (db.currentUser.balance < tutor.price) {
+                return toast("Balansingizda mablag' yetarli emas!");
+            }
+
+            db.currentUser.balance -= tutor.price;
+
+            if (!db.currentUser.tutorsBought) db.currentUser.tutorsBought = [];
+            if (!db.currentUser.tutorsBought.includes(tutorId)) {
+                db.currentUser.tutorsBought.push(tutorId);
+            }
+
+            const idx = db.users.findIndex(u => u.id === db.currentUser.id);
+            if (idx !== -1) db.users[idx] = db.currentUser;
+
+            saveDb();
+            renderTutors();
+            renderProfile();
+
+            document.getElementById('paySuccessMsg').innerHTML =
+                `"${tutor.name}" kursi <b>Mening kurslarim</b> bo'limiga qo'shildi!<br>
+                 <span class="text-slate-500 text-xs">Balansingizdan ${tutor.price.toLocaleString()} so'm yechildi.<br>
+                 Qolgan balans: <b class="text-green-400">${db.currentUser.balance.toLocaleString()} so'm</b></span>`;
+            document.getElementById('paySuccess').classList.remove('hidden');
+        }
+
+        function openInsufficientFundsModal(tutor, missing) {
+            document.getElementById('insufficientTutorName').textContent = tutor.name;
+            document.getElementById('insufficientPrice').textContent = tutor.price.toLocaleString() + " so'm";
+            document.getElementById('insufficientBalance').textContent = db.currentUser.balance.toLocaleString() + " so'm";
+            document.getElementById('insufficientMissing').textContent = missing.toLocaleString() + " so'm";
+            document.getElementById('insufficientModal').classList.remove('hidden');
+        }
+
+        function closeInsufficientModal() {
+            document.getElementById('insufficientModal').classList.add('hidden');
+        }
+
+        function goToTopUp() {
+            closeInsufficientModal();
+            navigateTo('profile');
+            setTimeout(() => openPaymentModal('topup', null), 300);
+        }
+        // ============ /YANGILANGAN buyTutor ============
 
         // RENDER MY COURSES
         function renderMyCourses() {
@@ -874,10 +960,6 @@
 
         // ADMIN LESSON MANAGEMENT (100+ Lessons)
 
-        // Converts any YouTube link format (watch?v=, youtu.be/, shorts/, or an
-        // already-pasted <iframe> embed code) into a clean embeddable URL.
-        // Vimeo links / embed codes are left as before (loadLesson() already
-        // knows how to pull src="..." out of a pasted iframe).
         function normalizeVideoUrl(raw) {
             let url = raw.trim();
 
@@ -929,8 +1011,6 @@
             document.getElementById('newLessonUrl').value = '';
         }
 
-        // Bulk-add: paste up to hundreds of lines like
-        // "1-Dars. Nomi | https://youtu.be/VIDEO_ID" and add them all at once.
         function addLessonsBulk() {
             const tutorId = document.getElementById('lessonTutorSelect').value;
             const tutor = db.tutors.find(t => t.id === tutorId);
@@ -1054,21 +1134,21 @@
 
             if (isReg) {
                 if (db.users.find(u => u.login.toLowerCase() === l.toLowerCase())) return alert("Bunday login mavjud!");
-                const newUser = { 
-                    id: 'USR-' + Math.floor(Math.random() * 9000 + 1000), 
-                    login: l, 
-                    passHash: enteredPassHash, 
-                    role: l.toLowerCase() === 'admin' ? 'admin' : 'student', 
-                    balance: 0, 
-                    tutorsBought: [] 
+                const newUser = {
+                    id: 'USR-' + Math.floor(Math.random() * 9000 + 1000),
+                    login: l,
+                    passHash: enteredPassHash,
+                    role: l.toLowerCase() === 'admin' ? 'admin' : 'student',
+                    balance: 0,
+                    tutorsBought: []
                 };
                 db.users.push(newUser);
                 db.currentUser = newUser;
                 saveDb();
                 toast("Ro'yxatdan o'tdingiz!");
             } else {
-                const u = db.users.find(x => 
-                    x.login.toLowerCase() === l.toLowerCase() && 
+                const u = db.users.find(x =>
+                    x.login.toLowerCase() === l.toLowerCase() &&
                     (x.passHash ? x.passHash === enteredPassHash : x.pass === p)
                 );
                 if(!u) return alert("Login yoki parol xato!");
@@ -1095,7 +1175,7 @@
             document.getElementById('adminTabUsers').classList.add('hidden');
             document.getElementById('adminTabTutors').classList.add('hidden');
             document.getElementById('adminTabLessons').classList.add('hidden');
-            
+
             document.getElementById('tabUsersBtn').className = "px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white";
             document.getElementById('tabTutorsBtn').className = "px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white";
             document.getElementById('tabLessonsBtn').className = "px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white";
@@ -1238,9 +1318,9 @@
             document.getElementById('profBalance').innerText = db.currentUser.balance.toLocaleString() + " so'm";
         }
 
-        // =================== FAKE PAYMENT SYSTEM ===================
+        // =================== FAKE PAYMENT SYSTEM (endilikda faqat to'ldirish uchun) ===================
 
-        let _payMode = 'topup';   // 'topup' | 'course'
+        let _payMode = 'topup';
         let _payTutorId = null;
 
         function addMoney() {
@@ -1251,7 +1331,6 @@
             _payMode = mode;
             _payTutorId = tutorId;
 
-            // Reset fields
             ['payCardNumber','payExpiry','payCVV','payHolder','payTopUpAmount'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.value = '';
@@ -1327,7 +1406,6 @@
             closePaymentModal();
             document.getElementById('payProcessing').classList.remove('hidden');
 
-            // Simulate network delay (1.5–2.5 s)
             const delay = 1500 + Math.random() * 1000;
             setTimeout(() => {
                 document.getElementById('payProcessing').classList.add('hidden');
@@ -1341,9 +1419,9 @@
                     renderProfile();
                     document.getElementById('paySuccessMsg').textContent =
                         `Balansingizga ${amount.toLocaleString()} so'm qo'shildi. Joriy balans: ${db.currentUser.balance.toLocaleString()} so'm`;
-
                 } else {
-                    // Course purchase
+                    // Bu holat endi ishlatilmaydi (buyTutor balansdan yechadi),
+                    // lekin kodda qolib ketgan bo'lsa — zaxira variant sifatida ishlaydi
                     const tutor = db.tutors.find(t => t.id === _payTutorId);
                     if (!tutor) return;
                     if(!db.currentUser.tutorsBought) db.currentUser.tutorsBought = [];
@@ -1365,13 +1443,10 @@
         function initPushNotifications() {
             if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
 
-            // Record today as last-active date whenever the page loads
             if (db.currentUser) {
                 const today = new Date().toISOString().slice(0, 10);
                 localStorage.setItem('edu_lastActive_' + db.currentUser.id, today);
             }
-
-            // Ask permission only after user interaction (called from profile page)
         }
 
         async function requestPushPermission() {
@@ -1397,7 +1472,6 @@
         async function registerServiceWorker() {
             if (!('serviceWorker' in navigator)) return;
             try {
-                // Inline SW via blob URL — no separate sw.js file needed
                 const swCode = `
 self.addEventListener('install', e => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(clients.claim()));
@@ -1433,7 +1507,6 @@ self.addEventListener('notificationclick', e => {
                 scheduleDailyReminder(reg);
             } catch(e) {
                 console.warn('SW registration failed:', e);
-                // Fallback: use Notification API directly (works while tab is open)
                 scheduleDailyReminderFallback();
             }
         }
@@ -1441,7 +1514,6 @@ self.addEventListener('notificationclick', e => {
         function scheduleDailyReminder(reg) {
             if (Notification.permission !== 'granted' || !db.currentUser) return;
 
-            // Fire at 19:00 today (or tomorrow if already past)
             const now = new Date();
             const target = new Date();
             target.setHours(19, 0, 0, 0);
