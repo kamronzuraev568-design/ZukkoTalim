@@ -31,7 +31,6 @@
             measurementId: "G-XVCFTYCJDB"
         };
 
-        // Инициализация Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
     </script>
@@ -61,7 +60,6 @@
             </div>
         </div>
 
-        <!-- MOBILE DROPDOWN MENU -->
         <div id="mobileMenu" class="hidden md:hidden mt-3 pt-3 border-t border-slate-800 flex flex-col gap-1 text-sm font-semibold">
             <button onclick="navigateTo('home'); closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-th-large w-4 text-center"></i> Barcha Kurslar</button>
             <button onclick="navigateTo('my-courses'); closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-play-circle text-indigo-400 w-4 text-center"></i> Mening Kurslarim</button>
@@ -80,7 +78,6 @@
                 <p class="text-slate-400 max-w-2xl mx-auto text-sm md:text-base">O'zingizga mos repetitor va kurslarni tanlang, xarid qiling va istalgan vaqtda video darslarni tomosha qiling!</p>
             </div>
 
-            <!-- FILTERS -->
             <div class="space-y-4 card-bg p-5 rounded-2xl shadow-md">
                 <div>
                     <span class="text-xs text-slate-400 block mb-2 font-bold uppercase tracking-wider">📌 Sinf bo'yicha filter:</span>
@@ -92,7 +89,6 @@
                 </div>
             </div>
 
-            <!-- TUTORS GRID -->
             <div>
                 <h2 class="text-2xl font-bold mb-6 text-white flex items-center gap-2"><i class="fas fa-chalkboard-teacher text-blue-400"></i> Mavjud Repetitorlar va Kurslar</h2>
                 <div id="tutorsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
@@ -128,7 +124,6 @@
                 </button>
             </div>
 
-            <!-- TAB: USERS -->
             <div id="adminTabUsers" class="space-y-6">
                 <div class="card-bg p-4 rounded-xl flex flex-wrap gap-3 items-center">
                     <input type="text" id="adminUserIdInput" placeholder="Foydalanuvchi ID (Masalan: USR-1002)" class="bg-slate-900 border border-slate-700 px-4 py-2 rounded-lg text-sm flex-grow focus:outline-none focus:border-blue-500">
@@ -139,7 +134,6 @@
                 <div id="adminUsersList" class="space-y-3"></div>
             </div>
 
-            <!-- TAB: TUTORS -->
             <div id="adminTabTutors" class="hidden space-y-6">
                 <div class="card-bg p-6 rounded-xl space-y-4">
                     <h3 class="text-lg font-bold text-white"><i class="fas fa-user-plus mr-2 text-green-400"></i>Yangi Repetitor Qo'shish</h3>
@@ -171,11 +165,11 @@
 
                 <div class="card-bg p-6 rounded-xl space-y-4">
                     <h3 class="text-lg font-bold text-white"><i class="fas fa-list mr-2"></i>Mavjud Repetitorlar Ro'yxati</h3>
+                    <p class="text-xs text-slate-500">↑↓ tugmalari bilan tartibni o'zgartiring — saytda shu tartibda ko'rinadi</p>
                     <div id="adminTutorsList" class="space-y-3"></div>
                 </div>
             </div>
 
-            <!-- TAB: LESSONS MANAGEMENT (100+ Lessons) -->
             <div id="adminTabLessons" class="hidden space-y-6">
                 <div class="card-bg p-6 rounded-xl space-y-4">
                     <h3 class="text-lg font-bold text-white"><i class="fas fa-plus-circle text-blue-400 mr-2"></i>Kursga Yangi Video Dars Qo'shish</h3>
@@ -246,10 +240,9 @@
 
     </main>
 
-    <!-- COURSE PLAYER MODAL (100+ LESSONS PLAYLIST) -->
+    <!-- COURSE PLAYER MODAL -->
     <div id="coursePlayerModal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-2 md:p-6 z-50">
         <div class="card-bg w-full max-w-6xl h-[90vh] rounded-2xl flex flex-col overflow-hidden relative border border-slate-800 shadow-2xl">
-            <!-- Modal Header -->
             <div class="px-6 py-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
                 <div class="flex items-center gap-3">
                     <span class="bg-blue-600/20 text-blue-400 p-2 rounded-lg text-sm"><i class="fas fa-play-circle"></i></span>
@@ -263,9 +256,7 @@
                 </button>
             </div>
 
-            <!-- Player & Playlist Layout -->
             <div class="flex-grow flex flex-col lg:flex-row overflow-hidden">
-                <!-- Video Screen -->
                 <div class="lg:w-3/4 bg-black flex flex-col justify-center items-center relative p-2">
                     <div class="w-full h-full rounded-xl overflow-hidden shadow-2xl relative aspect-video max-h-[70vh]">
                         <iframe id="mainVimeoIframe" src="" class="w-full h-full border-0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
@@ -279,7 +270,6 @@
                     </div>
                 </div>
 
-                <!-- Playlist Sidebar -->
                 <div class="lg:w-1/4 bg-slate-900/90 border-t lg:border-t-0 lg:border-l border-slate-800 flex flex-col h-full">
                     <div class="p-4 border-b border-slate-800 bg-slate-900/50 flex justify-between items-center">
                         <h4 class="font-bold text-sm text-white flex items-center gap-2"><i class="fas fa-list-ul text-blue-400"></i> Darslar ro'yxati</h4>
@@ -369,7 +359,7 @@
     <!-- TOAST NOTIFICATION -->
     <div id="toast" class="fixed bottom-5 right-5 bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-semibold hidden shadow-2xl z-50"></div>
 
-    <!-- ===================== INSUFFICIENT FUNDS MODAL ===================== -->
+    <!-- INSUFFICIENT FUNDS MODAL -->
     <div id="insufficientModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.8);backdrop-filter:blur(8px)">
         <div class="card-bg rounded-2xl w-full max-w-md shadow-2xl border border-slate-700 overflow-hidden">
             <div class="bg-gradient-to-r from-amber-600 to-red-600 px-6 py-5">
@@ -412,7 +402,7 @@
         </div>
     </div>
 
-    <!-- ===================== FAKE PAYMENT MODAL ===================== -->
+    <!-- FAKE PAYMENT MODAL -->
     <div id="paymentModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.8);backdrop-filter:blur(8px)">
         <div class="card-bg rounded-2xl w-full max-w-md shadow-2xl border border-slate-700 overflow-hidden">
             <div class="bg-gradient-to-r from-blue-700 to-indigo-700 px-6 py-5 flex items-center justify-between">
@@ -501,7 +491,6 @@
     </div>
 
     <script>
-        // Функция для хэширования паролей в SHA-256
         async function hashPassword(password) {
             const msgUint8 = new TextEncoder().encode(password);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
@@ -509,7 +498,6 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // DEFAULT INITIAL DATA WITH PASS HASHES (Пароли зашифрованы)
         const defaultUsers = [
             { id: 'USR-1001', login: 'admin', passHash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', role: 'admin', balance: 500000, tutorsBought: [] },
             { id: 'USR-1002', login: 'Azizbek', passHash: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', role: 'student', balance: 200000, tutorsBought: [] }
@@ -517,11 +505,7 @@
 
         const defaultTutors = [
             {
-                id: 'tut-1',
-                name: 'Ibat',
-                subject: 'Ingliz tili',
-                sinf: 'Umumiy',
-                price: 90000,
+                id: 'tut-1', name: 'Ibat', subject: 'Ingliz tili', sinf: 'Umumiy', price: 90000, order: 1,
                 img: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop',
                 lessons: [
                     { id: 'l1', title: '1-Dars. English Alphabet & Pronunciation', url: 'https://player.vimeo.com/video/1226105435' },
@@ -530,11 +514,7 @@
                 ]
             },
             {
-                id: 'tut-2',
-                name: 'Jasur M.',
-                subject: 'Matematika',
-                sinf: '9-sinf',
-                price: 110000,
+                id: 'tut-2', name: 'Jasur M.', subject: 'Matematika', sinf: '9-sinf', price: 110000, order: 2,
                 img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop',
                 lessons: [
                     { id: 'l10', title: '1-Dars. Tenglamalar va tengsizliklar', url: 'https://player.vimeo.com/video/1226105435' }
@@ -553,7 +533,6 @@
         let isReg = false;
         let dbLoaded = false;
 
-        // PLAYER STATE
         let activeCourse = null;
         let activeLessonIndex = 0;
 
@@ -578,20 +557,14 @@
 
             renderAuthArea();
 
-            if (!document.getElementById('pageHome').classList.contains('hidden')) {
-                renderTutors();
-            }
-            if (!document.getElementById('pageMyCourses').classList.contains('hidden')) {
-                renderMyCourses();
-            }
+            if (!document.getElementById('pageHome').classList.contains('hidden')) renderTutors();
+            if (!document.getElementById('pageMyCourses').classList.contains('hidden')) renderMyCourses();
             if (!document.getElementById('pageAdmin').classList.contains('hidden')) {
                 renderAdminUsers();
                 renderAdminTutorsList();
                 updateAdminLessonSelect();
             }
-            if (!document.getElementById('pageProfile').classList.contains('hidden')) {
-                renderProfile();
-            }
+            if (!document.getElementById('pageProfile').classList.contains('hidden')) renderProfile();
         }
 
         function initFirebaseSync() {
@@ -627,6 +600,7 @@
                 const data = snapshot.val();
                 if (data) {
                     db.tutors = Object.values(data);
+                    migrateTutorOrder();
                 } else if (!dbLoaded) {
                     db.tutors = defaultTutors;
                     database.ref('tutors').set(arrayToFirebaseObj(defaultTutors));
@@ -670,7 +644,6 @@
             }
         }
 
-        // MOBILE NAV MENU
         function toggleMobileMenu() {
             const menu = document.getElementById('mobileMenu');
             const icon = document.getElementById('mobileMenuIcon');
@@ -684,7 +657,6 @@
             document.getElementById('mobileMenuIcon').className = 'fas fa-bars';
         }
 
-        // NAVIGATION
         function navigateTo(page) {
             document.getElementById('pageHome').classList.add('hidden');
             document.getElementById('pageMyCourses').classList.add('hidden');
@@ -714,7 +686,6 @@
             }
         }
 
-        // FILTERS & COURSES RENDER
         function renderFilters() {
             const sinflar = ['Barcha sinflar', 'Umumiy', '5-sinf', '6-sinf', '7-sinf', '8-sinf', '9-sinf', '10-sinf', '11-sinf'];
             const fanlar = ['Barcha fanlar', 'Ingliz tili', 'Matematika', 'Fizika', 'Informatika', 'Kimyo', 'Tarix'];
@@ -731,8 +702,51 @@
         function setClassFilter(val) { selectedClass = val; renderFilters(); renderTutors(); }
         function setSubjectFilter(val) { selectedSubject = val; renderFilters(); renderTutors(); }
 
+        // ==== SORTING ====
+        function sortTutors() {
+            db.tutors.sort((a, b) => (a.order || 0) - (b.order || 0));
+        }
+
+        function migrateTutorOrder() {
+            let changed = false;
+            // Идём по текущему порядку и присваиваем order тем, у кого нет
+            db.tutors.forEach((t, i) => {
+                if (typeof t.order !== 'number') {
+                    t.order = i + 1;
+                    changed = true;
+                }
+            });
+            if (changed) {
+                // Сохраняем только tutors, без полной перезаписи users
+                database.ref('tutors').set(arrayToFirebaseObj(db.tutors));
+                localStorage.setItem('db_tutors_cache', JSON.stringify(db.tutors));
+            }
+            sortTutors();
+        }
+
+        function moveTutor(id, direction) {
+            sortTutors();
+            const idx = db.tutors.findIndex(t => t.id === id);
+            if (idx === -1) return;
+
+            const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+            if (swapIdx < 0 || swapIdx >= db.tutors.length) return;
+
+            const tmp = db.tutors[idx].order;
+            db.tutors[idx].order = db.tutors[swapIdx].order;
+            db.tutors[swapIdx].order = tmp;
+
+            sortTutors();
+            saveDb();
+            renderAdminTutorsList();
+            renderTutors();
+            toast("Tartib o'zgartirildi!");
+        }
+        // ==== /SORTING ====
+
         function renderTutors() {
             const grid = document.getElementById('tutorsGrid');
+            sortTutors();
             const list = db.tutors.filter(t => {
                 const matchClass = selectedClass === 'Barcha sinflar' || t.sinf === selectedClass;
                 const matchSub = selectedSubject === 'Barcha fanlar' || t.subject === selectedSubject;
@@ -778,7 +792,6 @@
             `}).join('');
         }
 
-        // ============ buyTutor — endi balansdan yechiladi ============
         function buyTutor(id) {
             if (!db.currentUser) return openAuthModal();
 
@@ -790,16 +803,13 @@
             }
 
             if (db.currentUser.balance >= tutor.price) {
-                // Mablag' yetarli — balansdan yechamiz
                 purchaseFromBalance(id);
             } else {
-                // Mablag' yetarli emas — to'ldirishni taklif qilamiz
                 const missing = tutor.price - db.currentUser.balance;
                 openInsufficientFundsModal(tutor, missing);
             }
         }
 
-        // Balansdan xarid qilish (kartasiz)
         function purchaseFromBalance(tutorId) {
             const tutor = db.tutors.find(t => t.id === tutorId);
             if (!tutor || !db.currentUser) return;
@@ -846,9 +856,7 @@
             navigateTo('profile');
             setTimeout(() => openPaymentModal('topup', null), 300);
         }
-        // ============ /buyTutor ============
 
-        // RENDER MY COURSES
         function renderMyCourses() {
             const grid = document.getElementById('myCoursesGrid');
             if(!db.currentUser) return;
@@ -883,7 +891,6 @@
             `).join('');
         }
 
-        // COURSE PLAYER WITH PLAYLIST (100+ LESSONS)
         function openCoursePlayer(tutorId) {
             const tutor = db.tutors.find(t => t.id === tutorId);
             if(!tutor) return;
@@ -958,8 +965,6 @@
             document.getElementById('coursePlayerModal').classList.add('hidden');
         }
 
-        // ADMIN LESSON MANAGEMENT (100+ Lessons)
-
         function normalizeVideoUrl(raw) {
             let url = raw.trim();
 
@@ -980,6 +985,7 @@
 
         function updateAdminLessonSelect() {
             const select = document.getElementById('lessonTutorSelect');
+            sortTutors();
             select.innerHTML = db.tutors.map(t => `<option value="${t.id}">${t.name} (${t.subject})</option>`).join('');
             renderAdminLessonsList();
         }
@@ -1081,7 +1087,6 @@
             toast("Dars o'chirildi!");
         }
 
-        // AUTH SYSTEM (Защищённая авторизация)
         function renderAuthArea() {
             const area = document.getElementById('authNavArea');
             const adminBtn = document.getElementById('navAdminBtn');
@@ -1170,7 +1175,6 @@
             toast("Tizimdan chiqdingiz!");
         }
 
-        // ADMIN TAB SWITCHER
         function switchAdminTab(tab) {
             document.getElementById('adminTabUsers').classList.add('hidden');
             document.getElementById('adminTabTutors').classList.add('hidden');
@@ -1229,7 +1233,7 @@
             u.balance = 0; saveDb(); renderAdminUsers(); toast("Balans nol qilindi!");
         }
 
-        // ============ TUZATILGAN: addTutor — unikal ID, endi hech narsani o'chirmaydi ============
+        // ============ addTutor (unikal ID + order) ============
         function addTutor() {
             const name = document.getElementById('newTutorName').value.trim();
             const img = document.getElementById('newTutorImg').value.trim();
@@ -1239,8 +1243,8 @@
 
             if(!name || !price) return alert("Ma'lumotlarni to'liq kiriting!");
 
-            // Unikal ID — vaqtga asoslangan, mavjud ID bilan hech qachon to'qnashmaydi
             const newId = 'tut-' + Date.now();
+            const maxOrder = db.tutors.reduce((max, t) => Math.max(max, t.order || 0), 0);
 
             db.tutors.push({
                 id: newId,
@@ -1249,24 +1253,37 @@
                 price,
                 sinf,
                 subject,
-                lessons: []
+                lessons: [],
+                order: maxOrder + 1
             });
 
             saveDb();
             toast("Yangi repetitor qo'shildi!");
             renderAdminTutorsList();
 
-            // Formani tozalash
             document.getElementById('newTutorName').value = '';
             document.getElementById('newTutorImg').value = '';
             document.getElementById('newTutorPrice').value = '';
         }
-        // ============ /addTutor ============
 
         function renderAdminTutorsList() {
-            document.getElementById('adminTutorsList').innerHTML = db.tutors.map(t => `
+            sortTutors();
+            const total = db.tutors.length;
+
+            document.getElementById('adminTutorsList').innerHTML = db.tutors.map((t, i) => `
                 <div class="card-bg p-4 rounded-xl flex justify-between items-center gap-4">
                     <div class="flex items-center gap-3">
+                        <div class="flex flex-col gap-1">
+                            <button onclick="moveTutor('${t.id}', 'up')" ${i === 0 ? 'disabled' : ''}
+                                class="w-6 h-6 flex items-center justify-center rounded ${i === 0 ? 'bg-slate-800/40 text-slate-600 cursor-not-allowed' : 'bg-slate-800 hover:bg-blue-600 text-white'} text-xs transition">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                            <button onclick="moveTutor('${t.id}', 'down')" ${i === total - 1 ? 'disabled' : ''}
+                                class="w-6 h-6 flex items-center justify-center rounded ${i === total - 1 ? 'bg-slate-800/40 text-slate-600 cursor-not-allowed' : 'bg-slate-800 hover:bg-blue-600 text-white'} text-xs transition">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        <span class="text-xs font-black text-slate-500 w-6 text-center">${i + 1}</span>
                         <img src="${t.img}" class="w-12 h-12 rounded-lg object-cover">
                         <div>
                             <h4 class="font-bold text-white text-sm">${t.name} <span class="text-xs text-slate-500">(${t.id})</span></h4>
@@ -1318,6 +1335,7 @@
             db.tutors = db.tutors.filter(t => t.id !== id);
             saveDb();
             renderAdminTutorsList();
+            renderTutors();
             toast("O'chirildi!");
         }
 
@@ -1365,13 +1383,8 @@
             document.getElementById('paymentModal').classList.remove('hidden');
         }
 
-        function closePaymentModal() {
-            document.getElementById('paymentModal').classList.add('hidden');
-        }
-
-        function closePaySuccess() {
-            document.getElementById('paySuccess').classList.add('hidden');
-        }
+        function closePaymentModal() { document.getElementById('paymentModal').classList.add('hidden'); }
+        function closePaySuccess() { document.getElementById('paySuccess').classList.add('hidden'); }
 
         function formatCardNumber(el) {
             let v = el.value.replace(/\D/g, '').slice(0, 16);
@@ -1446,11 +1459,10 @@
             }, delay);
         }
 
-        // =================== SERVICE WORKER / PUSH NOTIFICATIONS ===================
+        // =================== SERVICE WORKER / PUSH ===================
 
         function initPushNotifications() {
             if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
-
             if (db.currentUser) {
                 const today = new Date().toISOString().slice(0, 10);
                 localStorage.setItem('edu_lastActive_' + db.currentUser.id, today);
@@ -1458,9 +1470,7 @@
         }
 
         async function requestPushPermission() {
-            if (!('Notification' in window)) {
-                return alert("Bu brauzer bildirishnomalarni qo'llab-quvvatlamaydi.");
-            }
+            if (!('Notification' in window)) return alert("Bu brauzer bildirishnomalarni qo'llab-quvvatlamaydi.");
             if (Notification.permission === 'granted') {
                 scheduleDailyReminder();
                 toast("Bildirishnomalar allaqachon yoqilgan! ✅");
@@ -1528,9 +1538,7 @@ self.addEventListener('notificationclick', e => {
             if (target <= now) target.setDate(target.getDate() + 1);
             const delay = target - now;
 
-            const sw = reg
-                ? navigator.serviceWorker.controller
-                : null;
+            const sw = reg ? navigator.serviceWorker.controller : null;
 
             if (sw) {
                 sw.postMessage({ type: 'SCHEDULE_REMINDER', delay, userId: db.currentUser.id });
@@ -1539,7 +1547,6 @@ self.addEventListener('notificationclick', e => {
             }
 
             localStorage.setItem('edu_reminderSet', target.toISOString());
-            console.log(`Reminder scheduled for ${target.toLocaleString()}`);
         }
 
         function scheduleDailyReminderFallback(customDelay) {
