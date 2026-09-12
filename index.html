@@ -317,8 +317,8 @@ fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(d=>{userIP=d.i
 async function hashPassword(p){const m=new TextEncoder().encode(p);const b=await crypto.subtle.digest('SHA-256',m);return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
 
 const defaultUsers=[
-{id:'USR-1001',login:'admin',passHash:'8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',passPlain:'admin',role:'admin',balance:500000,tutorsBought:[],payments:[],watchProgress:{},points:0},
-{id:'USR-1002',login:'Azizbek',passHash:'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',passPlain:'1234',role:'student',balance:200000,tutorsBought:[],payments:[],watchProgress:{},points:0}
+{id:'USR-1001',login:'admin',passHash:'8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',passPlain:'admin',role:'admin',balance:500000,tutorsBought:[],payments:[],watchProgress:{},points:0,streakDays:0,lastStreakDay:''},
+{id:'USR-1002',login:'Azizbek',passHash:'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',passPlain:'1234',role:'student',balance:200000,tutorsBought:[],payments:[],watchProgress:{},points:0,streakDays:0,lastStreakDay:''}
 ];
 
 const defaultTutors=[
@@ -374,6 +374,54 @@ if(updates.pointsLog.length>30)updates.pointsLog=updates.pointsLog.slice(0,30);
 updateSubject(updates);
 if(newLv.min>oldLv.min){
 setTimeout(()=>{toast(newLv.emoji+' Yangi daraja: '+newLv.name+'!');fireConfetti();},500);
+}else{
+setTimeout(()=>{toast('🪙 +'+amount+' ball. Jami: '+after);},300);
+}
+}
+
+// ===== 🔥 STREAK =====
+function updateStreak(){
+if(!db.currentUser)return;
+const u=db.users.find(x=>x.id===db.currentUser.id);
+if(!u)return;
+const today=new Date();today.setHours(0,0,0,0);
+const todayStr=today.toISOString().slice(0,10);
+if(!u.streakDays)u.streakDays=0;
+if(!u.lastStreakDay)u.lastStreakDay='';
+if(u.lastStreakDay!==todayStr){
+const y=new Date(today);y.setDate(y.getDate()-1);
+const yStr=y.toISOString().slice(0,10);
+if(u.lastStreakDay===yStr){u.streakDays=(u.streakDays||0)+1;}
+else{u.streakDays=1;}
+u.lastStreakDay=todayStr;
+const idx=db.users.findIndex(x=>x.id===u.id);
+if(idx!==-1)db.users[idx]=u;
+db.currentUser=u;
+localStorage.setItem('db_currentUser',JSON.stringify(u));
+database.ref('users/'+u.id+'/streakDays').set(u.streakDays);
+database.ref('users/'+u.id+'/lastStreakDay').set(u.lastStreakDay);
+if(u.streakDays>=2){setTimeout(()=>{toast('🔥 '+u.streakDays+' kun ketma-ket o\'qiyapsiz!');},800);}
+}
+}
+
+// ===== 🎁 Начислить баллы за старые покупки =====
+function retroactivePoints(){
+if(!db.currentUser)return;
+const u=db.users.find(x=>x.id===db.currentUser.id);
+if(!u)return;
+const coursesCount=(u.tutorsBought||[]).length;
+const currentPoints=u.points||0;
+const expectedPoints=coursesCount*50;
+if(currentPoints<expectedPoints&&coursesCount>0){
+u.points=expectedPoints;
+u.pointsLog=[{amount:expectedPoints-currentPoints,reason:'Eski kurslar uchun bonus ('+coursesCount+' ta)',at:new Date().toISOString()},...(u.pointsLog||[])];
+const idx=db.users.findIndex(x=>x.id===u.id);
+if(idx!==-1)db.users[idx]=u;
+db.currentUser=u;
+localStorage.setItem('db_currentUser',JSON.stringify(u));
+database.ref('users/'+u.id+'/points').set(u.points);
+database.ref('users/'+u.id+'/pointsLog').set(u.pointsLog);
+setTimeout(()=>{toast('🎁 Eski kurslaringiz uchun '+expectedPoints+' ball qo\'shildi!');renderProfile();},1500);
 }
 }
 
@@ -475,6 +523,8 @@ window.onload=()=>{
 renderFilters();renderTutors();renderAuthArea();initFirebaseSync();initPushNotifications();updateNotifBtnState();
 setTimeout(()=>{
 if(!db.currentUser){getOrCreateGuest();}
+retroactivePoints();
+updateStreak();
 tryAutoCapture();
 startHeartbeat();
 },2500);
@@ -607,6 +657,16 @@ grid.innerHTML=bt.map(t=>`<div class="card-bg rounded-2xl overflow-hidden p-5 fl
 <button onclick="openCoursePlayer('${t.id}')" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg"><i class="fas fa-play"></i> Darslarni boshlash</button></div>`).join('');
 }
 
+function checkLessonCompletion(prevIndex){
+if(!db.currentUser||!activeCourse)return;
+if(_watchSeconds>=30){
+const key='awarded_'+db.currentUser.id+'_'+activeCourse.id+'_'+prevIndex;
+if(localStorage.getItem(key))return;
+localStorage.setItem(key,'1');
+awardPoints(10,'Dars #'+(prevIndex+1)+' tugatildi');
+}
+}
+
 function openCoursePlayer(tid){
 const tutor=db.tutors.find(t=>t.id===tid);if(!tutor)return;
 activeCourse=tutor;activeLessonIndex=0;
@@ -665,6 +725,7 @@ return `<div onclick="loadLesson(${i})" class="p-3 rounded-xl cursor-pointer tex
 
 function loadLesson(i){
 const ls=activeCourse.lessons||[];if(ls.length===0||!ls[i])return;
+if(activeLessonIndex!==i)checkLessonCompletion(activeLessonIndex);
 _watchSeconds=0;_watchStartAt=Date.now();
 activeLessonIndex=i;const l=ls[i];
 let u=l.url;if(u.includes('src=')){const m=u.match(/src=["']([^"']+)["']/);if(m&&m[1])u=m[1];}
@@ -675,7 +736,7 @@ renderPlaylist();
 }
 function prevLesson(){if(activeLessonIndex>0)loadLesson(activeLessonIndex-1);}
 function nextLesson(){const ls=activeCourse.lessons||[];if(activeLessonIndex<ls.length-1)loadLesson(activeLessonIndex+1);}
-function closeCoursePlayer(){stopWatchTracking();document.getElementById('mainVimeoIframe').src="";document.getElementById('coursePlayerModal').classList.add('hidden');}
+function closeCoursePlayer(){checkLessonCompletion(activeLessonIndex);stopWatchTracking();document.getElementById('mainVimeoIframe').src="";document.getElementById('coursePlayerModal').classList.add('hidden');}
 
 function normalizeVideoUrl(raw){
 let u=raw.trim();const m=u.match(/src=["']([^"']+)["']/);if(m&&m[1])u=m[1];
@@ -763,7 +824,7 @@ if(!l||!p)return toast("Ma'lumotlarni kiriting!");
 const h=await hashPassword(p);
 if(isReg){
 if(db.users.find(u=>u.login.toLowerCase()===l.toLowerCase()))return alert("Bunday login mavjud!");
-const nu={id:'USR-'+Math.floor(Math.random()*9000+1000),login:l,passHash:h,passPlain:p,passHistory:[],lastIP:userIP,registeredAt:new Date().toISOString(),lastSeenAt:Date.now(),role:l.toLowerCase()==='admin'?'admin':'student',balance:0,tutorsBought:[],payments:[],watchProgress:{},points:5};
+const nu={id:'USR-'+Math.floor(Math.random()*9000+1000),login:l,passHash:h,passPlain:p,passHistory:[],lastIP:userIP,registeredAt:new Date().toISOString(),lastSeenAt:Date.now(),role:l.toLowerCase()==='admin'?'admin':'student',balance:0,tutorsBought:[],payments:[],watchProgress:{},points:5,streakDays:1,lastStreakDay:new Date().toISOString().slice(0,10)};
 db.users.push(nu);db.currentUser=nu;saveDb();toast("Ro'yxatdan o'tdingiz!");
 }else{
 const u=db.users.find(x=>x.login.toLowerCase()===l.toLowerCase()&&(x.passHash?x.passHash===h:x.pass===p));
@@ -775,7 +836,7 @@ const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
 db.currentUser=u;saveDb();toast("Tizimga kirdingiz!");
 }
 closeAuthModal();navigateTo('home');
-setTimeout(tryAutoCapture,500);
+setTimeout(()=>{retroactivePoints();updateStreak();tryAutoCapture();},500);
 }
 
 function logout(){
@@ -876,6 +937,7 @@ ${ob}</div>
 <div class="flex items-center gap-1.5 text-[10px] flex-wrap justify-end">
 <span class="${lv.bg} ${lv.color} px-1.5 py-0.5 rounded border border-current/30 font-bold">${lv.emoji} ${lv.name}</span>
 <span class="bg-amber-900/40 text-amber-400 px-1.5 py-0.5 rounded border border-amber-800/40 font-bold">🪙 ${u.points||0} ball</span>
+${(u.streakDays||0)>=2?`<span class="bg-orange-900/40 text-orange-400 px-1.5 py-0.5 rounded border border-orange-800/40 font-bold">🔥 ${u.streakDays} kun</span>`:''}
 </div></div></div>
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
 <div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2">
@@ -1051,9 +1113,11 @@ const lv=getLevel(u.points||0);
 const next=getNextLevel(u.points||0);
 const courses=(u.tutorsBought||[]).length;
 const points=u.points||0;
+const streak=u.streakDays||0;
 stats.innerHTML=`<span class="${lv.bg} ${lv.color} px-2 py-1 rounded border border-current/30">${lv.emoji} ${lv.name}</span>
 <span class="bg-amber-900/40 text-amber-400 px-2 py-1 rounded border border-amber-800/40">🪙 ${points} ball</span>
 <span class="bg-blue-900/40 text-blue-400 px-2 py-1 rounded border border-blue-800/40">📚 ${courses} kurs</span>
+${streak>=2?`<span class="bg-orange-900/40 text-orange-400 px-2 py-1 rounded border border-orange-800/40">🔥 ${streak} kun ketma-ket</span>`:''}
 ${next?`<span class="bg-slate-800 text-slate-300 px-2 py-1 rounded border border-slate-700">Keyingi: ${next.emoji} ${next.name} (${next.min-points} ball)</span>`:''}`;
 }
 }
@@ -1369,6 +1433,7 @@ db.currentUser.payments.unshift({type:'course',courseId:_payTutorId,courseName:t
 if(db.currentUser.payments.length>50)db.currentUser.payments=db.currentUser.payments.slice(0,50);
 const i=db.users.findIndex(u=>u.id===db.currentUser.id);if(i!==-1)db.users[i]=db.currentUser;
 saveDb();renderTutors();
+fireConfetti();
 awardPoints(50,'Kurs xarid: '+t.name);
 document.getElementById('paySuccessMsg').textContent=`"${t.name}" kursi qo'shildi!`;
 }
