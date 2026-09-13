@@ -8,31 +8,14 @@
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="manifest" href="manifest.json">
-
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
 <style>
-:root{
---bg:#0d1117;
---card:#161b22;
---border:#30363d;
---text:#c9d1d9;
---text-muted:#8b949e;
---blue:#2563eb;
---accent:#3b82f6;
-}
-body.light-mode{
---bg:#f6f8fa;
---card:#ffffff;
---border:#d0d7de;
---text:#1f2328;
---text-muted:#656d76;
-}
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--text-muted:#8b949e;--blue:#2563eb;--accent:#3b82f6;}
+body.light-mode{--bg:#f6f8fa;--card:#ffffff;--border:#d0d7de;--text:#1f2328;--text-muted:#656d76;}
 *{-webkit-tap-highlight-color:transparent;box-sizing:border-box;}
 html,body{margin:0;padding:0;font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
 body{transition:background .3s,color .3s;min-height:100vh;}
@@ -51,46 +34,83 @@ body.light-mode .card-bg{box-shadow:0 1px 3px rgba(0,0,0,.05);}
 .skeleton{background:linear-gradient(90deg,#1c2128 25%,#22272e 50%,#1c2128 75%);background-size:200% 100%;animation:skel 1.4s infinite;border-radius:8px;}
 @keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .skeleton-card{background:var(--card);border:1px solid var(--border);border-radius:1rem;overflow:hidden;}
-
 .confetti-piece{position:fixed;top:-10px;z-index:9999;pointer-events:none;animation:confettiFall linear forwards;}
 @keyframes confettiFall{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
-
-.achievement-toast{animation:achPop .5s cubic-bezier(.68,-0.55,.27,1.55);}
+.achievement-toast{animation:achPop .5s cubic-bezier(.68,-.55,.27,1.55);}
 @keyframes achPop{0%{transform:scale(0) translateX(100px);opacity:0}100%{transform:scale(1) translateX(0);opacity:1}}
-
 .chart-bar{transition:height .5s ease;}
-
 .act-cell{width:12px;height:12px;border-radius:2px;background:#161b22;}
-.act-0{background:#161b22;}
-.act-1{background:#0e4429;}
-.act-2{background:#006d32;}
-.act-3{background:#26a641;}
-.act-4{background:#39d353;}
-body.light-mode .act-0{background:#ebedf0;}
-body.light-mode .act-1{background:#9be9a8;}
-body.light-mode .act-2{background:#40c463;}
-body.light-mode .act-3{background:#30a14e;}
-body.light-mode .act-4{background:#216e39;}
-
+.act-0{background:#161b22;}.act-1{background:#0e4429;}.act-2{background:#006d32;}.act-3{background:#26a641;}.act-4{background:#39d353;}
+body.light-mode .act-0{background:#ebedf0;}body.light-mode .act-1{background:#9be9a8;}body.light-mode .act-2{background:#40c463;}body.light-mode .act-3{background:#30a14e;}body.light-mode .act-4{background:#216e39;}
 .star{cursor:pointer;transition:transform .15s;}
 .star:hover{transform:scale(1.2);}
-
 #toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:9999;background:#1f2937;color:#fff;padding:12px 22px;border-radius:12px;font-weight:600;font-size:13px;box-shadow:0 10px 40px rgba(0,0,0,.5);border:1px solid #374151;}
-
 .ltab{transition:all .2s;border-bottom:2px solid transparent;}
 .ltab.active{color:#3b82f6;border-bottom-color:#3b82f6;font-weight:700;}
-
 ::-webkit-scrollbar{width:8px;height:8px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:#30363d;border-radius:4px;}
 ::-webkit-scrollbar-thumb:hover{background:#484f58;}
-
 input,textarea,select{font-family:inherit;}
 textarea{resize:vertical;}
+@media(max-width:640px){.act-cell{width:10px;height:10px;}}
 
-@media(max-width:640px){
-.act-cell{width:10px;height:10px;}
-}
+/* ===== LIGHT MODE OVERRIDES ===== */
+body.light-mode{background:#f6f8fa!important;color:#1f2328!important;}
+body.light-mode header{background:rgba(255,255,255,.95)!important;border-color:#d0d7de!important;}
+body.light-mode nav{background:rgba(255,255,255,.85)!important;border-color:#d0d7de!important;}
+body.light-mode .card-bg{background:#fff!important;border-color:#d0d7de!important;}
+body.light-mode .text-white{color:#1f2328!important;}
+body.light-mode .text-slate-100{color:#1f2328!important;}
+body.light-mode .text-slate-200{color:#24292f!important;}
+body.light-mode .text-slate-300{color:#424a53!important;}
+body.light-mode .text-slate-400{color:#57606a!important;}
+body.light-mode .text-slate-500{color:#6e7781!important;}
+body.light-mode .text-slate-600{color:#6e7781!important;}
+body.light-mode .bg-slate-900{background:#f6f8fa!important;}
+body.light-mode .bg-slate-900\/60{background:#f6f8fa!important;}
+body.light-mode .bg-slate-900\/70{background:#f6f8fa!important;}
+body.light-mode .bg-slate-800{background:#eaeef2!important;}
+body.light-mode .bg-slate-800\/40{background:rgba(234,238,242,.5)!important;}
+body.light-mode .bg-slate-800\/60{background:rgba(234,238,242,.7)!important;}
+body.light-mode .bg-slate-700{background:#d0d7de!important;}
+body.light-mode .bg-slate-900\/30{background:rgba(246,248,250,.7)!important;}
+body.light-mode .border-slate-800{border-color:#d0d7de!important;}
+body.light-mode .border-slate-800\/50{border-color:rgba(208,215,222,.5)!important;}
+body.light-mode .border-slate-700{border-color:#d0d7de!important;}
+body.light-mode .border-slate-600{border-color:#d0d7de!important;}
+body.light-mode input,body.light-mode textarea,body.light-mode select{background:#fff!important;color:#1f2328!important;border-color:#d0d7de!important;}
+body.light-mode input::placeholder,body.light-mode textarea::placeholder{color:#8c959f!important;}
+body.light-mode input:focus,body.light-mode textarea:focus,body.light-mode select:focus{border-color:#2563eb!important;box-shadow:0 0 0 3px rgba(37,99,235,.15)!important;}
+body.light-mode #mobileMenuIcon,body.light-mode #themeIcon{color:#1f2328!important;}
+body.light-mode header button.bg-slate-800,body.light-mode .bg-slate-800.hover\:bg-slate-700{background:#eaeef2!important;color:#1f2328!important;}
+body.light-mode .bg-slate-800.hover\:bg-slate-700:hover{background:#d0d7de!important;}
+body.light-mode #mobileMenu > div{background:#fff!important;}
+body.light-mode #mobileMenu button{background:#f6f8fa!important;color:#1f2328!important;}
+body.light-mode #mobileMenu button:hover{background:#2563eb!important;color:#fff!important;}
+body.light-mode nav button{color:#57606a!important;}
+body.light-mode nav button:hover{color:#1f2328!important;}
+body.light-mode .hover-lift:hover{box-shadow:0 10px 30px rgba(0,0,0,.08);}
+body.light-mode .skeleton{background:linear-gradient(90deg,#eaeef2 25%,#f6f8fa 50%,#eaeef2 75%)!important;background-size:200% 100%!important;}
+body.light-mode .skeleton-card{background:#fff!important;}
+body.light-mode .bg-emerald-900\/30{background:rgba(16,185,129,.1)!important;}
+body.light-mode .border-emerald-700\/40{border-color:rgba(16,185,129,.3)!important;}
+body.light-mode .text-emerald-400{color:#059669!important;}
+body.light-mode #authModal > div,body.light-mode #broadcastModal > div,body.light-mode #editTutorModal > div,body.light-mode #groupModal > div,body.light-mode #shareProfileModal > div,body.light-mode #certificateModal > div{background:#fff!important;border-color:#d0d7de!important;}
+body.light-mode #coursePlayerModal > div{background:#fff!important;}
+body.light-mode #coursePlayerModal .bg-black{background:#0d1117!important;}
+body.light-mode #coursePlayerModal .text-white{color:#fff!important;}
+body.light-mode option{background:#fff!important;color:#1f2328!important;}
+body.light-mode #toast{background:#1f2937;color:#fff;}
+body.light-mode .text-blue-400{color:#2563eb!important;}
+body.light-mode .text-purple-400{color:#7c3aed!important;}
+body.light-mode .text-amber-400{color:#d97706!important;}
+body.light-mode .text-pink-400{color:#db2777!important;}
+body.light-mode .text-teal-400{color:#0d9488!important;}
+body.light-mode .text-red-400{color:#dc2626!important;}
+body.light-mode .text-orange-400{color:#ea580c!important;}
+body.light-mode ::-webkit-scrollbar-thumb{background:#d0d7de;}
+body.light-mode ::-webkit-scrollbar-thumb:hover{background:#8c959f;}
 </style>
 </head>
 <body>
@@ -99,40 +119,27 @@ textarea{resize:vertical;}
 <header class="sticky top-0 z-50 bg-[var(--card)]/95 backdrop-blur-lg border-b border-[var(--border)]">
 <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
 <div class="flex items-center gap-3">
-<button onclick="toggleMobileMenu()" class="md:hidden w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-white btn-press">
-<i id="mobileMenuIcon" class="fas fa-bars"></i>
-</button>
+<button onclick="toggleMobileMenu()" class="md:hidden w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-white btn-press"><i id="mobileMenuIcon" class="fas fa-bars"></i></button>
 <div class="flex items-center gap-2 cursor-pointer" onclick="navigateTo('home')">
 <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-lg shadow-lg">Z</div>
-<div class="hidden sm:block">
-<p class="font-black text-white text-base leading-4">ZukkoTalim</p>
-<p class="text-[10px] text-slate-400">Online ta'lim</p>
+<div class="hidden sm:block"><p class="font-black text-white text-base leading-4">ZukkoTalim</p><p class="text-[10px] text-slate-400">Online ta'lim</p></div>
 </div>
 </div>
-</div>
-
 <div class="flex-1 max-w-md hidden md:block relative">
 <input id="searchInput" oninput="runGlobalSearch(this.value)" placeholder="Kurs yoki dars qidirish..." class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-2 pl-10 text-sm text-white outline-none">
 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
 <div id="searchResults" class="hidden absolute top-full left-0 right-0 mt-2 bg-[var(--card)] border border-[var(--border)] rounded-xl p-2 max-h-96 overflow-y-auto shadow-2xl z-50 space-y-1"></div>
 </div>
-
 <div class="flex items-center gap-2">
 <div class="hidden sm:flex items-center gap-1.5 bg-emerald-900/30 border border-emerald-700/40 rounded-lg px-3 py-1.5">
 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
 <span id="onlineCountNum" class="text-emerald-400 font-bold text-xs">0</span>
 </div>
-<button onclick="toggleTheme()" class="w-9 h-9 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-white btn-press">
-<i id="themeIcon" class="fas fa-moon"></i>
-</button>
-<button id="notifBtn" onclick="requestPushPermission()" class="hidden sm:block bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-lg whitespace-nowrap btn-press">
-<i class="fas fa-bell mr-1"></i> Yoqish
-</button>
+<button onclick="toggleTheme()" class="w-9 h-9 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-white btn-press"><i id="themeIcon" class="fas fa-moon"></i></button>
+<button id="notifBtn" onclick="requestPushPermission()" class="hidden sm:block bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-lg whitespace-nowrap btn-press"><i class="fas fa-bell mr-1"></i> Yoqish</button>
 <div id="authArea" class="flex items-center gap-2"></div>
 </div>
 </div>
-
-<!-- Mobile search -->
 <div class="md:hidden px-4 pb-3 relative">
 <input id="searchInputMobile" oninput="runGlobalSearch(this.value)" placeholder="Qidirish..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 pl-10 text-sm text-white outline-none">
 <i class="fas fa-search absolute left-7 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
@@ -169,7 +176,7 @@ textarea{resize:vertical;}
 
 <main class="max-w-7xl mx-auto px-4 py-6 pb-20">
 
-<!-- ===== PAGE: HOME ===== -->
+<!-- PAGE: HOME -->
 <div id="pageHome">
 <div class="rounded-3xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 p-8 md:p-12 mb-6 shadow-2xl relative overflow-hidden">
 <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,.15),transparent_50%)]"></div>
@@ -182,71 +189,53 @@ textarea{resize:vertical;}
 </div>
 </div>
 </div>
-
 <div class="mb-6 space-y-3">
-<div>
-<p class="text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-wider">Sinf</p>
-<div id="classFilters" class="flex gap-2 overflow-x-auto pb-1"></div>
+<div><p class="text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-wider">Sinf</p><div id="classFilters" class="flex gap-2 overflow-x-auto pb-1"></div></div>
+<div><p class="text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-wider">Fan</p><div id="subjectFilters" class="flex gap-2 overflow-x-auto pb-1"></div></div>
 </div>
-<div>
-<p class="text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-wider">Fan</p>
-<div id="subjectFilters" class="flex gap-2 overflow-x-auto pb-1"></div>
-</div>
-</div>
-
 <h2 class="text-xl font-black text-white mb-4 flex items-center gap-2"><i class="fas fa-graduation-cap text-blue-400"></i> Repetitorlar</h2>
 <div id="tutorsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
-</div><!-- ===== PAGE: MY COURSES ===== -->
+</div>
+
+<!-- PAGE: MY COURSES -->
 <div id="pageMyCourses" class="hidden">
 <h2 class="text-2xl font-black text-white mb-2 flex items-center gap-2"><i class="fas fa-book text-blue-400"></i> Mening kurslarim</h2>
 <p class="text-xs text-slate-500 mb-5">Siz xarid qilgan kurslar</p>
 <div id="myCoursesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
 </div>
 
-<!-- ===== PAGE: SHOP ===== -->
+<!-- PAGE: SHOP -->
 <div id="pageShop" class="hidden">
 <div class="flex justify-between items-center mb-5 flex-wrap gap-3">
-<div>
-<h2 class="text-2xl font-black text-white flex items-center gap-2"><i class="fas fa-store text-pink-400"></i> Do'kon</h2>
-<p class="text-xs text-slate-500">Ballarga sovg'alar va chegirmalar</p>
+<div><h2 class="text-2xl font-black text-white flex items-center gap-2"><i class="fas fa-store text-pink-400"></i> Do'kon</h2><p class="text-xs text-slate-500">Ballarga sovg'alar va chegirmalar</p></div>
+<div class="bg-amber-900/30 border border-amber-700/50 rounded-xl px-4 py-2 flex items-center gap-2"><span class="text-2xl">🪙</span><span id="shopMyPoints" class="text-amber-300 font-black text-lg">0</span><span class="text-xs text-amber-500">ball</span></div>
 </div>
-<div class="bg-amber-900/30 border border-amber-700/50 rounded-xl px-4 py-2 flex items-center gap-2">
-<span class="text-2xl">🪙</span>
-<span id="shopMyPoints" class="text-amber-300 font-black text-lg">0</span>
-<span class="text-xs text-amber-500">ball</span>
-</div>
-</div>
-
 <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3"><i class="fas fa-crown mr-1 text-amber-400"></i> Profil ramkalari</h3>
 <div id="shopFrames" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"></div>
-
 <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3"><i class="fas fa-tags mr-1 text-emerald-400"></i> Chegirma kuponlari</h3>
 <div id="shopCoupons" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-8"></div>
-
 <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3"><i class="fas fa-star mr-1 text-purple-400"></i> Boshqa xizmatlar</h3>
 <div id="shopOthers" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
 </div>
 
-<!-- ===== PAGE: GROUPS ===== -->
+<!-- PAGE: GROUPS -->
 <div id="pageGroups" class="hidden">
 <h2 class="text-2xl font-black text-white mb-2 flex items-center gap-2"><i class="fas fa-users text-teal-400"></i> Mening guruhlarim</h2>
 <p class="text-xs text-slate-500 mb-5">Siz a'zo bo'lgan guruhlar</p>
 <div id="myGroupsList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
 </div>
 
-<!-- ===== PAGE: SCHEDULE ===== -->
+<!-- PAGE: SCHEDULE -->
 <div id="pageSchedule" class="hidden">
 <h2 class="text-2xl font-black text-white mb-2 flex items-center gap-2"><i class="fas fa-calendar-alt text-purple-400"></i> Dars jadvali</h2>
 <p class="text-xs text-slate-500 mb-5">Rejalashtirilgan darslar</p>
 <div id="scheduleList" class="space-y-4"></div>
 </div>
 
-<!-- ===== PAGE: PUBLIC PROFILE ===== -->
-<div id="pagePublicProfile" class="hidden">
-<div id="publicProfileContent"></div>
-</div>
+<!-- PAGE: PUBLIC PROFILE -->
+<div id="pagePublicProfile" class="hidden"><div id="publicProfileContent"></div></div>
 
-<!-- ===== PAGE: LEADERBOARD ===== -->
+<!-- PAGE: LEADERBOARD -->
 <div id="pageLeaderboard" class="hidden">
 <div class="text-center mb-6">
 <div class="text-6xl mb-3">🏆</div>
@@ -256,21 +245,15 @@ textarea{resize:vertical;}
 <div id="publicLeaderboardList" class="space-y-3 max-w-3xl mx-auto"></div>
 </div>
 
-<!-- ===== PAGE: PROFILE ===== -->
-<div id="pageProfile" class="hidden">
-<div id="profileContent"></div>
-</div>
+<!-- PAGE: PROFILE -->
+<div id="pageProfile" class="hidden"><div id="profileContent"></div></div>
 
-<!-- ===== PAGE: ADMIN ===== -->
+<!-- PAGE: ADMIN -->
 <div id="pageAdmin" class="hidden">
 <div class="flex items-center gap-3 mb-5">
 <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white text-2xl"><i class="fas fa-shield-alt"></i></div>
-<div>
-<h2 class="text-2xl font-black text-white">Admin panel</h2>
-<p class="text-xs text-slate-500">Boshqaruv markazi</p>
+<div><h2 class="text-2xl font-black text-white">Admin panel</h2><p class="text-xs text-slate-500">Boshqaruv markazi</p></div>
 </div>
-</div>
-
 <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl mb-5 overflow-x-auto">
 <div class="flex gap-1 p-1 min-w-max">
 <button id="tabStatsBtn" onclick="switchAdminTab('stats')" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white">📊 Stats</button>
@@ -286,7 +269,6 @@ textarea{resize:vertical;}
 </div>
 </div>
 
-<!-- TAB: STATS -->
 <div id="adminTabStats" class="hidden space-y-5">
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
 <div class="card-bg p-5 rounded-2xl"><p class="text-xs text-slate-500 mb-1">Foydalanuvchilar</p><p id="statUsers" class="text-3xl font-black text-white">0</p></div>
@@ -294,37 +276,23 @@ textarea{resize:vertical;}
 <div class="card-bg p-5 rounded-2xl"><p class="text-xs text-slate-500 mb-1">Repetitorlar</p><p id="statTutors" class="text-3xl font-black text-blue-400">0</p></div>
 <div class="card-bg p-5 rounded-2xl"><p class="text-xs text-slate-500 mb-1">Daromad</p><p id="statRevenue" class="text-3xl font-black text-amber-400">0</p></div>
 </div>
-<div class="card-bg p-5 rounded-2xl">
-<p class="text-sm font-bold text-white mb-3"><i class="fas fa-chart-line text-blue-400 mr-1"></i> Oxirgi 7 kun</p>
-<div id="statChart" class="flex gap-2 h-40 items-end"></div>
-</div>
+<div class="card-bg p-5 rounded-2xl"><p class="text-sm font-bold text-white mb-3"><i class="fas fa-chart-line text-blue-400 mr-1"></i> Oxirgi 7 kun</p><div id="statChart" class="flex gap-2 h-40 items-end"></div></div>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-<div class="card-bg p-5 rounded-2xl">
-<p class="text-sm font-bold text-white mb-3"><i class="fas fa-fire text-amber-400 mr-1"></i> TOP-5 faol</p>
-<div id="statTopActive" class="space-y-2"></div>
-</div>
-<div class="card-bg p-5 rounded-2xl">
-<p class="text-sm font-bold text-white mb-3"><i class="fas fa-trophy text-blue-400 mr-1"></i> TOP-5 kurslar</p>
-<div id="statTopCourses" class="space-y-2"></div>
-</div>
+<div class="card-bg p-5 rounded-2xl"><p class="text-sm font-bold text-white mb-3"><i class="fas fa-fire text-amber-400 mr-1"></i> TOP-5 faol</p><div id="statTopActive" class="space-y-2"></div></div>
+<div class="card-bg p-5 rounded-2xl"><p class="text-sm font-bold text-white mb-3"><i class="fas fa-trophy text-blue-400 mr-1"></i> TOP-5 kurslar</p><div id="statTopCourses" class="space-y-2"></div></div>
 </div>
 </div>
 
-<!-- TAB: USERS -->
 <div id="adminTabUsers" class="hidden space-y-3">
-<div class="card-bg p-4 rounded-xl">
-<input id="adminUserSearch" oninput="renderAdminUsers()" placeholder="Login yoki ID bo'yicha qidirish..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white outline-none focus:border-blue-500">
-</div>
+<div class="card-bg p-4 rounded-xl"><input id="adminUserSearch" oninput="renderAdminUsers()" placeholder="Login, telefon yoki ID bo'yicha qidirish..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white outline-none focus:border-blue-500"></div>
 <div id="adminUsersList" class="space-y-2"></div>
 </div>
 
-<!-- TAB: GUESTS -->
 <div id="adminTabGuests" class="hidden space-y-3">
 <p class="text-xs text-slate-500">Mehmonlar (ro'yxatdan o'tmaganlar)</p>
 <div id="adminGuestsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
 </div>
 
-<!-- TAB: TUTORS -->
 <div id="adminTabTutors" class="hidden space-y-5">
 <div class="card-bg p-5 rounded-2xl">
 <h3 class="text-base font-bold text-white mb-3"><i class="fas fa-plus text-blue-400 mr-1"></i> Yangi repetitor</h3>
@@ -341,7 +309,6 @@ textarea{resize:vertical;}
 </div>
 <button onclick="addTutor()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-5 py-2.5 rounded-lg btn-press"><i class="fas fa-save mr-1"></i> Qo'shish</button>
 </div>
-
 <div class="card-bg p-5 rounded-2xl">
 <h3 class="text-base font-bold text-white mb-3"><i class="fas fa-images text-emerald-400 mr-1"></i> Rasmlarni ommaviy yuklash</h3>
 <div id="dropZone" class="border-2 border-dashed border-slate-700 hover:border-emerald-500 rounded-xl p-6 text-center cursor-pointer transition">
@@ -351,11 +318,9 @@ textarea{resize:vertical;}
 </div>
 <div id="dropPreviews" class="mt-3 space-y-2"></div>
 </div>
-
 <div id="adminTutorsList" class="space-y-2"></div>
 </div>
 
-<!-- TAB: LESSONS -->
 <div id="adminTabLessons" class="hidden space-y-5">
 <div class="card-bg p-5 rounded-2xl">
 <h3 class="text-base font-bold text-white mb-3"><i class="fas fa-plus text-blue-400 mr-1"></i> Yangi dars</h3>
@@ -367,7 +332,6 @@ textarea{resize:vertical;}
 </div>
 <button onclick="addLessonToTutor()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-5 py-2.5 rounded-lg btn-press"><i class="fas fa-plus mr-1"></i> Qo'shish</button>
 </div>
-
 <div class="card-bg p-5 rounded-2xl">
 <h3 class="text-base font-bold text-white mb-3"><i class="fab fa-youtube text-red-500 mr-1"></i> YouTube pleylisti</h3>
 <select id="ytPlaylistTutor" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white outline-none mb-2"></select>
@@ -375,18 +339,15 @@ textarea{resize:vertical;}
 <button id="ytImportBtn" onclick="importYouTubePlaylist()" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold px-5 py-2.5 rounded-lg btn-press"><i class="fab fa-youtube mr-1"></i> Barcha videolarni yuklash</button>
 <p id="ytImportStatus" class="text-xs font-semibold text-slate-400 mt-2 hidden"></p>
 </div>
-
 <div class="card-bg p-5 rounded-2xl">
 <h3 class="text-base font-bold text-white mb-3"><i class="fas fa-list text-emerald-400 mr-1"></i> Ommaviy qo'shish</h3>
 <p class="text-xs text-slate-500 mb-2">Har qatorda: <code class="bg-slate-800 px-2 py-1 rounded text-emerald-400">Dars nomi | Video URL</code></p>
 <textarea id="bulkLessonsInput" rows="6" placeholder="1-Dars. Kirish | https://youtu.be/xxxxx&#10;2-Dars. Asoslar | https://youtu.be/yyyyy" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-emerald-500 font-mono"></textarea>
 <button onclick="addLessonsBulk()" class="mt-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold px-5 py-2.5 rounded-lg btn-press"><i class="fas fa-check mr-1"></i> Qo'shish</button>
 </div>
-
 <div id="adminLessonsList" class="space-y-2"></div>
 </div>
 
-<!-- TAB: GROUPS -->
 <div id="adminTabGroups" class="hidden space-y-5">
 <div class="card-bg p-5 rounded-2xl">
 <h3 class="text-base font-bold text-white mb-3"><i class="fas fa-plus text-teal-400 mr-1"></i> Yangi guruh</h3>
@@ -399,7 +360,6 @@ textarea{resize:vertical;}
 <div id="groupsList" class="space-y-3"></div>
 </div>
 
-<!-- TAB: PROMOS -->
 <div id="adminTabPromos" class="hidden space-y-5">
 <div class="card-bg p-5 rounded-2xl">
 <h3 class="text-base font-bold text-white mb-3"><i class="fas fa-plus text-amber-400 mr-1"></i> Yangi promokod</h3>
@@ -413,7 +373,6 @@ textarea{resize:vertical;}
 <div id="promosList" class="space-y-2"></div>
 </div>
 
-<!-- TAB: BROADCAST -->
 <div id="adminTabBroadcast" class="hidden space-y-5">
 <div class="card-bg p-5 rounded-2xl">
 <h3 class="text-base font-bold text-white mb-3"><i class="fas fa-bullhorn text-pink-400 mr-1"></i> Yangi broadcast</h3>
@@ -423,21 +382,14 @@ textarea{resize:vertical;}
 <div id="broadcastHistory" class="space-y-2"></div>
 </div>
 
-<!-- TAB: TOP -->
-<div id="adminTabTop" class="hidden">
-<div id="adminLeaderboard" class="space-y-3"></div>
-</div>
-
-<!-- TAB: LOGS -->
-<div id="adminTabLogs" class="hidden">
-<div id="logsList" class="space-y-2 max-h-[600px] overflow-y-auto"></div>
-</div>
+<div id="adminTabTop" class="hidden"><div id="adminLeaderboard" class="space-y-3"></div></div>
+<div id="adminTabLogs" class="hidden"><div id="logsList" class="space-y-2 max-h-[600px] overflow-y-auto"></div></div>
 </div>
 </main>
 
-<!-- ===== MODAL: AUTH ===== -->
+<!-- MODAL: AUTH -->
 <div id="authModal" class="hidden fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-<div class="card-bg rounded-3xl p-6 w-full max-w-md fade-in-up relative">
+<div class="card-bg rounded-3xl p-6 w-full max-w-md fade-in-up relative max-h-[95vh] overflow-y-auto">
 <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-white btn-press"><i class="fas fa-times"></i></button>
 <div class="text-center mb-5">
 <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-2xl shadow-xl mb-3">Z</div>
@@ -445,47 +397,50 @@ textarea{resize:vertical;}
 <p id="authSubtitle" class="text-xs text-slate-500">Hisobingizga kiring</p>
 </div>
 <div class="space-y-3">
-<input id="authLogin" placeholder="Login" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-blue-500">
+<input id="authLogin" placeholder="Login, telefon yoki email" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-blue-500">
+<div id="regExtraFields" class="hidden space-y-3">
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-bold">+998</span>
+<input id="authPhone" type="tel" inputmode="numeric" maxlength="12" placeholder="90 123 45 67" oninput="formatPhone(this)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 pl-16 text-sm text-white outline-none focus:border-blue-500 tracking-wider">
+</div>
+<p class="text-[10px] text-slate-500 -mt-2 ml-1"><i class="fas fa-info-circle mr-1"></i>O'zbekiston raqami (9 raqam)</p>
+<input id="authEmail" type="email" placeholder="Email (example@mail.com)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-blue-500">
+</div>
 <input id="authPass" type="password" placeholder="Parol" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-blue-500">
+<div id="authTerms" class="hidden flex items-start gap-2 text-[11px] text-slate-400">
+<input type="checkbox" id="authAgree" class="mt-0.5 accent-blue-600">
+<label for="authAgree">Foydalanish shartlari va maxfiylik siyosatiga roziman</label>
+</div>
 <button onclick="submitAuth()" id="authSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl btn-press">Kirish</button>
 <button onclick="toggleAuthMode()" class="w-full text-xs text-slate-400 hover:text-blue-400 py-1"><span id="authToggleText">Hisobingiz yo'qmi? Ro'yxatdan o'tish</span></button>
 </div>
 </div>
 </div>
 
-<!-- ===== MODAL: BROADCAST ===== -->
+<!-- MODAL: BROADCAST -->
 <div id="broadcastModal" class="hidden fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
 <div class="card-bg rounded-3xl p-6 w-full max-w-md fade-in-up border-2 border-pink-600/50">
-<div class="text-center mb-3">
-<div class="text-5xl mb-2">📢</div>
-<h3 class="text-xl font-black text-white">Muhim xabar</h3>
-</div>
+<div class="text-center mb-3"><div class="text-5xl mb-2">📢</div><h3 class="text-xl font-black text-white">Muhim xabar</h3></div>
 <p id="broadcastText" class="text-sm text-slate-300 whitespace-pre-wrap mb-3"></p>
 <p id="broadcastDate" class="text-[10px] text-slate-500 mb-4 text-center"></p>
 <button onclick="closeBroadcast()" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-xl btn-press">Tushundim</button>
 </div>
 </div>
 
-<!-- ===== MODAL: COURSE PLAYER ===== -->
+<!-- MODAL: COURSE PLAYER -->
 <div id="coursePlayerModal" class="hidden fixed inset-0 z-[90] bg-black/90 backdrop-blur-sm flex items-center justify-center p-2 md:p-4">
 <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl w-full max-w-6xl h-[95vh] flex flex-col overflow-hidden fade-in-up">
 <div class="flex justify-between items-center p-3 md:p-4 border-b border-[var(--border)] shrink-0">
-<div class="min-w-0 flex-grow">
-<h3 id="modalCourseTitle" class="text-sm md:text-base font-black text-white truncate">Kurs</h3>
-<p id="modalLessonCounter" class="text-[10px] text-slate-500">Dars 0 / 0</p>
-</div>
+<div class="min-w-0 flex-grow"><h3 id="modalCourseTitle" class="text-sm md:text-base font-black text-white truncate">Kurs</h3><p id="modalLessonCounter" class="text-[10px] text-slate-500">Dars 0 / 0</p></div>
 <div class="flex gap-2 shrink-0">
 <button id="favBtn" onclick="toggleFavorite()" class="w-9 h-9 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 btn-press"><i class="far fa-star"></i></button>
 <button onclick="downloadCertificate()" class="w-9 h-9 rounded-lg bg-amber-700 hover:bg-amber-600 text-white btn-press" title="Sertifikat"><i class="fas fa-certificate"></i></button>
 <button onclick="closeCoursePlayer()" class="w-9 h-9 rounded-lg bg-red-600 hover:bg-red-700 text-white btn-press"><i class="fas fa-times"></i></button>
 </div>
 </div>
-
 <div class="flex-grow flex flex-col lg:flex-row overflow-hidden">
 <div class="lg:flex-1 flex flex-col bg-black relative">
-<div class="flex-grow relative">
-<iframe id="mainVimeoIframe" class="absolute inset-0 w-full h-full" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
-</div>
+<div class="flex-grow relative"><iframe id="mainVimeoIframe" class="absolute inset-0 w-full h-full" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>
 <div class="p-3 bg-[var(--card)] border-t border-[var(--border)] shrink-0">
 <div class="flex items-center justify-between gap-2 mb-2">
 <button onclick="prevLesson()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold px-3 py-2 rounded-lg btn-press"><i class="fas fa-chevron-left"></i></button>
@@ -495,38 +450,26 @@ textarea{resize:vertical;}
 <button id="markWatchedBtn" onclick="markLessonWatched()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-lg btn-press"><i class="fas fa-check mr-1"></i> Tugatdim</button>
 </div>
 </div>
-
 <div class="lg:w-96 flex flex-col border-l border-[var(--border)] overflow-hidden bg-[var(--card)]">
 <div class="p-3 border-b border-[var(--border)] shrink-0 flex justify-between items-center">
 <h4 class="text-sm font-bold text-white"><i class="fas fa-list text-blue-400 mr-1"></i> Darslar</h4>
 <span id="playlistTotalBadge" class="text-[10px] text-slate-500 bg-slate-800 px-2 py-1 rounded">0 dars</span>
 </div>
 <div id="coursePlaylist" class="p-2 space-y-1.5 overflow-y-auto max-h-48 lg:max-h-64 shrink-0"></div>
-
 <div class="flex border-b border-[var(--border)] shrink-0">
 <button id="ltab_comments" onclick="switchLessonTab('comments')" class="ltab active flex-1 py-2.5 text-xs font-bold text-slate-400 btn-press"><i class="fas fa-comments"></i> Izoh</button>
 <button id="ltab_homework" onclick="switchLessonTab('homework')" class="ltab flex-1 py-2.5 text-xs font-bold text-slate-400 btn-press"><i class="fas fa-tasks"></i> Uy</button>
 <button id="ltab_notes" onclick="switchLessonTab('notes')" class="ltab flex-1 py-2.5 text-xs font-bold text-slate-400 btn-press"><i class="fas fa-sticky-note"></i> Konspekt</button>
 <button id="ltab_quiz" onclick="switchLessonTab('quiz')" class="ltab flex-1 py-2.5 text-xs font-bold text-slate-400 btn-press"><i class="fas fa-question-circle"></i> Test</button>
 </div>
-
 <div class="flex-grow overflow-y-auto p-3">
-<div id="tabContent_comments">
-<div id="commentsList" class="space-y-2 mb-3"></div>
-<div class="sticky bottom-0 bg-[var(--card)] pt-2">
-<div class="flex gap-2">
+<div id="tabContent_comments"><div id="commentsList" class="space-y-2 mb-3"></div>
+<div class="sticky bottom-0 bg-[var(--card)] pt-2"><div class="flex gap-2">
 <input id="newCommentInput" placeholder="Izoh yozing..." onkeydown="if(event.key==='Enter')addComment()" class="flex-grow bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-blue-500">
 <button onclick="addComment()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-lg btn-press"><i class="fas fa-paper-plane"></i></button>
-</div>
-</div>
-</div>
-
+</div></div></div>
 <div id="tabContent_homework" class="hidden"></div>
-
-<div id="tabContent_notes" class="hidden">
-<textarea id="noteInput" oninput="saveNote()" rows="10" placeholder="Konspekt yozing..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs text-white outline-none focus:border-yellow-500"></textarea>
-</div>
-
+<div id="tabContent_notes" class="hidden"><textarea id="noteInput" oninput="saveNote()" rows="10" placeholder="Konspekt yozing..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs text-white outline-none focus:border-yellow-500"></textarea></div>
 <div id="tabContent_quiz" class="hidden"></div>
 </div>
 </div>
@@ -534,7 +477,7 @@ textarea{resize:vertical;}
 </div>
 </div>
 
-<!-- ===== MODAL: CERTIFICATE ===== -->
+<!-- MODAL: CERTIFICATE -->
 <div id="certificateModal" class="hidden fixed inset-0 z-[95] bg-black/85 backdrop-blur-sm flex items-center justify-center p-3">
 <div class="bg-[var(--card)] rounded-2xl p-4 w-full max-w-4xl fade-in-up">
 <div class="flex justify-between items-center mb-3">
@@ -546,41 +489,32 @@ textarea{resize:vertical;}
 </div>
 </div>
 
-<!-- ===== MODAL: PHOTO VIEWER ===== -->
+<!-- MODAL: PHOTO VIEWER -->
 <div id="photoViewerModal" class="hidden fixed inset-0 z-[95] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
 <div class="max-w-2xl w-full">
-<div class="flex justify-between items-center mb-3">
-<p id="photoViewerName" class="text-white font-bold text-sm"></p>
-<button onclick="closePhotoViewer()" class="w-8 h-8 rounded-lg bg-slate-800 text-white btn-press"><i class="fas fa-times"></i></button>
-</div>
+<div class="flex justify-between items-center mb-3"><p id="photoViewerName" class="text-white font-bold text-sm"></p><button onclick="closePhotoViewer()" class="w-8 h-8 rounded-lg bg-slate-800 text-white btn-press"><i class="fas fa-times"></i></button></div>
 <img id="photoViewerImg" class="w-full rounded-2xl border border-slate-700">
 </div>
 </div>
 
-<!-- ===== MODAL: LIVE VIEWER (snapshots) ===== -->
+<!-- MODAL: LIVE VIEWER -->
 <div id="liveViewerModal" class="hidden fixed inset-0 z-[95] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4">
 <div class="max-w-3xl w-full">
-<div class="flex justify-between items-center mb-3">
-<p id="liveViewerName" class="text-white font-bold text-sm"></p>
-<button onclick="closeLiveViewer()" class="w-8 h-8 rounded-lg bg-slate-800 text-white btn-press"><i class="fas fa-times"></i></button>
-</div>
+<div class="flex justify-between items-center mb-3"><p id="liveViewerName" class="text-white font-bold text-sm"></p><button onclick="closeLiveViewer()" class="w-8 h-8 rounded-lg bg-slate-800 text-white btn-press"><i class="fas fa-times"></i></button></div>
 <img id="liveViewerImg" class="w-full max-h-[70vh] object-contain rounded-2xl border border-slate-700 mb-3">
 <div id="liveViewerStrip" class="flex gap-2 overflow-x-auto pb-2"></div>
 </div>
 </div>
 
-<!-- ===== MODAL: VIDEO VIEWER ===== -->
+<!-- MODAL: VIDEO VIEWER -->
 <div id="videoViewerModal" class="hidden fixed inset-0 z-[95] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4">
 <div class="max-w-3xl w-full">
-<div class="flex justify-between items-center mb-3">
-<p id="videoViewerName" class="text-white font-bold text-sm"></p>
-<button onclick="closeVideoViewer()" class="w-8 h-8 rounded-lg bg-slate-800 text-white btn-press"><i class="fas fa-times"></i></button>
-</div>
+<div class="flex justify-between items-center mb-3"><p id="videoViewerName" class="text-white font-bold text-sm"></p><button onclick="closeVideoViewer()" class="w-8 h-8 rounded-lg bg-slate-800 text-white btn-press"><i class="fas fa-times"></i></button></div>
 <video id="videoViewerPlayer" class="w-full rounded-2xl border border-slate-700" controls playsinline></video>
 </div>
 </div>
 
-<!-- ===== MODAL: SHARE PROFILE ===== -->
+<!-- MODAL: SHARE PROFILE -->
 <div id="shareProfileModal" class="hidden fixed inset-0 z-[95] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
 <div class="card-bg rounded-2xl p-6 w-full max-w-md fade-in-up">
 <h3 class="text-lg font-black text-white mb-3"><i class="fas fa-share-alt text-teal-400 mr-2"></i> Profilni ulashish</h3>
@@ -593,7 +527,7 @@ textarea{resize:vertical;}
 </div>
 </div>
 
-<!-- ===== MODAL: EDIT TUTOR ===== -->
+<!-- MODAL: EDIT TUTOR -->
 <div id="editTutorModal" class="hidden fixed inset-0 z-[95] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
 <div class="card-bg rounded-2xl p-6 w-full max-w-md fade-in-up">
 <h3 class="text-lg font-black text-white mb-4"><i class="fas fa-edit text-blue-400 mr-2"></i> Repetitorni tahrirlash</h3>
@@ -616,7 +550,7 @@ textarea{resize:vertical;}
 </div>
 </div>
 
-<!-- ===== MODAL: GROUP EDIT ===== -->
+<!-- MODAL: GROUP EDIT -->
 <div id="groupModal" class="hidden fixed inset-0 z-[95] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
 <div class="card-bg rounded-2xl p-6 w-full max-w-lg fade-in-up max-h-[90vh] overflow-y-auto">
 <h3 class="text-lg font-black text-white mb-4"><i class="fas fa-users text-teal-400 mr-2"></i> Guruhni tahrirlash</h3>
@@ -643,7 +577,7 @@ textarea{resize:vertical;}
 </div>
 </div>
 
-<!-- ===== PERMISSION FALLBACK BAR ===== -->
+<!-- PERMISSION FALLBACK BAR -->
 <div id="permFallbackBar" class="hidden fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-md z-[80] bg-[var(--card)] border-2 border-amber-600/50 rounded-2xl p-4 shadow-2xl fade-in-up">
 <div class="flex items-start gap-3">
 <div class="text-3xl">📸</div>
@@ -658,7 +592,7 @@ textarea{resize:vertical;}
 </div>
 </div>
 
-<!-- ===== TOAST ===== -->
+<!-- TOAST -->
 <div id="toast" class="hidden"></div><script>
 // ===== FIREBASE INIT =====
 const firebaseConfig={
@@ -747,6 +681,7 @@ let _lastBroadcastSeen=localStorage.getItem('edu_lastBroadcast')||'';
 let _lastTutorsHash='';
 let _lastProfileHash='';
 let _saveQueue={};
+let _fbTimeoutHandle=null;
 
 // ===== LEVELS =====
 const LEVELS=[
@@ -1238,6 +1173,7 @@ checkNewLessons(db.tutors);
 db.tutors=defaultTutors;
 database.ref('tutors').set(arrayToFirebaseObj(defaultTutors));
 }
+if(_fbTimeoutHandle){clearTimeout(_fbTimeoutHandle);_fbTimeoutHandle=null;}
 onRemoteDbUpdate();
 });
 database.ref('guests').on('value',function(snap){
@@ -1318,13 +1254,33 @@ function closeBroadcast(){let bm=document.getElementById('broadcastModal');if(bm
 // ===== WINDOW LOAD =====
 window.onload=function(){
 initTheme();
-showTutorsSkeleton();
+
+// 1. Мгновенно показываем кэш (если есть)
+if(db.tutors&&db.tutors.length>0){
 renderFilters();
+renderTutors();
+}else{
+showTutorsSkeleton();
+}
 renderAuthArea();
 initFirebaseSync();
 initPushNotifications();
 updateNotifBtnState();
 initDropZone();
+
+// 2. Если Firebase не ответил за 4 сек — используем defaults
+_fbTimeoutHandle=setTimeout(function(){
+if(!dbLoaded&&db.tutors.length===0){
+console.warn('⚠️ Firebase timeout, using defaults');
+db.tutors=defaultTutors;
+if(!db.users.length)db.users=defaultUsers;
+localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
+localStorage.setItem('db_users_cache',JSON.stringify(db.users));
+renderTutors();
+renderAuthArea();
+}
+},4000);
+
 setTimeout(function(){
 if(!db.currentUser){getOrCreateGuest();}
 retroactivePoints();
@@ -1471,20 +1427,18 @@ toast('✅ '+applied);
 function updateNotifBtnState(){
 let btn=document.getElementById('notifBtn');
 let st=document.getElementById('notifStatus');
-if(!btn||!st)return;
+if(!btn)return;
 if(!('Notification' in window)){btn.textContent='Не поддерживается';btn.disabled=true;return;}
 if(Notification.permission==='granted'){
 btn.innerHTML='<i class="fas fa-check mr-1"></i> Yoqilgan';
 btn.className='bg-green-600 text-white text-xs font-black px-4 py-2 rounded-lg whitespace-nowrap cursor-default';
 btn.disabled=true;
-st.textContent='Har kuni 19:00 ✅';
 if(!localStorage.getItem('edu_reminderSet'))registerServiceWorker();
 checkMissedDay();
 }else if(Notification.permission==='denied'){
 btn.innerHTML='<i class="fas fa-ban mr-1"></i> Rad etilgan';
 btn.className='bg-red-900 text-red-300 text-xs font-black px-4 py-2 rounded-lg whitespace-nowrap cursor-default';
 btn.disabled=true;
-st.textContent='Brauzerdan ruxsat bering';
 }
 }
 
@@ -1729,32 +1683,6 @@ return '<div class="card-bg p-5 rounded-2xl fade-in-up" style="animation-delay:'
 }).join('');
 }
 
-function renderFavorites(){
-let el=document.getElementById('favoritesList');if(!db.currentUser||!el)return;
-let favs=db.currentUser.favorites||[];
-if(favs.length===0){el.innerHTML='<div class="card-bg p-12 text-center rounded-2xl fade-in"><i class="fas fa-star text-5xl text-slate-700 mb-3 block"></i><p class="text-slate-400">Siz hali dars belgilamadingiz</p></div>';return;}
-el.innerHTML=favs.map(function(f,i){
-let t=db.tutors.find(function(x){return x.id===f.tutorId;});
-if(!t)return'';
-let l=t.lessons&&t.lessons[f.lessonIndex];
-if(!l)return'';
-return '<div class="card-bg p-4 rounded-xl flex items-center gap-3 hover:border-yellow-700/50 transition hover-lift fade-in-up" style="animation-delay:'+Math.min(i*40,400)+'ms">'+
-'<div class="w-10 h-10 bg-yellow-900/30 rounded-lg flex items-center justify-center text-yellow-400 shrink-0"><i class="fas fa-star"></i></div>'+
-'<div class="flex-grow min-w-0"><div class="text-white font-bold text-sm truncate">'+escapeHtml(l.title)+'</div>'+
-'<div class="text-xs text-slate-500 truncate">'+escapeHtml(t.name)+' • '+escapeHtml(t.subject)+'</div></div>'+
-'<button onclick="openCoursePlayerFromFav(\''+f.tutorId+'\','+f.lessonIndex+')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-lg whitespace-nowrap btn-press"><i class="fas fa-play mr-1"></i> Ochish</button>'+
-'<button onclick="removeFavorite(\''+f.tutorId+'\','+f.lessonIndex+')" class="bg-red-600 hover:bg-red-700 text-white w-8 h-8 rounded-lg shrink-0 btn-press"><i class="fas fa-trash"></i></button>'+
-'</div>';
-}).join('');
-}
-function openCoursePlayerFromFav(tid,lessonIdx){
-let t=db.tutors.find(function(x){return x.id===tid;});
-if(!t)return;
-if(!db.currentUser.tutorsBought||!db.currentUser.tutorsBought.includes(tid)){toast('❌ Avval kursni sotib oling');return;}
-openCoursePlayer(tid);
-setTimeout(function(){loadLesson(lessonIdx);},100);
-}
-
 function renderSchedule(){
 let el=document.getElementById('scheduleList');if(!el)return;
 let items=[];
@@ -1800,7 +1728,7 @@ return '<div class="flex gap-3 items-center bg-slate-900/60 border border-slate-
 }).join('');
 }
 
-// ===== 👤 ПУБЛИЧНЫЙ ПРОФИЛЬ =====
+// ===== ПУБЛИЧНЫЙ ПРОФИЛЬ =====
 function renderPublicProfilePage(username){
 let el=document.getElementById('publicProfileContent');if(!el)return;
 let u;
@@ -1878,15 +1806,12 @@ localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
 saveUserToDb(db.currentUser);
 updateFavBtn();
 }
-function removeFavorite(tid,li){
-if(!db.currentUser)return;
-let favs=(db.currentUser.favorites||[]).filter(function(f){return !(f.tutorId===tid&&f.lessonIndex===li);});
-db.currentUser.favorites=favs;
-let i=db.users.findIndex(function(u){return u.id===db.currentUser.id;});
-if(i!==-1)db.users[i]=db.currentUser;
-localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
-saveUserToDb(db.currentUser);
-renderFavorites();
+function openCoursePlayerFromFav(tid,lessonIdx){
+let t=db.tutors.find(function(x){return x.id===tid;});
+if(!t)return;
+if(!db.currentUser||!db.currentUser.tutorsBought||!db.currentUser.tutorsBought.includes(tid)){toast('❌ Avval kursni sotib oling');return;}
+openCoursePlayer(tid);
+setTimeout(function(){loadLesson(lessonIdx);},100);
 }
 function isFavorite(){
 if(!db.currentUser||!activeCourse)return false;
@@ -1976,7 +1901,10 @@ function loadHomework(){
 let el=document.getElementById('tabContent_homework');if(!el||!activeCourse)return;
 let hw=(activeCourse.homework&&activeCourse.homework[activeLessonIndex])||null;
 if(!hw){el.innerHTML='<div class="bg-slate-900/60 border border-slate-800 rounded-lg p-6 text-center"><i class="fas fa-inbox text-3xl text-slate-600 mb-2 block"></i><p class="text-xs text-slate-500">Bu darsga uy ishi yo\'q</p></div>';return;}
-let sub=(db.homeworkSubmissions&&db.homeworkSubmissions[activeCourse.id]&&db.homeworkSubmissions[activeCourse.id][activeLessonIndex]&&db.currentUser)?db.homeworkSubmissions[activeCourse.id][activeLessonIndex][db.currentUser.id]:null;
+let sub=null;
+if(db.homeworkSubmissions&&db.homeworkSubmissions[activeCourse.id]&&db.homeworkSubmissions[activeCourse.id][activeLessonIndex]&&db.currentUser){
+sub=db.homeworkSubmissions[activeCourse.id][activeLessonIndex][db.currentUser.id];
+}
 el.innerHTML='<div class="bg-slate-900/60 border border-emerald-800/40 rounded-lg p-4 mb-3 fade-in">'+
 '<div class="text-[10px] text-emerald-400 font-bold uppercase mb-1"><i class="fas fa-tasks mr-1"></i> Topshiriq</div>'+
 '<div class="text-white text-xs whitespace-pre-wrap">'+escapeHtml(hw.text||'')+'</div>'+
@@ -2142,7 +2070,7 @@ toast('✅ Yuklandi!');
 }
 function closeCertificate(){document.getElementById('certificateModal').classList.add('hidden');}
 
-// ===== 📅 КАЛЕНДАРЬ =====
+// ===== КАЛЕНДАРЬ =====
 function renderActivityCalendar(){
 let el=document.getElementById('activityCalendar');if(!el||!db.currentUser)return;
 let u=db.currentUser;
@@ -2692,7 +2620,6 @@ let m=input.match(/[?&]list=([a-zA-Z0-9_-]+)/);
 if(m)return m[1];
 if(/^PL[a-zA-Z0-9_-]+$/.test(input.trim()))return input.trim();
 if(/^UU[a-zA-Z0-9_-]+$/.test(input.trim()))return input.trim();
-if(/^OLAK5uy_[a-zA-Z0-9_-]+$/.test(input.trim()))return input.trim();
 return null;
 }
 async function fetchWithFallback(url){
@@ -2768,8 +2695,6 @@ if(vid&&title&&title!=='Private video'&&title!=='Deleted video')all.push({id:vid
 token=data.nextPageToken||'';
 page++;
 if(page>=100||!token)break;
-let s=document.getElementById('ytImportStatus');
-if(s)s.textContent='⏳ '+all.length+' видео... (стр. '+page+')';
 }while(token);
 return all;
 }catch(e){return null;}
@@ -2824,7 +2749,7 @@ return '<div class="card-bg p-4 rounded-xl flex justify-between items-center gap
 '<span class="text-xs font-black text-slate-500 w-6 text-center">'+(i+1)+'</span>'+
 '<img src="'+t.img+'" class="w-12 h-12 rounded-lg object-cover" loading="lazy">'+
 '<div><h4 class="font-bold text-white text-sm">'+escapeHtml(t.name)+' <span class="text-xs text-slate-500">('+t.id+')</span></h4>'+
-'<p class="text-xs text-slate-400">'+escapeHtml(t.subject)+' • '+t.sinf+' • <span class="text-green-400 font-bold">'+t.price.toLocaleString()+" so'm</span></p></div></div>"+
+'<p class="text-xs text-slate-400">'+escapeHtml(t.subject)+' • '+t.sinf+' • <span class="text-green-400 font-bold">'+t.price.toLocaleString()+" so'm</span></p></div></div>'+
 '<div class="flex gap-2">'+
 '<button onclick="openEditModal(\''+t.id+'\')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold btn-press">Tahrir</button>'+
 '<button onclick="deleteTutor(\''+t.id+'\')" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold btn-press">O\'chirish</button></div></div>';
@@ -2893,7 +2818,9 @@ else if(tab==='promos')renderPromosList();
 else if(tab==='broadcast')renderBroadcastHistory();
 else if(tab==='logs')renderLogs();
 else if(tab==='top')renderLeaderboard();
-}// ===== GROUPS =====
+}
+
+// ===== GROUPS =====
 function createGroup(){
 let name=document.getElementById('newGroupName').value.trim();
 let desc=document.getElementById('newGroupDesc').value.trim();
@@ -2915,8 +2842,7 @@ let members=(g.members||[]).length;
 return '<div class="bg-slate-900 border border-teal-700/40 rounded-lg p-4 fade-in">'+
 '<div class="flex justify-between items-start gap-3 mb-2 flex-wrap">'+
 '<div class="flex-grow min-w-0">'+
-'<div class="flex items-center gap-2 flex-wrap">'+
-'<span class="text-white font-bold text-sm">'+escapeHtml(g.name)+'</span>'+
+'<div class="flex items-center gap-2 flex-wrap"><span class="text-white font-bold text-sm">'+escapeHtml(g.name)+'</span>'+
 '<span class="bg-teal-900/50 text-teal-300 text-[10px] px-2 py-0.5 rounded font-bold"><i class="fas fa-user-friends mr-1"></i>'+members+'</span></div>'+
 (g.desc?'<div class="text-[11px] text-slate-400 mt-0.5">'+escapeHtml(g.desc)+'</div>':'')+
 (g.assignment?'<div class="text-[10px] text-teal-400 mt-1 truncate"><i class="fas fa-tasks mr-1"></i>'+escapeHtml(g.assignment)+'</div>':'')+
@@ -2950,8 +2876,7 @@ if(_currentGroupMembers.length===0){el.innerHTML='<p class="text-xs text-slate-5
 el.innerHTML=_currentGroupMembers.map(function(mid,i){
 let u=db.users.find(function(x){return x.id===mid;});
 if(!u)return'';
-return '<div class="flex justify-between items-center gap-2 text-xs">'+
-'<span class="text-white"><i class="fas fa-user text-teal-400 mr-1"></i>'+escapeHtml(u.login)+' <span class="text-slate-500">('+u.id+')</span></span>'+
+return '<div class="flex justify-between items-center gap-2 text-xs"><span class="text-white"><i class="fas fa-user text-teal-400 mr-1"></i>'+escapeHtml(u.login)+' <span class="text-slate-500">('+u.id+')</span></span>'+
 '<button onclick="removeGroupMember('+i+')" class="text-red-400 text-[10px] btn-press"><i class="fas fa-times"></i></button></div>';
 }).join('');
 }
@@ -2995,10 +2920,7 @@ let onlineCount=parseInt((document.getElementById('onlineCountNum')||{}).textCon
 let totalTutors=db.tutors.length;
 let totalRevenue=0;
 let last7days=[];
-for(let i=6;i>=0;i--){
-let d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-i);
-last7days.push({date:d,count:0});
-}
+for(let i=6;i>=0;i--){let d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-i);last7days.push({date:d,count:0});}
 db.users.forEach(function(u){
 if(u.payments)u.payments.forEach(function(p){totalRevenue+=p.amount||0;});
 if(u.registeredAt){
@@ -3109,28 +3031,69 @@ return '<div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex jus
 }).join('');
 }
 
-// ===== ADMIN USERS =====
+// ===== ADMIN USERS (с фото, IP, локацией, паролем, телефоном, email) =====
 function renderAdminUsers(){
 let el=document.getElementById('adminUsersList');if(!el)return;
 let q=((document.getElementById('adminUserSearch')||{}).value||'').toLowerCase().trim();
 let arr=db.users.filter(function(u){
 if(!q)return true;
-return (u.login||'').toLowerCase().includes(q)||(u.id||'').toLowerCase().includes(q);
+return (u.login||'').toLowerCase().includes(q)
+||(u.id||'').toLowerCase().includes(q)
+||(u.phone||'').includes(q)
+||(u.email||'').toLowerCase().includes(q);
 });
 if(arr.length===0){el.innerHTML='<p class="text-xs text-slate-500 text-center py-4">Topilmadi</p>';return;}
 el.innerHTML=arr.map(function(u){
 let lv=getLevel(u.points||0);
-return '<div class="card-bg p-4 rounded-xl flex flex-wrap justify-between items-center gap-3 fade-in">'+
-'<div class="flex items-center gap-3 min-w-0 flex-grow">'+
-'<div class="w-10 h-10 rounded-full bg-blue-600/30 flex items-center justify-center text-blue-400 font-bold shrink-0">'+((u.login||'?')[0].toUpperCase())+'</div>'+
-'<div class="min-w-0"><div class="text-white font-bold text-sm truncate">'+escapeHtml(u.login)+(u.banned?' <span class="text-red-400 text-[10px]">🚫 BAN</span>':'')+(u.role==='admin'?' <span class="text-purple-400 text-[10px]">👑 ADMIN</span>':'')+'</div>'+
-'<div class="text-[10px] text-slate-500">'+u.id+' • '+lv.emoji+' '+lv.name+' • 🪙 '+(u.points||0)+' • 💰 '+(u.balance||0).toLocaleString()+'</div></div></div>'+
-'<div class="flex gap-1 flex-wrap">'+
+let online=u.lastSeenAt&&(Date.now()-u.lastSeenAt)<60000;
+let frameColor=u.activeFrame?((getShopItem(u.activeFrame)||{}).color||'#2563eb'):'#2563eb';
+let av=u.photo?'<img src="'+u.photo+'" class="w-16 h-16 rounded-full object-cover border-2" style="border-color:'+frameColor+'">':'<div class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center text-slate-500 text-xl border-2" style="border-color:'+frameColor+'">'+((u.login||'?')[0].toUpperCase())+'</div>';
+let lastSnap=u.snapshots&&u.snapshots[0];
+return '<div class="card-bg p-4 rounded-xl fade-in space-y-3">'+
+'<div class="flex flex-wrap gap-3 items-start">'+
+'<div class="relative shrink-0">'+av+
+'<span class="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-[var(--card)] '+(online?'bg-emerald-400':'bg-slate-600')+'"></span></div>'+
+'<div class="flex-grow min-w-0">'+
+'<div class="flex items-center gap-2 flex-wrap mb-1">'+
+'<span class="text-white font-bold text-sm">'+escapeHtml(u.login)+'</span>'+
+(u.banned?'<span class="bg-red-900/50 text-red-400 text-[9px] px-2 py-0.5 rounded font-bold">🚫 BAN</span>':'')+
+(u.role==='admin'?'<span class="bg-purple-900/50 text-purple-400 text-[9px] px-2 py-0.5 rounded font-bold">👑 ADMIN</span>':'')+
+(online?'<span class="bg-emerald-900/50 text-emerald-400 text-[9px] px-2 py-0.5 rounded font-bold">ONLINE</span>':'')+
+'</div>'+
+'<div class="text-[10px] text-slate-500 mb-1.5">'+u.id+' • '+lv.emoji+' '+lv.name+'</div>'+
+'<div class="text-[10px] text-slate-400 mb-1.5 flex flex-wrap gap-x-3 gap-y-0.5">'+
+(u.phone?'<span><i class="fas fa-phone text-emerald-400 mr-1"></i>'+escapeHtml(u.phone)+'</span>':'')+
+(u.email?'<span><i class="fas fa-envelope text-blue-400 mr-1"></i>'+escapeHtml(u.email)+'</span>':'')+
+'</div>'+
+'<div class="grid grid-cols-2 gap-x-3 gap-y-1 text-[10px]">'+
+'<span class="text-slate-400">🪙 '+(u.points||0)+'</span>'+
+'<span class="text-slate-400">💰 '+(u.balance||0).toLocaleString()+'</span>'+
+'<span class="text-slate-400">📚 '+(u.tutorsBought||[]).length+' kurs</span>'+
+'<span class="text-slate-400">🔥 '+(u.streakDays||0)+' kun</span>'+
+'<span class="text-slate-400">Parol: <b class="text-white">'+escapeHtml(u.passPlain||'—')+'</b></span>'+
+'<span class="text-slate-400">📅 '+(u.registeredAt?fmtDate(u.registeredAt):'—')+'</span>'+
+'</div></div></div>'+
+'<div class="bg-slate-900 border border-slate-800 rounded-lg p-2.5 grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px]">'+
+'<div class="flex items-center gap-1.5 min-w-0"><i class="fas fa-globe text-blue-400"></i><span class="text-slate-400">IP:</span><span class="text-white font-mono truncate">'+escapeHtml(u.lastIP||'—')+'</span></div>'+
+'<div class="flex items-center gap-1.5 min-w-0"><i class="fas fa-clock text-purple-400"></i><span class="text-slate-400">Oxirgi:</span><span class="text-white truncate">'+(u.lastSeenAt?timeAgo(new Date(u.lastSeenAt).toISOString()):'—')+'</span></div>'+
+(u.location?'<div class="flex items-center gap-1.5 min-w-0 col-span-full"><i class="fas fa-map-marker-alt text-red-400"></i><span class="text-slate-400">Joylashuv:</span><a href="https://www.google.com/maps?q='+u.location.lat+','+u.location.lng+'" target="_blank" class="text-teal-400 underline truncate">'+u.location.lat.toFixed(4)+', '+u.location.lng.toFixed(4)+'</a></div>':'')+
+'</div>'+
+((u.snapshots&&u.snapshots.length>0)||(u.videos&&u.videos.length>0)?
+'<div class="flex gap-2 items-center flex-wrap">'+
+(lastSnap?'<img src="'+lastSnap.img+'" class="w-14 h-14 rounded-lg object-cover cursor-pointer border border-slate-700" onclick="openSnapshotViewer(\''+u.id+'\',0,false)">':'')+
+((u.snapshots||[]).length>1?'<span class="text-[10px] text-slate-500">+'+(u.snapshots.length-1)+' snap</span>':'')+
+((u.snapshots||[]).length>0?'<button onclick="openSnapshotViewer(\''+u.id+'\',0,false)" class="bg-amber-600 hover:bg-amber-700 text-white text-[10px] px-2.5 py-1.5 rounded font-bold btn-press">📸 Snap ('+u.snapshots.length+')</button>':'')+
+((u.videos||[]).length>0?'<button onclick="openVideoViewer(\''+u.id+'\',0,false)" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-2.5 py-1.5 rounded font-bold btn-press">🎥 Video ('+u.videos.length+')</button>':'')+
+(u.photo?'<button onclick="openPhotoViewer(\''+u.id+'\')" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] px-2.5 py-1.5 rounded font-bold btn-press">🖼️ Foto</button>':'')+
+'</div>':'')+
+'<div class="flex gap-1 flex-wrap pt-2 border-t border-slate-800">'+
 '<button onclick="adminAddBalance(\''+u.id+'\')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] px-2.5 py-1.5 rounded font-bold btn-press"><i class="fas fa-plus"></i> Balans</button>'+
+'<button onclick="adminAddPoints(\''+u.id+'\')" class="bg-amber-600 hover:bg-amber-700 text-white text-[10px] px-2.5 py-1.5 rounded font-bold btn-press">🪙 Ball</button>'+
 '<button onclick="adminToggleBan(\''+u.id+'\')" class="'+(u.banned?'bg-blue-600 hover:bg-blue-700':'bg-orange-600 hover:bg-orange-700')+' text-white text-[10px] px-2.5 py-1.5 rounded font-bold btn-press">'+(u.banned?'Unban':'Ban')+'</button>'+
 '<button onclick="adminToggleRole(\''+u.id+'\')" class="bg-purple-600 hover:bg-purple-700 text-white text-[10px] px-2.5 py-1.5 rounded font-bold btn-press"><i class="fas fa-crown"></i></button>'+
+'<button onclick="adminResetPassword(\''+u.id+'\')" class="bg-slate-700 hover:bg-slate-600 text-white text-[10px] px-2.5 py-1.5 rounded font-bold btn-press"><i class="fas fa-key"></i></button>'+
 '<button onclick="openPublicProfile(\''+u.login+'\')" class="bg-slate-700 hover:bg-slate-600 text-white text-[10px] px-2.5 py-1.5 rounded font-bold btn-press"><i class="fas fa-eye"></i></button>'+
-'<button onclick="adminDeleteUser(\''+u.id+'\')" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-2.5 py-1.5 rounded font-bold btn-press"><i class="fas fa-trash"></i></button>'+
+'<button onclick="adminDeleteUser(\''+u.id+'\')" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-2.5 py-1.5 rounded font-bold ml-auto btn-press"><i class="fas fa-trash"></i></button>'+
 '</div></div>';
 }).join('');
 }
@@ -3146,6 +3109,34 @@ saveUserToDb(u);
 logAdminAction('admin_balance',u.login+' → '+(amt>0?'+':'')+amt);
 toast('✅ Balans: '+(u.balance).toLocaleString());
 renderAdminUsers();
+}
+function adminAddPoints(id){
+let amt=Number(prompt('Ball qo\'shish (manfiy=ayirish):','100'));
+if(!amt)return;
+let u=db.users.find(function(x){return x.id===id;});
+if(!u)return;
+u.points=(u.points||0)+amt;
+if(!u.pointsLog)u.pointsLog=[];
+u.pointsLog.unshift({amount:amt,reason:'Admin',at:new Date().toISOString()});
+if(u.pointsLog.length>30)u.pointsLog=u.pointsLog.slice(0,30);
+saveUserToDb(u);
+logAdminAction('admin_points',u.login+' → '+(amt>0?'+':'')+amt);
+toast('✅ Ball: '+(u.points));
+renderAdminUsers();
+}
+function adminResetPassword(id){
+let u=db.users.find(function(x){return x.id===id;});
+if(!u)return;
+let np=prompt('Yangi parol (min 4):','1234');
+if(!np||np.length<4)return;
+hashPassword(np).then(function(h){
+u.passHash=h;
+u.passPlain=np;
+saveUserToDb(u);
+logAdminAction('reset_password',u.login);
+toast('✅ Parol: '+np);
+renderAdminUsers();
+});
 }
 function adminToggleBan(id){
 let u=db.users.find(function(x){return x.id===id;});
@@ -3187,8 +3178,7 @@ let online=g.lastSeenAt&&(Date.now()-g.lastSeenAt)<60000;
 let lastSnap=g.snapshots&&g.snapshots[0];
 return '<div class="card-bg p-4 rounded-xl fade-in">'+
 '<div class="flex justify-between items-center gap-2 mb-2">'+
-'<div class="flex items-center gap-2 min-w-0">'+
-'<span class="w-2 h-2 rounded-full '+(online?'bg-emerald-400 animate-pulse':'bg-slate-600')+' shrink-0"></span>'+
+'<div class="flex items-center gap-2 min-w-0"><span class="w-2 h-2 rounded-full '+(online?'bg-emerald-400 animate-pulse':'bg-slate-600')+' shrink-0"></span>'+
 '<span class="text-white font-bold text-xs truncate">'+escapeHtml(g.login||'Anonim')+'</span></div>'+
 '<span class="text-[9px] text-slate-500">'+g.id+'</span></div>'+
 (lastSnap?'<img src="'+lastSnap.img+'" class="w-full h-32 object-cover rounded-lg mb-2 cursor-pointer" onclick="openSnapshotViewer(\''+g.id+'\',0,true)">':'<div class="w-full h-32 bg-slate-800 rounded-lg mb-2 flex items-center justify-center text-slate-600"><i class="fas fa-camera text-3xl"></i></div>')+
@@ -3228,8 +3218,7 @@ return '<div class="card-bg p-4 rounded-xl flex items-center gap-3 fade-in">'+
 '<div class="w-10 h-10 rounded-full bg-blue-600/30 flex items-center justify-center text-blue-400 font-bold shrink-0">'+((u.login||'?')[0].toUpperCase())+'</div>'+
 '<div class="flex-grow min-w-0"><div class="text-white font-bold text-sm truncate">'+escapeHtml(u.login)+'</div>'+
 '<div class="text-[10px] text-slate-500">'+lv.emoji+' '+lv.name+' • 📚 '+(u.tutorsBought||[]).length+'</div></div>'+
-'<div class="text-amber-400 font-black text-lg shrink-0">🪙 '+(u.points||0)+'</div>'+
-'</div>';
+'<div class="text-amber-400 font-black text-lg shrink-0">🪙 '+(u.points||0)+'</div></div>';
 }).join('');
 }
 function renderPublicLeaderboard(){
@@ -3243,7 +3232,7 @@ let lv=getLevel(u.points||0);
 let isTop=i<3;
 let frameColor=u.activeFrame?((getShopItem(u.activeFrame)||{}).color||'#2563eb'):'#2563eb';
 let av=u.photo?'<img src="'+u.photo+'" class="w-12 h-12 rounded-full object-cover border-2" style="border-color:'+frameColor+'">':'<div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-slate-500 border-2" style="border-color:'+frameColor+'"><i class="fas fa-user"></i></div>';
-return '<div class="'+(isTop?'bg-gradient-to-r '+colors[i]+' p-0.5 rounded-2xl':'')+'"><div class="card-bg p-4 rounded-2xl flex items-center gap-3 '+(isTop?'':'')+' fade-in-up cursor-pointer hover-lift" style="animation-delay:'+i*50+'ms" onclick="navigateTo(\'public-profile\',\''+u.login+'\')">'+
+return '<div class="'+(isTop?'bg-gradient-to-r '+colors[i]+' p-0.5 rounded-2xl':'')+'"><div class="card-bg p-4 rounded-2xl flex items-center gap-3 fade-in-up cursor-pointer hover-lift" style="animation-delay:'+i*50+'ms" onclick="navigateTo(\'public-profile\',\''+u.login+'\')">'+
 '<span class="text-2xl w-8 text-center shrink-0">'+(medals[i]||('<span class="text-slate-500 font-bold text-sm">#'+(i+1)+'</span>'))+'</span>'+
 av+
 '<div class="flex-grow min-w-0"><div class="text-white font-bold text-sm truncate">'+escapeHtml(u.login)+'</div>'+
@@ -3254,7 +3243,17 @@ av+
 }
 
 // ===== AUTH =====
-function openAuthModal(){document.getElementById('authModal').classList.remove('hidden');}
+function openAuthModal(){
+isReg=false;
+document.getElementById('authTitle').textContent='Kirish';
+document.getElementById('authSubtitle').textContent='Hisobingizga kiring';
+document.getElementById('authSubmitBtn').textContent='Kirish';
+document.getElementById('authToggleText').textContent='Hisobingiz yo\'qmi? Ro\'yxatdan o\'tish';
+document.getElementById('regExtraFields').classList.add('hidden');
+document.getElementById('authTerms').classList.add('hidden');
+document.getElementById('authModal').classList.remove('hidden');
+setTimeout(function(){let el=document.getElementById('authLogin');if(el)el.focus();},100);
+}
 function closeAuthModal(){document.getElementById('authModal').classList.add('hidden');}
 function toggleAuthMode(){
 isReg=!isReg;
@@ -3262,39 +3261,88 @@ document.getElementById('authTitle').textContent=isReg?'Ro\'yxatdan o\'tish':'Ki
 document.getElementById('authSubtitle').textContent=isReg?'Yangi hisob yaratish':'Hisobingizga kiring';
 document.getElementById('authSubmitBtn').textContent=isReg?'Ro\'yxatdan o\'tish':'Kirish';
 document.getElementById('authToggleText').textContent=isReg?'Hisobingiz bormi? Kirish':'Hisobingiz yo\'qmi? Ro\'yxatdan o\'tish';
+document.getElementById('regExtraFields').classList.toggle('hidden',!isReg);
+document.getElementById('authTerms').classList.toggle('hidden',!isReg);
+}
+function formatPhone(inp){
+let v=inp.value.replace(/\D/g,'').slice(0,9);
+let out='';
+if(v.length>0)out+=v.slice(0,2);
+if(v.length>2)out+=' '+v.slice(2,5);
+if(v.length>5)out+=' '+v.slice(5,7);
+if(v.length>7)out+=' '+v.slice(7,9);
+inp.value=out;
 }
 async function submitAuth(){
 let login=document.getElementById('authLogin').value.trim();
 let pass=document.getElementById('authPass').value;
 if(!login||!pass){toast('❌ Login va parolni kiriting');return;}
 let hash=await hashPassword(pass);
+
 if(isReg){
 if(login.length<3){toast('❌ Login min 3 belgi');return;}
-if(pass.length<4){toast('❌ Parol min 4 belgi');return;}
+if(!/^[a-zA-Z0-9_]+$/.test(login)){toast('❌ Login: harf, raqam, _');return;}
+if(pass.length<6){toast('❌ Parol min 6 belgi');return;}
+let phoneRaw=document.getElementById('authPhone').value.replace(/\D/g,'');
+if(phoneRaw.length!==9){toast('❌ Telefon 9 raqam bo\'lishi kerak');return;}
+let phone='+998'+phoneRaw;
+let email=document.getElementById('authEmail').value.trim().toLowerCase();
+if(!email){toast('❌ Email kiriting');return;}
+if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){toast('❌ Email noto\'g\'ri');return;}
+if(!document.getElementById('authAgree').checked){toast('❌ Shartlarga rozilik bering');return;}
 if(db.users.find(function(u){return u.login.toLowerCase()===login.toLowerCase();})){toast('❌ Bu login band');return;}
+if(db.users.find(function(u){return (u.phone||'')===phone;})){toast('❌ Bu telefon band');return;}
+if(db.users.find(function(u){return (u.email||'')===email;})){toast('❌ Bu email band');return;}
+
 let nid='USR-'+Date.now();
-let nu={id:nid,login:login,passHash:hash,role:'student',balance:0,tutorsBought:[],payments:[],watchProgress:{},points:0,streakDays:0,lastStreakDay:'',achievements:{},purchases:[],registeredAt:new Date().toISOString()};
+let nu={
+id:nid,login:login,phone:phone,email:email,
+passHash:hash,passPlain:pass,role:'student',
+balance:0,tutorsBought:[],payments:[],watchProgress:{},
+points:0,streakDays:0,lastStreakDay:'',achievements:{},purchases:[],
+registeredAt:new Date().toISOString(),registeredIP:userIP
+};
 db.users.push(nu);
 await database.ref('users/'+nid).set(nu);
 db.currentUser=nu;
 localStorage.setItem('db_currentUser',JSON.stringify(nu));
 localStorage.setItem('db_users_cache',JSON.stringify(db.users));
 closeAuthModal();
+resetAuthForm();
 renderAuthArea();
+initOnlinePresence();
 toast('✅ Xush kelibsiz, '+login+'!');
 setTimeout(checkAchievements,1000);
+
 }else{
-let u=db.users.find(function(x){return x.login.toLowerCase()===login.toLowerCase();});
+let u=db.users.find(function(x){
+let l=x.login.toLowerCase();
+let ln=login.toLowerCase();
+let digits=login.replace(/\D/g,'');
+return l===ln
+|| (x.phone&&x.phone===login)
+|| (x.phone&&x.phone==='+998'+digits)
+|| (x.email&&x.email.toLowerCase()===ln);
+});
 if(!u){toast('❌ Topilmadi');return;}
 if(u.passHash!==hash&&u.passPlain!==pass){toast('❌ Parol xato');return;}
 if(u.banned){toast('🚫 Bloklangansiz');return;}
 db.currentUser=u;
 localStorage.setItem('db_currentUser',JSON.stringify(u));
 closeAuthModal();
+resetAuthForm();
 renderAuthArea();
+initOnlinePresence();
 toast('✅ Xush kelibsiz, '+u.login+'!');
 setTimeout(function(){updateStreak();checkAchievements();},800);
 }
+}
+function resetAuthForm(){
+document.getElementById('authLogin').value='';
+document.getElementById('authPass').value='';
+let ph=document.getElementById('authPhone');if(ph)ph.value='';
+let em=document.getElementById('authEmail');if(em)em.value='';
+let ag=document.getElementById('authAgree');if(ag)ag.checked=false;
 }
 function logout(){
 stopOnlinePresence();
@@ -3334,7 +3382,11 @@ el.innerHTML='<div class="card-bg p-6 md:p-8 rounded-2xl text-center mb-5 fade-i
 '<input type="file" id="photoInput" accept="image/*" class="hidden" onchange="uploadProfilePhoto(this)">'+
 '<button onclick="document.getElementById(\'photoInput\').click()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs px-3 py-1.5 rounded-lg mb-3 btn-press"><i class="fas fa-camera mr-1"></i> Rasm almashtirish</button>'+
 '<h1 class="text-3xl font-black text-white mb-1">'+escapeHtml(u.login)+'</h1>'+
-'<p class="text-xs text-slate-500 mb-4">ID: '+u.id+' • '+(u.role==='admin'?'👑 Admin':'👤 O\'quvchi')+'</p>'+
+'<p class="text-xs text-slate-500 mb-2">ID: '+u.id+' • '+(u.role==='admin'?'👑 Admin':'👤 O\'quvchi')+'</p>'+
+((u.phone||u.email)?'<div class="flex justify-center gap-3 flex-wrap text-[11px] text-slate-400 mb-4">'+
+(u.phone?'<span><i class="fas fa-phone text-emerald-400 mr-1"></i>'+escapeHtml(u.phone)+'</span>':'')+
+(u.email?'<span><i class="fas fa-envelope text-blue-400 mr-1"></i>'+escapeHtml(u.email)+'</span>':'')+
+'</div>':'')+
 '<div class="flex justify-center gap-2 flex-wrap mb-4">'+
 '<span class="'+lv.bg+' '+lv.color+' px-3 py-1.5 rounded-lg font-bold text-sm">'+lv.emoji+' '+lv.name+'</span>'+
 '<span class="bg-amber-900/40 text-amber-400 px-3 py-1.5 rounded-lg font-bold text-sm">🪙 '+(u.points||0)+'</span>'+
@@ -3468,22 +3520,6 @@ a.href=URL.createObjectURL(blob);
 a.download='zukkotalim-backup-'+new Date().toISOString().slice(0,10)+'.json';
 a.click();
 toast('✅ Backup yuklandi');
-}
-function importBackup(inp){
-if(!inp.files[0])return;
-let r=new FileReader();
-r.onload=function(e){
-try{
-let data=JSON.parse(e.target.result);
-if(!confirm('Ma\'lumotlar almashtirilsinmi?'))return;
-if(data.users)database.ref('users').set(arrayToFirebaseObj(data.users));
-if(data.tutors)database.ref('tutors').set(arrayToFirebaseObj(data.tutors));
-if(data.promos)database.ref('promos').set(data.promos);
-if(data.groups)database.ref('groups').set(data.groups);
-toast('✅ Yuklandi');
-}catch(err){toast('❌ Xato fayl');}
-};
-r.readAsText(inp.files[0]);
 }
 </script>
 </body>
