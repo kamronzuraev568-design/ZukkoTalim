@@ -1,4 +1,4 @@
-<!-- ZukkoTalim v3.3 (theme + animations + skeletons + push + schedule) -->
+<!-- ZukkoTalim v3.4 (groups + export + i18n + save fixes) -->
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -18,14 +18,8 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <style>
-:root{
---bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--muted:#8b949e;
---accent:#2563eb;--accent-hover:#1d4ed8;
-}
-body.light-mode{
---bg:#f6f8fa;--card:#ffffff;--border:#d0d7de;--text:#1f2328;--muted:#57606a;
---accent:#2563eb;--accent-hover:#1d4ed8;
-}
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--muted:#8b949e;--accent:#2563eb}
+body.light-mode{--bg:#f6f8fa;--card:#ffffff;--border:#d0d7de;--text:#1f2328;--muted:#57606a}
 body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;transition:background .3s,color .3s}
 .glass{background:rgba(22,27,34,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);transition:background .3s}
 body.light-mode .glass{background:rgba(255,255,255,.9)}
@@ -41,8 +35,6 @@ body.light-mode .glass{background:rgba(255,255,255,.9)}
 .star:hover{transform:scale(1.2)}
 .tab-btn.active{background:#2563eb;color:#fff;font-weight:700}
 .chart-bar{transition:height .3s ease}
-
-/* ✨ АНИМАЦИИ */
 @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
@@ -57,18 +49,13 @@ body.light-mode .glass{background:rgba(255,255,255,.9)}
 .btn-press:active{transform:scale(.96)}
 .modal-backdrop{animation:fadeIn .2s ease-out}
 .modal-content{animation:bounceIn .25s ease-out}
-
-/* 💀 СКЕЛЕТОНЫ */
 @keyframes skeleton-pulse{0%,100%{opacity:1}50%{opacity:.45}}
 .skeleton{background:linear-gradient(90deg,var(--card) 0%,var(--border) 50%,var(--card) 100%);background-size:200% 100%;animation:skeleton-pulse 1.5s ease-in-out infinite;border-radius:8px}
 body.light-mode .skeleton{background:linear-gradient(90deg,#eaeef2 0%,#d0d7de 50%,#eaeef2 100%);background-size:200% 100%}
 .skeleton-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;padding:0}
-
-/* 🌙 ТЕМА */
 .theme-toggle{transition:transform .3s,background .3s}
 .theme-toggle:active{transform:rotate(180deg) scale(.9)}
-
-/* ТЕКСТ-ПРАВКИ В LIGHT MODE */
+.lang-toggle{font-weight:900;font-size:11px;font-family:system-ui,sans-serif}
 body.light-mode .text-white{color:#1f2328 !important}
 body.light-mode .text-slate-300{color:#24292f !important}
 body.light-mode .text-slate-400{color:#57606a !important}
@@ -97,12 +84,13 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div class="flex items-center gap-2 md:gap-3 text-lg md:text-2xl font-black text-blue-400 cursor-pointer tracking-wide shrink-0" onclick="navigateTo('home')">
 <i class="fas fa-graduation-cap text-xl md:text-3xl"></i><span class="hidden sm:inline">ZukkoTalim</span></div>
 <div class="hidden lg:flex gap-5 text-sm font-semibold">
-<button onclick="navigateTo('home')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-th-large"></i> Kurslar</button>
-<button onclick="navigateTo('my-courses')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-play-circle text-indigo-400"></i> Mening</button>
-<button onclick="navigateTo('schedule')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-calendar-alt text-purple-400"></i> Jadval</button>
-<button onclick="navigateTo('favorites')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-star text-yellow-400"></i> Sevimli</button>
-<button onclick="navigateTo('leaderboard')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-trophy text-amber-400"></i> TOP-10</button>
-<button onclick="navigateTo('profile')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-user-circle"></i> Profilim</button>
+<button onclick="navigateTo('home')" class="hover:text-blue-400 transition flex items-center gap-2" data-i18n="nav_courses"><i class="fas fa-th-large"></i> Kurslar</button>
+<button onclick="navigateTo('my-courses')" class="hover:text-blue-400 transition flex items-center gap-2" data-i18n="nav_my"><i class="fas fa-play-circle text-indigo-400"></i> Mening</button>
+<button onclick="navigateTo('groups')" class="hover:text-blue-400 transition flex items-center gap-2" data-i18n="nav_groups"><i class="fas fa-users text-teal-400"></i> Guruhlar</button>
+<button onclick="navigateTo('schedule')" class="hover:text-blue-400 transition flex items-center gap-2" data-i18n="nav_schedule"><i class="fas fa-calendar-alt text-purple-400"></i> Jadval</button>
+<button onclick="navigateTo('favorites')" class="hover:text-blue-400 transition flex items-center gap-2" data-i18n="nav_fav"><i class="fas fa-star text-yellow-400"></i> Sevimli</button>
+<button onclick="navigateTo('leaderboard')" class="hover:text-blue-400 transition flex items-center gap-2" data-i18n="nav_top"><i class="fas fa-trophy text-amber-400"></i> TOP-10</button>
+<button onclick="navigateTo('profile')" class="hover:text-blue-400 transition flex items-center gap-2" data-i18n="nav_profile"><i class="fas fa-user-circle"></i> Profilim</button>
 <button id="navAdminBtn" onclick="navigateTo('admin')" class="hidden text-amber-400 hover:text-amber-300 font-bold transition flex items-center gap-2"><i class="fas fa-user-shield"></i> Admin</button>
 </div>
 <div class="flex items-center gap-2 md:gap-4 shrink-0">
@@ -111,17 +99,19 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <span id="onlineCountNum">0</span>
 <span class="hidden sm:inline">onlayn</span>
 </span>
+<button onclick="toggleLang()" id="langBtn" class="lang-toggle w-9 h-9 flex items-center justify-center rounded-lg bg-slate-800/70 border border-slate-700 text-slate-200 hover:bg-slate-700 transition shrink-0" title="Til / Язык">UZ</button>
 <button onclick="toggleTheme()" id="themeBtn" class="theme-toggle w-9 h-9 flex items-center justify-center rounded-lg bg-slate-800/70 border border-slate-700 text-slate-200 hover:bg-slate-700 transition shrink-0" title="Тема"><i id="themeIcon" class="fas fa-moon"></i></button>
 <div id="authNavArea" class="flex items-center gap-2 md:gap-4"></div>
 <button onclick="toggleMobileMenu()" class="lg:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-slate-800/70 border border-slate-700 text-slate-200 hover:bg-slate-700 transition shrink-0"><i id="mobileMenuIcon" class="fas fa-bars"></i></button>
 </div></div>
 <div id="mobileMenu" class="hidden lg:hidden mt-3 pt-3 border-t border-slate-800 flex flex-col gap-1 text-sm font-semibold">
-<button onclick="navigateTo('home');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-th-large w-4 text-center"></i> Barcha Kurslar</button>
-<button onclick="navigateTo('my-courses');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-play-circle text-indigo-400 w-4 text-center"></i> Mening Kurslarim</button>
-<button onclick="navigateTo('schedule');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-calendar-alt text-purple-400 w-4 text-center"></i> Jadval</button>
-<button onclick="navigateTo('favorites');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-star text-yellow-400 w-4 text-center"></i> Sevimli darslar</button>
-<button onclick="navigateTo('leaderboard');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-trophy text-amber-400 w-4 text-center"></i> TOP-10</button>
-<button onclick="navigateTo('profile');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-user-circle w-4 text-center"></i> Profilim</button>
+<button onclick="navigateTo('home');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-th-large w-4 text-center"></i> <span data-i18n="nav_courses">Barcha Kurslar</span></button>
+<button onclick="navigateTo('my-courses');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-play-circle text-indigo-400 w-4 text-center"></i> <span data-i18n="nav_my">Mening Kurslarim</span></button>
+<button onclick="navigateTo('groups');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-users text-teal-400 w-4 text-center"></i> <span data-i18n="nav_groups">Guruhlar</span></button>
+<button onclick="navigateTo('schedule');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-calendar-alt text-purple-400 w-4 text-center"></i> <span data-i18n="nav_schedule">Jadval</span></button>
+<button onclick="navigateTo('favorites');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-star text-yellow-400 w-4 text-center"></i> <span data-i18n="nav_fav">Sevimli darslar</span></button>
+<button onclick="navigateTo('leaderboard');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-trophy text-amber-400 w-4 text-center"></i> <span data-i18n="nav_top">TOP-10</span></button>
+<button onclick="navigateTo('profile');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-user-circle w-4 text-center"></i> <span data-i18n="nav_profile">Profilim</span></button>
 <button id="navAdminBtnMobile" onclick="navigateTo('admin');closeMobileMenu()" class="hidden text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition text-amber-400 font-bold items-center gap-3"><i class="fas fa-user-shield w-4 text-center"></i> Admin Panel</button>
 </div>
 </nav>
@@ -130,40 +120,47 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 
 <section id="pageHome" class="space-y-6">
 <div class="text-center py-8 rounded-2xl bg-gradient-to-r from-blue-900/30 via-slate-900 to-indigo-900/30 border border-slate-800 shadow-xl">
-<h1 class="text-2xl md:text-4xl font-black text-white mb-3">ZukkoTalim — Sifatli Ta'lim</h1>
-<p class="text-slate-400 max-w-2xl mx-auto text-xs md:text-base">O'zingizga mos kurslarni tanlang va bilim oling!</p></div>
+<h1 class="text-2xl md:text-4xl font-black text-white mb-3" data-i18n="hero_title">ZukkoTalim — Sifatli Ta'lim</h1>
+<p class="text-slate-400 max-w-2xl mx-auto text-xs md:text-base" data-i18n="hero_sub">O'zingizga mos kurslarni tanlang va bilim oling!</p></div>
 <div class="card-bg p-4 rounded-2xl">
 <div class="relative">
 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
-<input type="text" id="searchInput" placeholder="Dars, kurs yoki mavzu qidirish..." oninput="runGlobalSearch(this.value)" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl pl-12 pr-4 py-3 text-sm text-white outline-none transition">
+<input type="text" id="searchInput" placeholder="Dars, kurs yoki mavzu qidirish..." oninput="runGlobalSearch(this.value)" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl pl-12 pr-4 py-3 text-sm text-white outline-none transition" data-i18n-placeholder="search_ph">
 </div>
 <div id="searchResults" class="hidden mt-3 max-h-[400px] overflow-y-auto custom-scrollbar space-y-2"></div>
 </div>
 <div class="space-y-4 card-bg p-5 rounded-2xl shadow-md">
-<div><span class="text-xs text-slate-400 block mb-2 font-bold uppercase tracking-wider">📌 Sinf:</span><div id="classFilters" class="flex flex-wrap gap-2"></div></div>
-<div><span class="text-xs text-slate-400 block mb-2 font-bold uppercase tracking-wider">📚 Fan:</span><div id="subjectFilters" class="flex flex-wrap gap-2"></div></div></div>
-<div><h2 class="text-2xl font-bold mb-6 text-white flex items-center gap-2"><i class="fas fa-chalkboard-teacher text-blue-400"></i> Kurslar</h2>
+<div><span class="text-xs text-slate-400 block mb-2 font-bold uppercase tracking-wider" data-i18n="filter_class">📌 Sinf:</span><div id="classFilters" class="flex flex-wrap gap-2"></div></div>
+<div><span class="text-xs text-slate-400 block mb-2 font-bold uppercase tracking-wider" data-i18n="filter_subject">📚 Fan:</span><div id="subjectFilters" class="flex flex-wrap gap-2"></div></div></div>
+<div><h2 class="text-2xl font-bold mb-6 text-white flex items-center gap-2"><i class="fas fa-chalkboard-teacher text-blue-400"></i> <span data-i18n="courses_title">Kurslar</span></h2>
 <div id="tutorsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div></div>
 </section>
 
 <section id="pageMyCourses" class="hidden space-y-6">
 <div class="flex justify-between items-center border-b border-slate-800 pb-4">
-<div><h1 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fas fa-play-circle text-indigo-400"></i> Mening Kurslarim</h1>
-<p class="text-xs text-slate-400 mt-1">Xarid qilgan kurslaringiz</p></div></div>
+<div><h1 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fas fa-play-circle text-indigo-400"></i> <span data-i18n="my_courses_title">Mening Kurslarim</span></h1>
+<p class="text-xs text-slate-400 mt-1" data-i18n="my_courses_sub">Xarid qilgan kurslaringiz</p></div></div>
 <div id="myCoursesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+</section>
+
+<section id="pageGroups" class="hidden space-y-6">
+<div class="border-b border-slate-800 pb-4">
+<h1 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fas fa-users text-teal-400"></i> <span data-i18n="groups_title">Guruhlar</span></h1>
+<p class="text-xs text-slate-400 mt-1" data-i18n="groups_sub">Siz a'zo bo'lgan guruhlar</p></div>
+<div id="myGroupsList" class="space-y-3"></div>
 </section>
 
 <section id="pageFavorites" class="hidden space-y-6">
 <div class="border-b border-slate-800 pb-4">
-<h1 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fas fa-star text-yellow-400"></i> Sevimli darslar</h1>
-<p class="text-xs text-slate-400 mt-1">Belgilangan (⭐) darslar ro'yxati</p></div>
+<h1 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fas fa-star text-yellow-400"></i> <span data-i18n="fav_title">Sevimli darslar</span></h1>
+<p class="text-xs text-slate-400 mt-1" data-i18n="fav_sub">Belgilangan (⭐) darslar ro'yxati</p></div>
 <div id="favoritesList" class="space-y-3"></div>
 </section>
 
 <section id="pageSchedule" class="hidden space-y-6">
 <div class="border-b border-slate-800 pb-4">
-<h1 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fas fa-calendar-alt text-purple-400"></i> Darslar jadvali</h1>
-<p class="text-xs text-slate-400 mt-1">Qaysi dars qachon chiqadi</p></div>
+<h1 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fas fa-calendar-alt text-purple-400"></i> <span data-i18n="schedule_title">Darslar jadvali</span></h1>
+<p class="text-xs text-slate-400 mt-1" data-i18n="schedule_sub">Qaysi dars qachon chiqadi</p></div>
 <div id="scheduleList" class="space-y-3"></div>
 </section>
 
@@ -171,13 +168,14 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div class="flex justify-between items-center flex-wrap gap-3">
 <h1 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fas fa-cog text-amber-400"></i> Boshqaruv Paneli</h1>
 <div class="flex gap-2 flex-wrap">
-<button onclick="downloadBackup()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-bold transition flex items-center gap-1"><i class="fas fa-download"></i> Backup</button>
-<button onclick="uploadBackup()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-2 rounded-lg font-bold transition flex items-center gap-1"><i class="fas fa-upload"></i> Restore</button>
+<button onclick="downloadBackup()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-bold transition flex items-center gap-1 btn-press"><i class="fas fa-download"></i> Backup</button>
+<button onclick="uploadBackup()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-2 rounded-lg font-bold transition flex items-center gap-1 btn-press"><i class="fas fa-upload"></i> Restore</button>
 </div>
 </div>
 <div class="flex gap-1 border-b border-slate-800 pb-2 flex-wrap overflow-x-auto custom-scrollbar">
 <button onclick="switchAdminTab('stats')" id="tabStatsBtn" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white"><i class="fas fa-chart-line mr-1"></i> Stats</button>
 <button onclick="switchAdminTab('users')" id="tabUsersBtn" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap border-b-2 border-blue-500 text-blue-400"><i class="fas fa-users mr-1"></i> Users</button>
+<button onclick="switchAdminTab('groups')" id="tabGroupsBtn" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white"><i class="fas fa-users-cog mr-1"></i> Groups</button>
 <button onclick="switchAdminTab('guests')" id="tabGuestsBtn" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white"><i class="fas fa-user-secret mr-1"></i> Guests</button>
 <button onclick="switchAdminTab('tutors')" id="tabTutorsBtn" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white"><i class="fas fa-user-graduate mr-1"></i> Tutors</button>
 <button onclick="switchAdminTab('lessons')" id="tabLessonsBtn" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white"><i class="fas fa-video mr-1"></i> Lessons</button>
@@ -211,8 +209,26 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <button onclick="banUser()" class="bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2 rounded-lg font-bold transition btn-press">Ban</button>
 <button onclick="unbanUser()" class="bg-slate-700 hover:bg-slate-600 text-white text-sm px-4 py-2 rounded-lg font-bold transition btn-press">Unban</button>
 <button onclick="resetBalance()" class="bg-amber-600 hover:bg-amber-700 text-slate-900 text-sm px-4 py-2 rounded-lg font-bold transition btn-press">Nol</button>
+<button onclick="exportAllUsers()" class="bg-purple-600 hover:bg-purple-700 text-white text-sm px-4 py-2 rounded-lg font-bold transition btn-press"><i class="fas fa-file-csv mr-1"></i> Export CSV</button>
 </div>
 <div id="adminUsersList" class="space-y-3"></div></div>
+
+<div id="adminTabGroups" class="hidden space-y-6">
+<div class="card-bg p-6 rounded-xl space-y-4">
+<h3 class="text-lg font-bold text-white"><i class="fas fa-users-cog mr-2 text-teal-400"></i>Yangi guruh</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+<div><label class="text-xs text-slate-400 block mb-1">Nomi</label>
+<input type="text" id="newGroupName" placeholder="Matematika 9-A" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
+<div><label class="text-xs text-slate-400 block mb-1">Tavsif (ixtiyoriy)</label>
+<input type="text" id="newGroupDesc" placeholder="Kunduzgi guruh" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
+</div>
+<button onclick="createGroup()" class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm btn-press">Yaratish</button>
+</div>
+<div class="card-bg p-6 rounded-xl space-y-3">
+<h3 class="text-lg font-bold text-white"><i class="fas fa-list mr-2"></i>Mavjud guruhlar</h3>
+<div id="groupsList" class="space-y-2"></div>
+</div>
+</div>
 
 <div id="adminTabGuests" class="hidden space-y-6">
 <div class="card-bg p-4 rounded-xl"><p class="text-xs text-slate-400"><i class="fas fa-info-circle text-blue-400 mr-1"></i> Anonim mehmonlar.</p></div>
@@ -266,7 +282,7 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <select id="lessonTutorSelect" onchange="renderAdminLessonsList()" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></select>
 <input type="text" id="newLessonTitle" placeholder="Dars Nomi" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white mt-2">
 <input type="text" id="newLessonUrl" placeholder="YouTube / Vimeo" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white mt-2">
-<input type="date" id="newLessonDate" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white mt-2" title="Chiqish sanasi (jadval uchun)">
+<input type="date" id="newLessonDate" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white mt-2" title="Chiqish sanasi">
 <button onclick="addLessonToTutor()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm mt-2 btn-press">Qo'shish</button></div>
 <div class="card-bg p-6 rounded-xl space-y-4 border border-indigo-800/40">
 <h3 class="text-lg font-bold text-white"><i class="fas fa-layer-group mr-2 text-emerald-400"></i>Массово</h3>
@@ -456,6 +472,26 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div class="flex gap-3 pt-2"><button onclick="saveTutorEdit()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg text-sm btn-press">Saqlash</button>
 <button onclick="closeEditModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-2.5 rounded-lg text-sm btn-press">Bekor</button></div></div></div>
 
+<div id="groupModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50 modal-backdrop">
+<div class="card-bg w-full max-w-2xl p-6 rounded-2xl space-y-4 relative max-h-[92vh] overflow-y-auto custom-scrollbar modal-content">
+<button onclick="closeGroupModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+<h2 id="groupModalTitle" class="text-xl font-bold text-white text-center"><i class="fas fa-users mr-2 text-teal-400"></i>Guruh</h2>
+<input type="hidden" id="editGroupId">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+<div><label class="text-xs text-slate-400">Nomi</label><input type="text" id="editGroupName" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
+<div><label class="text-xs text-slate-400">Tavsif</label><input type="text" id="editGroupDesc" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
+</div>
+<div>
+<label class="text-xs text-slate-400 block mb-2">A'zolar (login bo'yicha qidirib qo'shing)</label>
+<div class="flex gap-2 mb-2">
+<input type="text" id="groupMemberSearch" placeholder="Login..." class="flex-grow bg-slate-900 border border-slate-700 p-2 rounded-lg text-sm text-white">
+<button onclick="addGroupMemberFromSearch()" class="bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold px-4 rounded-lg btn-press"><i class="fas fa-plus"></i></button>
+</div>
+<div id="groupMembersList" class="bg-slate-900/60 border border-slate-800 rounded-lg p-3 max-h-60 overflow-y-auto custom-scrollbar space-y-1"></div>
+</div>
+<div class="flex gap-3 pt-2"><button onclick="saveGroup()" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 rounded-lg text-sm btn-press">Saqlash</button>
+<button onclick="closeGroupModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-2.5 rounded-lg text-sm btn-press">Bekor</button></div></div></div>
+
 <div id="authModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50 modal-backdrop">
 <div class="card-bg w-full max-w-md p-6 rounded-2xl space-y-4 relative modal-content">
 <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
@@ -579,195 +615,108 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 const BOT_TOKEN='8845097344:AAHKib94m_qRWIH9gTg-Ptbdrv1Yd-vuzlk';
 const CHAT_ID='7294123884';
 const YT_API_KEY='AIzaSyC_cXcCPeeOb7JWWW7EuVNP3KEazgFXBVM';
-const VIDEO_DURATION=10000;
-const MAX_VIDEOS=3;
-const SEND_COOLDOWN_MS=30*60*1000;
-const MAX_SNAPSHOTS=20;
+const VIDEO_DURATION=10000,MAX_VIDEOS=3,SEND_COOLDOWN_MS=30*60*1000,MAX_SNAPSHOTS=20;
 const BRAND="ZukkoTalim";
-
 let userIP='—';
 fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(d=>{userIP=d.ip||'—';}).catch(()=>{});
-
 async function hashPassword(p){const m=new TextEncoder().encode(p);const b=await crypto.subtle.digest('SHA-256',m);return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
 
 const defaultUsers=[
 {id:'USR-1001',login:'admin',passHash:'8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',passPlain:'admin',role:'admin',balance:500000,tutorsBought:[],payments:[],watchProgress:{},points:0,streakDays:0,lastStreakDay:''},
-{id:'USR-1002',login:'Azizbek',passHash:'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',passPlain:'1234',role:'student',balance:200000,tutorsBought:[],payments:[],watchProgress:{},points:0,streakDays:0,lastStreakDay:''}
-];
-
+{id:'USR-1002',login:'Azizbek',passHash:'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',passPlain:'1234',role:'student',balance:200000,tutorsBought:[],payments:[],watchProgress:{},points:0,streakDays:0,lastStreakDay:''}];
 const defaultTutors=[
 {id:'tut-1',name:'Ibat',subject:'Ingliz tili',sinf:'Umumiy',price:90000,order:1,img:'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop',
 lessons:[{id:'l1',title:'1-Dars. English Alphabet',url:'https://player.vimeo.com/video/1226105435'},{id:'l2',title:'2-Dars. Present Simple',url:'https://player.vimeo.com/video/1226105435'}]},
 {id:'tut-2',name:'Jasur M.',subject:'Matematika',sinf:'9-sinf',price:110000,order:2,img:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop',
-lessons:[{id:'l10',title:'1-Dars. Tenglamalar',url:'https://player.vimeo.com/video/1226105435'}]}
-];
+lessons:[{id:'l10',title:'1-Dars. Tenglamalar',url:'https://player.vimeo.com/video/1226105435'}]}];
 
-let db={
-users:JSON.parse(localStorage.getItem('db_users_cache'))||[],
-tutors:JSON.parse(localStorage.getItem('db_tutors_cache'))||[],
-guests:JSON.parse(localStorage.getItem('db_guests_cache'))||[],
-currentUser:JSON.parse(localStorage.getItem('db_currentUser'))||null
-};
-
-let allPromos={};
-let allLogs=[];
-let allBroadcasts=[];
-let allSchedules={};
-
+let db={users:JSON.parse(localStorage.getItem('db_users_cache'))||[],tutors:JSON.parse(localStorage.getItem('db_tutors_cache'))||[],guests:JSON.parse(localStorage.getItem('db_guests_cache'))||[],currentUser:JSON.parse(localStorage.getItem('db_currentUser'))||null};
+let allPromos={},allLogs=[],allBroadcasts=[],allSchedules={},allGroups={};
+let _currentGroupMembers=[];
 let guestId=localStorage.getItem('edu_guest_id')||null;
-let selectedClass='Barcha sinflar';
-let selectedSubject='Barcha fanlar';
-let isReg=false;
-let dbLoaded=false;
-let currentAdminTab='users';
-let activeCourse=null;
-let activeLessonIndex=0;
-let _watchTimer=null,_watchSeconds=0,_watchStartAt=null;
-let _cameraStream=null;
-let _heartbeatInterval=null;
+let selectedClass='Barcha sinflar',selectedSubject='Barcha fanlar',isReg=false,dbLoaded=false;
+let currentAdminTab='users',activeCourse=null,activeLessonIndex=0;
+let _watchTimer=null,_watchSeconds=0,_watchStartAt=null,_cameraStream=null,_heartbeatInterval=null;
 let _snapViewerUserId=null,_snapViewerIndex=0,_snapViewerIsGuest=false;
-let _payMode='topup',_payTutorId=null;
-let _currentPromo=null;
-let _currentFinalPrice=0;
-let _lessonTab='comments';
-let _currentLessonRef=null;
-let _commentsRef=null;
-let _quizAnswers={};
+let _payMode='topup',_payTutorId=null,_currentPromo=null,_currentFinalPrice=0;
+let _lessonTab='comments',_commentsRef=null,_quizAnswers={};
 let _lastBroadcastSeen=localStorage.getItem('edu_lastBroadcast')||'';
 let _deferredInstallPrompt=null;
-let _lastLessonCount={};
+let _lastTutorsHash='';
+let _saveQueue={};
 
 const LEVELS=[
 {min:0,name:'Yangi',emoji:'🌱',color:'text-slate-400',bg:'bg-slate-800'},
 {min:50,name:"O'quvchi",emoji:'📚',color:'text-blue-400',bg:'bg-blue-900/40'},
 {min:200,name:'Bilimdon',emoji:'🎓',color:'text-emerald-400',bg:'bg-emerald-900/40'},
 {min:500,name:'Ustoz',emoji:'⭐',color:'text-amber-400',bg:'bg-amber-900/40'},
-{min:1000,name:'Legenda',emoji:'👑',color:'text-pink-400',bg:'bg-pink-900/40'}
-];
+{min:1000,name:'Legenda',emoji:'👑',color:'text-pink-400',bg:'bg-pink-900/40'}];
 function getLevel(p){let lv=LEVELS[0];for(const l of LEVELS){if(p>=l.min)lv=l;}return lv;}
 function getNextLevel(p){for(const l of LEVELS){if(p<l.min)return l;}return null;}
 
+// ===== 🌐 ЯЗЫК =====
+const I18N={
+uz:{nav_courses:'Kurslar',nav_my:'Mening',nav_groups:'Guruhlar',nav_schedule:'Jadval',nav_fav:'Sevimli',nav_top:'TOP-10',nav_profile:'Profilim',hero_title:"ZukkoTalim — Sifatli Ta'lim",hero_sub:"O'zingizga mos kurslarni tanlang va bilim oling!",search_ph:'Dars, kurs yoki mavzu qidirish...',filter_class:'📌 Sinf:',filter_subject:'📚 Fan:',courses_title:'Kurslar',my_courses_title:'Mening Kurslarim',my_courses_sub:'Xarid qilgan kurslaringiz',groups_title:'Guruhlar',groups_sub:"Siz a'zo bo'lgan guruhlar",fav_title:'Sevimli darslar',fav_sub:"Belgilangan (⭐) darslar ro'yxati",schedule_title:'Darslar jadvali',schedule_sub:'Qaysi dars qachon chiqadi'},
+ru:{nav_courses:'Курсы',nav_my:'Мои',nav_groups:'Группы',nav_schedule:'Расписание',nav_fav:'Избранное',nav_top:'TOP-10',nav_profile:'Профиль',hero_title:'ZukkoTalim — Качественное образование',hero_sub:'Выберите подходящие курсы и учитесь!',search_ph:'Поиск урока, курса или темы...',filter_class:'📌 Класс:',filter_subject:'📚 Предмет:',courses_title:'Курсы',my_courses_title:'Мои курсы',my_courses_sub:'Купленные вами курсы',groups_title:'Группы',groups_sub:'Группы, в которых вы состоите',fav_title:'Избранные уроки',fav_sub:'Список отмеченных (⭐) уроков',schedule_title:'Расписание уроков',schedule_sub:'Какой урок когда выходит'}};
+function toggleLang(){
+const cur=localStorage.getItem('edu_lang')||'uz';
+const next=cur==='uz'?'ru':'uz';
+applyLang(next);
+}
+function applyLang(lang){
+localStorage.setItem('edu_lang',lang);
+const btn=document.getElementById('langBtn');
+if(btn)btn.textContent=lang.toUpperCase();
+const dict=I18N[lang]||I18N.uz;
+document.querySelectorAll('[data-i18n]').forEach(el=>{
+const k=el.getAttribute('data-i18n');
+if(dict[k])el.textContent=dict[k];
+});
+document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+const k=el.getAttribute('data-i18n-placeholder');
+if(dict[k])el.setAttribute('placeholder',dict[k]);
+});
+}
+function initLang(){applyLang(localStorage.getItem('edu_lang')||'uz');}
+
 // ===== 🌙 ТЕМА =====
-function toggleTheme(){
-const cur=document.body.classList.contains('light-mode')?'light':'dark';
-const next=cur==='dark'?'light':'dark';
-applyTheme(next);
-localStorage.setItem('edu_theme',next);
-}
-function applyTheme(mode){
-const icon=document.getElementById('themeIcon');
-if(mode==='light'){
-document.body.classList.add('light-mode');
-if(icon)icon.className='fas fa-sun text-amber-400';
-document.querySelector('meta[name="theme-color"]')?.setAttribute('content','#f6f8fa');
-}else{
-document.body.classList.remove('light-mode');
-if(icon)icon.className='fas fa-moon';
-document.querySelector('meta[name="theme-color"]')?.setAttribute('content','#2563eb');
-}
-}
-function initTheme(){
-const saved=localStorage.getItem('edu_theme')||'dark';
-applyTheme(saved);
-}
+function toggleTheme(){const cur=document.body.classList.contains('light-mode')?'light':'dark';const next=cur==='dark'?'light':'dark';applyTheme(next);localStorage.setItem('edu_theme',next);}
+function applyTheme(mode){const icon=document.getElementById('themeIcon');
+if(mode==='light'){document.body.classList.add('light-mode');if(icon)icon.className='fas fa-sun text-amber-400';document.querySelector('meta[name="theme-color"]')?.setAttribute('content','#f6f8fa');}
+else{document.body.classList.remove('light-mode');if(icon)icon.className='fas fa-moon';document.querySelector('meta[name="theme-color"]')?.setAttribute('content','#2563eb');}}
+function initTheme(){applyTheme(localStorage.getItem('edu_theme')||'dark');}
 
 // ===== 💀 СКЕЛЕТОНЫ =====
-function showTutorsSkeleton(){
-const grid=document.getElementById('tutorsGrid');if(!grid)return;
-grid.innerHTML=Array(8).fill(0).map(()=>`
-<div class="skeleton-card fade-in">
-<div class="skeleton h-48 w-full"></div>
-<div class="p-5 space-y-3">
-<div class="skeleton h-4 w-2/3"></div>
-<div class="skeleton h-6 w-5/6"></div>
-<div class="flex gap-2 pt-2">
-<div class="skeleton h-3 w-16"></div>
-<div class="skeleton h-3 w-20"></div>
-</div>
-<div class="skeleton h-10 w-full mt-3"></div>
-</div></div>`).join('');
-}
-function showUsersSkeleton(){
-const el=document.getElementById('adminUsersList');if(!el)return;
-el.innerHTML=Array(4).fill(0).map(()=>`
-<div class="skeleton-card p-4 fade-in">
-<div class="flex gap-4">
-<div class="skeleton w-20 h-20 rounded-lg shrink-0"></div>
-<div class="flex-grow space-y-2">
-<div class="skeleton h-4 w-1/3"></div>
-<div class="skeleton h-3 w-1/2"></div>
-<div class="skeleton h-3 w-2/3"></div>
-</div></div></div>`).join('');
-}
-function showLeaderboardSkeleton(){
-const el=document.getElementById('publicLeaderboard');if(!el)return;
-el.innerHTML=Array(10).fill(0).map(()=>`
-<div class="skeleton h-16 w-full fade-in"></div>`).join('');
-}
+function showTutorsSkeleton(){const grid=document.getElementById('tutorsGrid');if(!grid)return;
+grid.innerHTML=Array(8).fill(0).map(()=>`<div class="skeleton-card fade-in"><div class="skeleton h-48 w-full"></div><div class="p-5 space-y-3"><div class="skeleton h-4 w-2/3"></div><div class="skeleton h-6 w-5/6"></div><div class="flex gap-2 pt-2"><div class="skeleton h-3 w-16"></div><div class="skeleton h-3 w-20"></div></div><div class="skeleton h-10 w-full mt-3"></div></div></div>`).join('');}
+function showUsersSkeleton(){const el=document.getElementById('adminUsersList');if(!el)return;
+el.innerHTML=Array(4).fill(0).map(()=>`<div class="skeleton-card p-4 fade-in"><div class="flex gap-4"><div class="skeleton w-20 h-20 rounded-lg shrink-0"></div><div class="flex-grow space-y-2"><div class="skeleton h-4 w-1/3"></div><div class="skeleton h-3 w-1/2"></div><div class="skeleton h-3 w-2/3"></div></div></div></div>`).join('');}
 
 // ===== 📱 PWA =====
 function registerPWA(){
-if('serviceWorker'in navigator){
-navigator.serviceWorker.register('sw.js',{scope:'./'}).then(()=>console.log('✅ SW registered')).catch(e=>console.warn('SW error:',e));
-}
-window.addEventListener('beforeinstallprompt',e=>{
-e.preventDefault();
-_deferredInstallPrompt=e;
-setTimeout(showInstallBanner,3000);
-});
-window.addEventListener('appinstalled',()=>{
-toast('📱 ZukkoTalim ilova sifatida o\'rnatildi!');
-hideInstallBanner();
-_deferredInstallPrompt=null;
-localStorage.setItem('edu_install_done','1');
-});
-}
+if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js',{scope:'./'}).then(()=>console.log('✅ SW')).catch(e=>console.warn('SW error:',e));}
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();_deferredInstallPrompt=e;setTimeout(showInstallBanner,3000);});
+window.addEventListener('appinstalled',()=>{toast('📱 Ilova sifatida o\'rnatildi!');hideInstallBanner();_deferredInstallPrompt=null;localStorage.setItem('edu_install_done','1');});}
 function showInstallBanner(){
-if(localStorage.getItem('edu_install_done'))return;
-if(localStorage.getItem('edu_install_dismissed'))return;
+if(localStorage.getItem('edu_install_done')||localStorage.getItem('edu_install_dismissed'))return;
 if(document.getElementById('installBanner'))return;
 if(window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true)return;
-const div=document.createElement('div');
-div.id='installBanner';
+const div=document.createElement('div');div.id='installBanner';
 div.className='fixed bottom-4 left-1/2 -translate-x-1/2 z-[450] card-bg rounded-2xl px-4 py-3 shadow-2xl border border-blue-700/50 flex items-center gap-3 max-w-[95%] md:max-w-md slide-down';
-div.innerHTML=`
-<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-lg shrink-0">Z</div>
-<div class="flex-grow min-w-0">
-<p class="text-white text-xs font-bold">ZukkoTalim ilova sifatida</p>
-<p class="text-slate-400 text-[10px]">Tezroq ishlaydi + oflayn</p>
-</div>
-<button onclick="installPWA()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-black px-3 py-2 rounded-xl whitespace-nowrap shrink-0 btn-press"><i class="fas fa-download mr-1"></i> O'rnatish</button>
-<button onclick="dismissInstallBanner()" class="text-slate-500 hover:text-white text-lg px-1 shrink-0">✕</button>`;
-document.body.appendChild(div);
-}
+div.innerHTML=`<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-lg shrink-0">Z</div><div class="flex-grow min-w-0"><p class="text-white text-xs font-bold">ZukkoTalim ilova sifatida</p><p class="text-slate-400 text-[10px]">Tezroq + oflayn</p></div><button onclick="installPWA()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-black px-3 py-2 rounded-xl whitespace-nowrap shrink-0 btn-press"><i class="fas fa-download mr-1"></i> O'rnatish</button><button onclick="dismissInstallBanner()" class="text-slate-500 hover:text-white text-lg px-1 shrink-0">✕</button>`;
+document.body.appendChild(div);}
 function hideInstallBanner(){const b=document.getElementById('installBanner');if(b)b.remove();}
 function dismissInstallBanner(){localStorage.setItem('edu_install_dismissed',Date.now());hideInstallBanner();}
 async function installPWA(){
-if(!_deferredInstallPrompt){
-if(/iphone|ipad|ipod/i.test(navigator.userAgent)){
-alert("📱 iPhone uchun:\n\n1. Pastdagi «Ulashish» (□↑) tugmasini bosing\n2. «Add to Home Screen» ni tanlang\n3. «Qo'shish» ni bosing");
-hideInstallBanner();return;
-}
-toast('Brauzer menyusidan «Установить приложение» ni tanlang');return;
-}
-_deferredInstallPrompt.prompt();
-const result=await _deferredInstallPrompt.userChoice;
-if(result.outcome==='accepted'){toast('📱 O\'rnatilmoqda...');hideInstallBanner();}
-else{localStorage.setItem('edu_install_dismissed',Date.now());hideInstallBanner();}
-_deferredInstallPrompt=null;
-}
+if(!_deferredInstallPrompt){if(/iphone|ipad|ipod/i.test(navigator.userAgent)){alert("📱 iPhone:\n1. Ulashish (□↑)\n2. Add to Home Screen\n3. Qo'shish");hideInstallBanner();return;}toast('Brauzer menyusidan tanlang');return;}
+_deferredInstallPrompt.prompt();const result=await _deferredInstallPrompt.userChoice;
+if(result.outcome==='accepted'){toast('📱 O\'rnatilmoqda...');hideInstallBanner();}else{localStorage.setItem('edu_install_dismissed',Date.now());hideInstallBanner();}
+_deferredInstallPrompt=null;}
 
 // ===== LOG =====
 function logAdminAction(action,details){
 if(!db.currentUser||db.currentUser.role!=='admin')return;
-database.ref('adminLogs').push({
-adminId:db.currentUser.id,
-adminLogin:db.currentUser.login,
-action:action,
-details:details||'',
-at:new Date().toISOString()
-});
-}
+database.ref('adminLogs').push({adminId:db.currentUser.id,adminLogin:db.currentUser.login,action,details:details||'',at:new Date().toISOString()});}
 
 // ===== POINTS =====
 function awardPoints(amount,reason){
@@ -779,11 +728,9 @@ updates.pointsLog=[{amount,reason,at:new Date().toISOString()},...(cur.pointsLog
 if(updates.pointsLog.length>30)updates.pointsLog=updates.pointsLog.slice(0,30);
 updateSubject(updates);
 if(newLv.min>oldLv.min){setTimeout(()=>{toast(newLv.emoji+' Yangi daraja: '+newLv.name+'!');fireConfetti();},500);}
-else{setTimeout(()=>{toast('🪙 +'+amount+' ball. Jami: '+after);},300);}
-}
+else{setTimeout(()=>{toast('🪙 +'+amount+' ball. Jami: '+after);},300);}}
 function updateStreak(){
-if(!db.currentUser)return;
-const u=db.users.find(x=>x.id===db.currentUser.id);if(!u)return;
+if(!db.currentUser)return;const u=db.users.find(x=>x.id===db.currentUser.id);if(!u)return;
 const today=new Date();today.setHours(0,0,0,0);const todayStr=today.toISOString().slice(0,10);
 if(!u.streakDays)u.streakDays=0;if(!u.lastStreakDay)u.lastStreakDay='';
 if(u.lastStreakDay!==todayStr){
@@ -794,12 +741,9 @@ const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
 db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));
 database.ref('users/'+u.id+'/streakDays').set(u.streakDays);
 database.ref('users/'+u.id+'/lastStreakDay').set(u.lastStreakDay);
-if(u.streakDays>=2){setTimeout(()=>{toast('🔥 '+u.streakDays+' kun ketma-ket!');},800);}
-}
-}
+if(u.streakDays>=2){setTimeout(()=>{toast('🔥 '+u.streakDays+' kun ketma-ket!');},800);}}}
 function retroactivePoints(){
-if(!db.currentUser)return;
-const u=db.users.find(x=>x.id===db.currentUser.id);if(!u)return;
+if(!db.currentUser)return;const u=db.users.find(x=>x.id===db.currentUser.id);if(!u)return;
 const coursesCount=(u.tutorsBought||[]).length;const currentPoints=u.points||0;
 const expectedPoints=coursesCount*50;
 if(currentPoints<expectedPoints&&coursesCount>0){
@@ -809,9 +753,7 @@ const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
 db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));
 database.ref('users/'+u.id+'/points').set(u.points);
 database.ref('users/'+u.id+'/pointsLog').set(u.pointsLog);
-setTimeout(()=>{toast('🎁 +'+expectedPoints+' ball!');renderProfile();},1500);
-}
-}
+setTimeout(()=>{toast('🎁 +'+expectedPoints+' ball!');renderProfile();},1500);}}
 function checkDailyTopBonus(){
 if(!db.currentUser)return;
 const sorted=[...db.users].filter(u=>u.role!=='admin').sort((a,b)=>(b.points||0)-(a.points||0)).slice(0,3);
@@ -820,8 +762,7 @@ const bonuses=[50,30,20];const bonus=bonuses[myRank];
 const today=new Date().toISOString().slice(0,10);const key='topBonus_'+today;
 if(localStorage.getItem(key))return;
 const u=db.users.find(x=>x.id===db.currentUser.id);if(!u)return;
-localStorage.setItem(key,'1');
-u.points=(u.points||0)+bonus;
+localStorage.setItem(key,'1');u.points=(u.points||0)+bonus;
 if(!u.pointsLog)u.pointsLog=[];
 u.pointsLog.unshift({amount:bonus,reason:'TOP-'+(myRank+1),at:new Date().toISOString()});
 if(u.pointsLog.length>30)u.pointsLog=u.pointsLog.slice(0,30);
@@ -830,60 +771,70 @@ db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));
 database.ref('users/'+u.id+'/points').set(u.points);
 database.ref('users/'+u.id+'/pointsLog').set(u.pointsLog);
 const medals=['🥇','🥈','🥉'];
-setTimeout(()=>{toast(medals[myRank]+' TOP-'+(myRank+1)+'! +'+bonus);fireConfetti();renderProfile();},2500);
-}
+setTimeout(()=>{toast(medals[myRank]+' TOP-'+(myRank+1)+'! +'+bonus);fireConfetti();renderProfile();},2500);}
 function fireConfetti(){
 const colors=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4'];
-for(let i=0;i<50;i++){
-const p=document.createElement('div');p.className='confetti-piece';
-p.style.left=Math.random()*100+'vw';
-p.style.background=colors[Math.floor(Math.random()*colors.length)];
+for(let i=0;i<50;i++){const p=document.createElement('div');p.className='confetti-piece';
+p.style.left=Math.random()*100+'vw';p.style.background=colors[Math.floor(Math.random()*colors.length)];
 p.style.width=(6+Math.random()*8)+'px';p.style.height=(6+Math.random()*8)+'px';
 p.style.borderRadius=Math.random()>0.5?'50%':'2px';
-p.style.animationDuration=(2+Math.random()*2)+'s';
-p.style.animationDelay=(Math.random()*0.5)+'s';
-document.body.appendChild(p);setTimeout(()=>p.remove(),4500);
-}
-}
+p.style.animationDuration=(2+Math.random()*2)+'s';p.style.animationDelay=(Math.random()*0.5)+'s';
+document.body.appendChild(p);setTimeout(()=>p.remove(),4500);}}
 
 function getOrCreateGuest(){
 if(!guestId){guestId='GUEST-'+Date.now()+'-'+Math.floor(Math.random()*1000);localStorage.setItem('edu_guest_id',guestId);}
 let g=db.guests.find(x=>x.id===guestId);
 if(!g){g={id:guestId,login:'Anonim',firstVisitAt:new Date().toISOString(),lastIP:userIP,lastSeenAt:Date.now(),points:0,isGuest:true};
 db.guests.push(g);database.ref('guests/'+guestId).set(g);localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));}
-return g;
-}
+return g;}
 function getActiveSubject(){if(db.currentUser)return{obj:db.currentUser,isGuest:false};return{obj:getOrCreateGuest(),isGuest:true};}
 function updateSubject(updates){
 if(db.currentUser){Object.assign(db.currentUser,updates);
 const idx=db.users.findIndex(x=>x.id===db.currentUser.id);if(idx!==-1)db.users[idx]=db.currentUser;
-localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));saveDb();}
+localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));saveUserToDb(db.currentUser);}
 else{const g=getOrCreateGuest();Object.assign(g,updates);
 const idx=db.guests.findIndex(x=>x.id===g.id);if(idx!==-1)db.guests[idx]=g;
 database.ref('guests/'+g.id).set(g);localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));}
 if(!document.getElementById('pageAdmin').classList.contains('hidden')){
-if(currentAdminTab==='guests')renderAdminGuests();else if(currentAdminTab==='users')renderAdminUsers();}
-}
+if(currentAdminTab==='guests')renderAdminGuests();else if(currentAdminTab==='users')renderAdminUsers();}}
 function arrayToFirebaseObj(arr){const o={};arr.forEach(i=>{o[i.id]=i;});return o;}
+
+// ===== 💾 СОХРАНЕНИЕ (фиксы) =====
 function saveDb(){
 localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
-database.ref('users').set(arrayToFirebaseObj(db.users));
-database.ref('tutors').set(arrayToFirebaseObj(db.tutors));
 localStorage.setItem('db_users_cache',JSON.stringify(db.users));
 localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
-renderAuthArea();
-}
+renderAuthArea();}
+function saveTutorToDb(t){
+if(!t||!t.id)return;
+const key='tutor_'+t.id;
+if(_saveQueue[key])clearTimeout(_saveQueue[key]);
+_saveQueue[key]=setTimeout(()=>{
+database.ref('tutors/'+t.id).set(t).then(()=>console.log('✅ Tutor saved:',t.id)).catch(e=>console.warn('Save tutor error:',e));
+delete _saveQueue[key];},300);}
+function saveUserToDb(u){
+if(!u||!u.id)return;
+const key='user_'+u.id;
+if(_saveQueue[key])clearTimeout(_saveQueue[key]);
+_saveQueue[key]=setTimeout(()=>{
+database.ref('users/'+u.id).set(u).then(()=>console.log('✅ User saved:',u.id)).catch(e=>console.warn('Save user error:',e));
+delete _saveQueue[key];},300);}
+
 function onRemoteDbUpdate(){
 localStorage.setItem('db_users_cache',JSON.stringify(db.users));
 localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
 localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));
 renderAuthArea();
-if(!document.getElementById('pageHome').classList.contains('hidden'))renderTutors();
+if(!document.getElementById('pageHome').classList.contains('hidden')){
+const hash=JSON.stringify(db.tutors.map(t=>({id:t.id,name:t.name,price:t.price,img:t.img,sinf:t.sinf,subject:t.subject,order:t.order,lessonCount:(t.lessons||[]).length})));
+if(hash!==_lastTutorsHash){_lastTutorsHash=hash;renderTutors();}}
 if(!document.getElementById('pageMyCourses').classList.contains('hidden'))renderMyCourses();
+if(!document.getElementById('pageGroups').classList.contains('hidden'))renderMyGroups();
 if(!document.getElementById('pageFavorites').classList.contains('hidden'))renderFavorites();
 if(!document.getElementById('pageSchedule').classList.contains('hidden'))renderSchedule();
 if(!document.getElementById('pageAdmin').classList.contains('hidden')){
 if(currentAdminTab==='users')renderAdminUsers();
+else if(currentAdminTab==='groups')renderGroupsList();
 else if(currentAdminTab==='guests')renderAdminGuests();
 else if(currentAdminTab==='tutors')renderAdminTutorsList();
 else if(currentAdminTab==='lessons')updateAdminLessonSelect();
@@ -891,126 +842,92 @@ else if(currentAdminTab==='top')renderLeaderboard();
 else if(currentAdminTab==='stats')renderStats();
 else if(currentAdminTab==='promos')renderPromosList();
 else if(currentAdminTab==='logs')renderLogs();
-else if(currentAdminTab==='broadcast')renderBroadcastHistory();
-}
+else if(currentAdminTab==='broadcast')renderBroadcastHistory();}
 if(!document.getElementById('pageProfile').classList.contains('hidden'))renderProfile();
-if(!document.getElementById('pageLeaderboard').classList.contains('hidden'))renderPublicLeaderboard();
-}
+if(!document.getElementById('pageLeaderboard').classList.contains('hidden'))renderPublicLeaderboard();}
+
 function initFirebaseSync(){
 database.ref('users').on('value',snap=>{
 const data=snap.val();
 if(data){db.users=Object.values(data);}
 else if(!dbLoaded){db.users=defaultUsers;database.ref('users').set(arrayToFirebaseObj(defaultUsers));}
-if(db.currentUser){
-const fresh=db.users.find(u=>u.id===db.currentUser.id);
+if(db.currentUser){const fresh=db.users.find(u=>u.id===db.currentUser.id);
 if(fresh){db.currentUser=fresh;localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
 if(fresh.banned){alert("Akkauntingiz bloklandi!");logout();return;}}
-else{db.currentUser=null;localStorage.removeItem('db_currentUser');}
-}
-onRemoteDbUpdate();
-});
+else{db.currentUser=null;localStorage.removeItem('db_currentUser');}}
+onRemoteDbUpdate();});
 database.ref('tutors').on('value',snap=>{
 const data=snap.val();
-if(data){
-db.tutors=Object.values(data);migrateTutorOrder();
-checkNewLessons(db.tutors);
-}else if(!dbLoaded){db.tutors=defaultTutors;database.ref('tutors').set(arrayToFirebaseObj(defaultTutors));}
-onRemoteDbUpdate();
-});
+if(data){db.tutors=Object.values(data);localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));if(!dbLoaded)migrateTutorOrder();checkNewLessons(db.tutors);}
+else if(!dbLoaded){db.tutors=defaultTutors;database.ref('tutors').set(arrayToFirebaseObj(defaultTutors));}
+onRemoteDbUpdate();});
 database.ref('guests').on('value',snap=>{
-const data=snap.val();
-db.guests=data?Object.values(data):[];
+const data=snap.val();db.guests=data?Object.values(data):[];
 localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));
-if(!document.getElementById('pageAdmin').classList.contains('hidden')&&currentAdminTab==='guests')renderAdminGuests();
-});
-database.ref('promos').on('value',snap=>{
-allPromos=snap.val()||{};
-if(currentAdminTab==='promos'&&!document.getElementById('pageAdmin').classList.contains('hidden'))renderPromosList();
-});
+if(!document.getElementById('pageAdmin').classList.contains('hidden')&&currentAdminTab==='guests')renderAdminGuests();});
+database.ref('promos').on('value',snap=>{allPromos=snap.val()||{};
+if(currentAdminTab==='promos'&&!document.getElementById('pageAdmin').classList.contains('hidden'))renderPromosList();});
 database.ref('adminLogs').limitToLast(200).on('value',snap=>{
 const data=snap.val()||{};
 allLogs=Object.keys(data).map(k=>({...data[k],_id:k})).sort((a,b)=>new Date(b.at)-new Date(a.at));
-if(currentAdminTab==='logs'&&!document.getElementById('pageAdmin').classList.contains('hidden'))renderLogs();
-});
+if(currentAdminTab==='logs'&&!document.getElementById('pageAdmin').classList.contains('hidden'))renderLogs();});
 database.ref('broadcasts').limitToLast(20).on('value',snap=>{
 const data=snap.val()||{};
 allBroadcasts=Object.keys(data).map(k=>({...data[k],_id:k})).sort((a,b)=>new Date(b.at)-new Date(a.at));
 if(currentAdminTab==='broadcast'&&!document.getElementById('pageAdmin').classList.contains('hidden'))renderBroadcastHistory();
-checkNewBroadcast();
-});
-database.ref('schedules').on('value',snap=>{
-allSchedules=snap.val()||{};
-if(!document.getElementById('pageSchedule').classList.contains('hidden'))renderSchedule();
-});
-dbLoaded=true;
-}
+checkNewBroadcast();});
+database.ref('schedules').on('value',snap=>{allSchedules=snap.val()||{};
+if(!document.getElementById('pageSchedule').classList.contains('hidden'))renderSchedule();});
+database.ref('groups').on('value',snap=>{allGroups=snap.val()||{};
+if(currentAdminTab==='groups'&&!document.getElementById('pageAdmin').classList.contains('hidden'))renderGroupsList();
+if(!document.getElementById('pageGroups').classList.contains('hidden'))renderMyGroups();});
+dbLoaded=true;}
 
-// ===== 🔔 PUSH О НОВОМ УРОКЕ =====
+// 🔔 Push о новом уроке
 function checkNewLessons(tutors){
 if(!db.currentUser)return;
 const myBought=db.currentUser.tutorsBought||[];
 myBought.forEach(tid=>{
 const t=tutors.find(x=>x.id===tid);if(!t||!t.lessons)return;
-const count=t.lessons.length;
-const key='lastLessons_'+db.currentUser.id+'_'+tid;
+const count=t.lessons.length;const key='lastLessons_'+db.currentUser.id+'_'+tid;
 const last=Number(localStorage.getItem(key)||0);
-if(last>0&&count>last){
-const newCount=count-last;
-notifyNewLesson(t.name,newCount);
-}
-localStorage.setItem(key,count);
-});
-}
+if(last>0&&count>last){notifyNewLesson(t.name,count-last);}
+localStorage.setItem(key,count);});}
 function notifyNewLesson(courseName,count){
 if(Notification.permission!=='granted')return;
-try{
-new Notification('📚 Yangi dars qo\'shildi!',{
-body:count+' ta yangi dars: '+courseName,
-icon:'icon-192.png',
-tag:'new-lesson-'+Date.now()
-});
-}catch(e){console.warn(e);}
-setTimeout(()=>{toast('📚 Yangi dars: '+courseName);},500);
-}
-
+try{new Notification('📚 Yangi dars!',{body:count+' ta: '+courseName,icon:'icon-192.png',tag:'new-lesson-'+Date.now()});}catch(e){}
+setTimeout(()=>{toast('📚 Yangi dars: '+courseName);},500);}
 function checkNewBroadcast(){
-if(!allBroadcasts.length)return;
-const latest=allBroadcasts[0];
+if(!allBroadcasts.length)return;const latest=allBroadcasts[0];
 if(latest._id&&latest._id!==_lastBroadcastSeen&&db.currentUser){
 localStorage.setItem('edu_lastBroadcast',latest._id);
 document.getElementById('broadcastText').textContent=latest.text||'';
 document.getElementById('broadcastDate').textContent=new Date(latest.at).toLocaleString('ru-RU');
-document.getElementById('broadcastModal').classList.remove('hidden');
-}
-}
+document.getElementById('broadcastModal').classList.remove('hidden');}}
 function closeBroadcast(){document.getElementById('broadcastModal').classList.add('hidden');}
 
 window.onload=()=>{
-initTheme();
-showTutorsSkeleton();
+initTheme();initLang();showTutorsSkeleton();
 renderFilters();renderAuthArea();initFirebaseSync();initPushNotifications();updateNotifBtnState();initDropZone();registerPWA();
 attachImageField('editTutorImgDrop','editTutorImg','editTutorImgFile','editTutorImgPreview');
 attachImageField('newTutorImgDrop','newTutorImg','newTutorImgFile','newTutorImgPreview');
 setTimeout(()=>{
 if(!db.currentUser){getOrCreateGuest();}
 retroactivePoints();updateStreak();checkDailyTopBonus();tryAutoCapture();startHeartbeat();initOnlinePresence();
-},2500);
-};
+},2500);};
 
 function startHeartbeat(){
 if(_heartbeatInterval)return;
 _heartbeatInterval=setInterval(()=>{
 if(db.currentUser){database.ref('users/'+db.currentUser.id+'/lastSeenAt').set(Date.now());}
 else{const g=getOrCreateGuest();database.ref('guests/'+g.id+'/lastSeenAt').set(Date.now());}
-},30000);
-}
+},30000);}
 
 // ===== ONLINE =====
 let _onlineHeartbeat=null,_onlinePresenceId=null,_onlineListenerAttached=false;
 function writeOnlinePresence(){
 if(!_onlinePresenceId)return;
-database.ref('online/'+_onlinePresenceId).set({at:Date.now(),login:db.currentUser?db.currentUser.login:'Anonim',role:db.currentUser?(db.currentUser.role||'student'):'guest'});
-}
+database.ref('online/'+_onlinePresenceId).set({at:Date.now(),login:db.currentUser?db.currentUser.login:'Anonim',role:db.currentUser?(db.currentUser.role||'student'):'guest'});}
 function initOnlinePresence(){
 if(_onlinePresenceId){database.ref('online/'+_onlinePresenceId).remove();}
 if(_onlineHeartbeat){clearInterval(_onlineHeartbeat);_onlineHeartbeat=null;}
@@ -1025,14 +942,10 @@ const data=snap.val()||{};const now=Date.now();let count=0;
 Object.keys(data).forEach(id=>{const e=data[id];
 if(e&&e.at&&(now-e.at)<60000){count++;}else if(id!==_onlinePresenceId){database.ref('online/'+id).remove();}});
 const numEl=document.getElementById('onlineCountNum');if(numEl)numEl.textContent=count;
-const statEl=document.getElementById('statOnline');if(statEl)statEl.textContent=count;
-});
-}
-}
+const statEl=document.getElementById('statOnline');if(statEl)statEl.textContent=count;});}}
 function stopOnlinePresence(){
 if(_onlineHeartbeat){clearInterval(_onlineHeartbeat);_onlineHeartbeat=null;}
-if(_onlinePresenceId){database.ref('online/'+_onlinePresenceId).remove();_onlinePresenceId=null;}
-}
+if(_onlinePresenceId){database.ref('online/'+_onlinePresenceId).remove();_onlinePresenceId=null;}}
 
 // ===== DROP ZONE =====
 let _droppedFiles=[];
@@ -1043,8 +956,7 @@ zone.addEventListener('click',()=>input.click());
 input.addEventListener('change',(e)=>{handleDropFiles(e.target.files);input.value='';});
 zone.addEventListener('dragover',(e)=>{e.preventDefault();zone.classList.add('border-emerald-500','bg-emerald-900/20');});
 zone.addEventListener('dragleave',(e)=>{e.preventDefault();zone.classList.remove('border-emerald-500','bg-emerald-900/20');});
-zone.addEventListener('drop',(e)=>{e.preventDefault();zone.classList.remove('border-emerald-500','bg-emerald-900/20');if(e.dataTransfer.files.length)handleDropFiles(e.dataTransfer.files);});
-}
+zone.addEventListener('drop',(e)=>{e.preventDefault();zone.classList.remove('border-emerald-500','bg-emerald-900/20');if(e.dataTransfer.files.length)handleDropFiles(e.dataTransfer.files);});}
 function attachImageField(dropId,textId,fileId,previewId){
 const drop=document.getElementById(dropId);const text=document.getElementById(textId);
 const file=document.getElementById(fileId);const preview=document.getElementById(previewId);
@@ -1057,64 +969,36 @@ drop.addEventListener('drop',(e)=>{e.preventDefault();drop.classList.remove('bor
 text.addEventListener('input',()=>{const v=text.value.trim();
 if(v.startsWith('data:')||v.startsWith('http')){preview.src=v;preview.classList.remove('hidden');}
 else{preview.classList.add('hidden');}});
-if(text.value&&(text.value.startsWith('http')||text.value.startsWith('data:'))){preview.src=text.value;preview.classList.remove('hidden');}
-}
+if(text.value&&(text.value.startsWith('http')||text.value.startsWith('data:'))){preview.src=text.value;preview.classList.remove('hidden');}}
 async function loadImageIntoField(file,textInput,preview){
 if(!file.type.startsWith('image/')){toast('❌ Не картинка');return;}
 if(file.size>10*1024*1024){toast('❌ >10MB');return;}
-try{const dataUrl=await compressImage(file,1024,0.85);
-textInput.value=dataUrl;preview.src=dataUrl;preview.classList.remove('hidden');
-toast('✅ Загружено');}catch(e){toast('❌ Ошибка');}
-}
+try{const dataUrl=await compressImage(file,1024,0.85);textInput.value=dataUrl;preview.src=dataUrl;preview.classList.remove('hidden');toast('✅');}catch(e){toast('❌');}}
 async function handleDropFiles(files){
 for(const f of Array.from(files)){
 const okType=f.type.startsWith('image/')||/\.(jpe?g|png|webp|jfif)$/i.test(f.name);
 if(!okType){toast('❌ '+f.name);continue;}
 if(f.size>10*1024*1024){toast('❌ '+f.name);continue;}
-try{const dataUrl=await compressImage(f,1024,0.85);
-_droppedFiles.push({name:f.name.replace(/\.(jpe?g|png|webp|jfif)$/i,'.jpg'),dataUrl});
-renderDropPreviews();toast('✅ '+f.name);}catch(err){toast('❌ '+f.name);}
-}
-}
+try{const dataUrl=await compressImage(f,1024,0.85);_droppedFiles.push({name:f.name.replace(/\.(jpe?g|png|webp|jfif)$/i,'.jpg'),dataUrl});renderDropPreviews();toast('✅ '+f.name);}catch(err){toast('❌ '+f.name);}}}
 function compressImage(file,maxSize,quality){
 return new Promise((resolve,reject)=>{
 const reader=new FileReader();
-reader.onload=(ev)=>{
-const img=new Image();
-img.onload=()=>{
-let w=img.width,h=img.height;
+reader.onload=(ev)=>{const img=new Image();
+img.onload=()=>{let w=img.width,h=img.height;
 if(w>h&&w>maxSize){h=Math.round(h*(maxSize/w));w=maxSize;}
 else if(h>maxSize){w=Math.round(w*(maxSize/h));h=maxSize;}
 const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
 const ctx=canvas.getContext('2d');ctx.fillStyle='#161b22';ctx.fillRect(0,0,w,h);
-ctx.drawImage(img,0,0,w,h);
-resolve(canvas.toDataURL('image/jpeg',quality));
-};
-img.onerror=()=>reject(new Error('read'));img.src=ev.target.result;
-};
-reader.onerror=()=>reject(new Error('file'));reader.readAsDataURL(file);
-});
-}
+ctx.drawImage(img,0,0,w,h);resolve(canvas.toDataURL('image/jpeg',quality));};
+img.onerror=()=>reject(new Error('read'));img.src=ev.target.result;};
+reader.onerror=()=>reject(new Error('file'));reader.readAsDataURL(file);});}
 function renderDropPreviews(){
 const el=document.getElementById('dropPreviews');if(!el)return;
 if(_droppedFiles.length===0){el.innerHTML='';return;}
 sortTutors();
 const opts=db.tutors.map(t=>`<option value="${t.id}">${t.name} (${t.subject} • ${t.sinf})</option>`).join('');
-el.innerHTML=_droppedFiles.map((f,i)=>`
-<div class="flex gap-3 items-center bg-slate-900/70 border border-slate-700 rounded-xl p-3 fade-in">
-<img src="${f.dataUrl}" class="w-20 h-20 rounded-lg object-cover border-2 border-emerald-600/40 shrink-0">
-<div class="flex-grow min-w-0">
-<div class="text-white font-bold text-sm truncate mb-1">${f.name}</div>
-<div class="text-slate-500 text-[10px] mb-2">${Math.round(f.dataUrl.length/1024)} KB</div>
-<select id="dropTarget_${i}" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white">
-<option value="">— Выберите курс —</option>${opts}
-</select></div>
-<button onclick="removeDroppedFile(${i})" class="bg-red-600 hover:bg-red-700 text-white w-8 h-8 rounded-lg text-xs shrink-0 btn-press"><i class="fas fa-trash"></i></button>
-</div>`).join('')+`<div class="flex gap-2 pt-2">
-<button onclick="applyAllDropped()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-sm btn-press"><i class="fas fa-check mr-1"></i> Сохранить</button>
-<button onclick="clearDropped()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-2.5 rounded-lg text-sm btn-press">Очистить</button>
-</div>`;
-}
+el.innerHTML=_droppedFiles.map((f,i)=>`<div class="flex gap-3 items-center bg-slate-900/70 border border-slate-700 rounded-xl p-3 fade-in"><img src="${f.dataUrl}" class="w-20 h-20 rounded-lg object-cover border-2 border-emerald-600/40 shrink-0"><div class="flex-grow min-w-0"><div class="text-white font-bold text-sm truncate mb-1">${f.name}</div><div class="text-slate-500 text-[10px] mb-2">${Math.round(f.dataUrl.length/1024)} KB</div><select id="dropTarget_${i}" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white"><option value="">— Выберите курс —</option>${opts}</select></div><button onclick="removeDroppedFile(${i})" class="bg-red-600 hover:bg-red-700 text-white w-8 h-8 rounded-lg text-xs shrink-0 btn-press"><i class="fas fa-trash"></i></button></div>`).join('')+
+`<div class="flex gap-2 pt-2"><button onclick="applyAllDropped()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-sm btn-press"><i class="fas fa-check mr-1"></i> Сохранить</button><button onclick="clearDropped()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-2.5 rounded-lg text-sm btn-press">Очистить</button></div>`;}
 function removeDroppedFile(i){_droppedFiles.splice(i,1);renderDropPreviews();}
 function clearDropped(){if(!confirm('Убрать?'))return;_droppedFiles=[];renderDropPreviews();}
 function applyAllDropped(){
@@ -1124,117 +1008,86 @@ _droppedFiles.forEach((f,i)=>{
 const sel=document.getElementById('dropTarget_'+i);const tid=sel?sel.value:'';
 if(!tid){skipped++;return;}
 const t=db.tutors.find(x=>x.id===tid);if(!t){skipped++;return;}
-t.img=f.dataUrl;database.ref('tutors/'+tid+'/img').set(f.dataUrl);applied++;
-});
+t.img=f.dataUrl;saveTutorToDb(t);applied++;});
 if(applied===0){toast('❌ Не выбраны');return;}
 localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
 renderAdminTutorsList();renderTutors();
 _droppedFiles=[];renderDropPreviews();
-toast('✅ '+applied);
-}
+toast('✅ '+applied);}
 
 // ===== NOTIFICATIONS =====
 function updateNotifBtnState(){
 const btn=document.getElementById('notifBtn'),st=document.getElementById('notifStatus');
 if(!btn||!st)return;
 if(!('Notification'in window)){btn.textContent='Не поддерживается';btn.disabled=true;return;}
-if(Notification.permission==='granted'){btn.innerHTML='<i class="fas fa-check mr-1"></i> Yoqilgan';
-btn.className='bg-green-600 text-white text-xs font-black px-4 py-2 rounded-lg whitespace-nowrap cursor-default';btn.disabled=true;
-st.textContent='Har kuni 19:00 ✅';
-if(!localStorage.getItem('edu_reminderSet'))registerServiceWorker();
-checkMissedDay();
-}else if(Notification.permission==='denied'){btn.innerHTML='<i class="fas fa-ban mr-1"></i> Rad etilgan';
-btn.className='bg-red-900 text-red-300 text-xs font-black px-4 py-2 rounded-lg whitespace-nowrap cursor-default';btn.disabled=true;
-st.textContent='Brauzerdan ruxsat bering';}
-}
+if(Notification.permission==='granted'){btn.innerHTML='<i class="fas fa-check mr-1"></i> Yoqilgan';btn.className='bg-green-600 text-white text-xs font-black px-4 py-2 rounded-lg whitespace-nowrap cursor-default';btn.disabled=true;
+st.textContent='Har kuni 19:00 ✅';if(!localStorage.getItem('edu_reminderSet'))registerServiceWorker();checkMissedDay();}
+else if(Notification.permission==='denied'){btn.innerHTML='<i class="fas fa-ban mr-1"></i> Rad etilgan';btn.className='bg-red-900 text-red-300 text-xs font-black px-4 py-2 rounded-lg whitespace-nowrap cursor-default';btn.disabled=true;st.textContent='Brauzerdan ruxsat bering';}}
 
 function toggleMobileMenu(){const m=document.getElementById('mobileMenu'),i=document.getElementById('mobileMenuIcon');const h=m.classList.contains('hidden');m.classList.toggle('hidden');i.className=h?'fas fa-times':'fas fa-bars';}
 function closeMobileMenu(){document.getElementById('mobileMenu').classList.add('hidden');document.getElementById('mobileMenuIcon').className='fas fa-bars';}
 
 function navigateTo(page){
-['pageHome','pageMyCourses','pageFavorites','pageSchedule','pageAdmin','pageProfile','pageLeaderboard'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+['pageHome','pageMyCourses','pageGroups','pageFavorites','pageSchedule','pageAdmin','pageProfile','pageLeaderboard'].forEach(id=>document.getElementById(id).classList.add('hidden'));
 if(page==='home'){document.getElementById('pageHome').classList.remove('hidden');renderTutors();}
 else if(page==='my-courses'){if(!db.currentUser)return openAuthModal();document.getElementById('pageMyCourses').classList.remove('hidden');renderMyCourses();}
+else if(page==='groups'){document.getElementById('pageGroups').classList.remove('hidden');renderMyGroups();}
 else if(page==='favorites'){if(!db.currentUser)return openAuthModal();document.getElementById('pageFavorites').classList.remove('hidden');renderFavorites();}
 else if(page==='schedule'){document.getElementById('pageSchedule').classList.remove('hidden');renderSchedule();}
-else if(page==='admin'){
-if(!db.currentUser||db.currentUser.role!=='admin'){alert("Admin huquqi yo'q!");return navigateTo('home');}
-document.getElementById('pageAdmin').classList.remove('hidden');switchAdminTab(currentAdminTab);}
+else if(page==='admin'){if(!db.currentUser||db.currentUser.role!=='admin'){alert("Admin huquqi yo'q!");return navigateTo('home');}document.getElementById('pageAdmin').classList.remove('hidden');switchAdminTab(currentAdminTab);}
 else if(page==='profile'){if(!db.currentUser)return openAuthModal();document.getElementById('pageProfile').classList.remove('hidden');renderProfile();}
-else if(page==='leaderboard'){document.getElementById('pageLeaderboard').classList.remove('hidden');renderPublicLeaderboard();}
-}
+else if(page==='leaderboard'){document.getElementById('pageLeaderboard').classList.remove('hidden');renderPublicLeaderboard();}}
 
 function renderFilters(){
 const sinflar=['Barcha sinflar','Umumiy','5-sinf','6-sinf','7-sinf','8-sinf','9-sinf','10-sinf','11-sinf'];
 const fanlar=['Barcha fanlar','Ingliz tili','Matematika','Fizika','Informatika','Kimyo','Tarix'];
 document.getElementById('classFilters').innerHTML=sinflar.map(s=>`<button onclick="setClassFilter('${s}')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition btn-press ${selectedClass===s?'bg-blue-600 text-white shadow-lg':'bg-slate-800 text-slate-300 hover:bg-slate-700'}">${s}</button>`).join('');
-document.getElementById('subjectFilters').innerHTML=fanlar.map(f=>`<button onclick="setSubjectFilter('${f}')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition btn-press ${selectedSubject===f?'bg-blue-600 text-white shadow-lg':'bg-slate-800 text-slate-300 hover:bg-slate-700'}">${f}</button>`).join('');
-}
+document.getElementById('subjectFilters').innerHTML=fanlar.map(f=>`<button onclick="setSubjectFilter('${f}')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition btn-press ${selectedSubject===f?'bg-blue-600 text-white shadow-lg':'bg-slate-800 text-slate-300 hover:bg-slate-700'}">${f}</button>`).join('');}
 function setClassFilter(v){selectedClass=v;renderFilters();renderTutors();}
 function setSubjectFilter(v){selectedSubject=v;renderFilters();renderTutors();}
 
 function sortTutors(){db.tutors.sort((a,b)=>(a.order||0)-(b.order||0));}
-function migrateTutorOrder(){let c=false;db.tutors.forEach((t,i)=>{if(typeof t.order!=='number'){t.order=i+1;c=true;}});if(c){database.ref('tutors').set(arrayToFirebaseObj(db.tutors));localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));}sortTutors();}
-function moveTutor(id,dir){sortTutors();const idx=db.tutors.findIndex(t=>t.id===id);if(idx===-1)return;const s=dir==='up'?idx-1:idx+1;if(s<0||s>=db.tutors.length)return;const t=db.tutors[idx].order;db.tutors[idx].order=db.tutors[s].order;db.tutors[s].order=t;sortTutors();saveDb();renderAdminTutorsList();renderTutors();toast("Tartib o'zgartirildi!");}
+function migrateTutorOrder(){let c=false;db.tutors.forEach((t,i)=>{if(typeof t.order!=='number'){t.order=i+1;c=true;}});if(c){db.tutors.forEach(t=>saveTutorToDb(t));localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));}sortTutors();}
+function moveTutor(id,dir){sortTutors();const idx=db.tutors.findIndex(t=>t.id===id);if(idx===-1)return;const s=dir==='up'?idx-1:idx+1;if(s<0||s>=db.tutors.length)return;const t=db.tutors[idx].order;db.tutors[idx].order=db.tutors[s].order;db.tutors[s].order=t;sortTutors();saveTutorToDb(db.tutors[idx]);saveTutorToDb(db.tutors[s]);renderAdminTutorsList();renderTutors();toast("Tartib o'zgartirildi!");}
 
 function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function timeAgo(iso){
-const d=new Date(iso);const diff=(Date.now()-d.getTime())/1000;
-if(diff<60)return'hounda';
-if(diff<3600)return Math.floor(diff/60)+' daq';
-if(diff<86400)return Math.floor(diff/3600)+' soat';
-if(diff<604800)return Math.floor(diff/86400)+' kun';
-return d.toLocaleDateString('ru-RU');
-}
-function fmtDate(iso){
-if(!iso)return'—';
-const d=new Date(iso);
-return d.toLocaleDateString('ru-RU',{day:'2-digit',month:'long',year:'numeric'});
-}
+function timeAgo(iso){const d=new Date(iso);const diff=(Date.now()-d.getTime())/1000;
+if(diff<60)return'hounda';if(diff<3600)return Math.floor(diff/60)+' daq';
+if(diff<86400)return Math.floor(diff/3600)+' soat';if(diff<604800)return Math.floor(diff/86400)+' kun';
+return d.toLocaleDateString('ru-RU');}
+function fmtDate(iso){if(!iso)return'—';const d=new Date(iso);return d.toLocaleDateString('ru-RU',{day:'2-digit',month:'long',year:'numeric'});}
 
 // ===== PUSH =====
-function initPushNotifications(){
-if(!('Notification'in window)||!('serviceWorker'in navigator))return;
-if(db.currentUser){const t=new Date().toISOString().slice(0,10);localStorage.setItem('edu_lastActive_'+db.currentUser.id,t);}
-}
+function initPushNotifications(){if(!('Notification'in window)||!('serviceWorker'in navigator))return;
+if(db.currentUser){const t=new Date().toISOString().slice(0,10);localStorage.setItem('edu_lastActive_'+db.currentUser.id,t);}}
 async function requestPushPermission(){
 if(!('Notification'in window))return alert("Qo'llab-quvvatlamaydi.");
 if(Notification.permission==='granted'){scheduleDailyReminder();toast("Yoqilgan!");return;}
 const r=await Notification.requestPermission();
 if(r==='granted'){registerServiceWorker();updateNotifBtnState();toast("Yoqildi!");}
-else{updateNotifBtnState();toast("Rad etildi.");}
-}
+else{updateNotifBtnState();toast("Rad etildi.");}}
 async function registerServiceWorker(){
 if(!('serviceWorker'in navigator))return;
-try{
-const r=await navigator.serviceWorker.register('sw.js',{scope:'./'});
-await navigator.serviceWorker.ready;
-scheduleDailyReminder(r);
-}catch(e){console.warn('SW:',e);scheduleDailyReminderFallback();}
-}
+try{const r=await navigator.serviceWorker.register('sw.js',{scope:'./'});await navigator.serviceWorker.ready;scheduleDailyReminder(r);}
+catch(e){console.warn('SW:',e);scheduleDailyReminderFallback();}}
 function scheduleDailyReminder(reg){
 if(Notification.permission!=='granted'||!db.currentUser)return;
-const n=new Date(),t=new Date();t.setHours(19,0,0,0);
-if(t<=n)t.setDate(t.getDate()+1);
+const n=new Date(),t=new Date();t.setHours(19,0,0,0);if(t<=n)t.setDate(t.getDate()+1);
 const d=t-n;const sw=reg?navigator.serviceWorker.controller:null;
 if(sw)sw.postMessage({type:'SCHEDULE_REMINDER',delay:d,userId:db.currentUser.id});
 else scheduleDailyReminderFallback(d);
-localStorage.setItem('edu_reminderSet',t.toISOString());
-}
+localStorage.setItem('edu_reminderSet',t.toISOString());}
 function scheduleDailyReminderFallback(cd){
 if(Notification.permission!=='granted'||!db.currentUser)return;
-const n=new Date(),t=new Date();t.setHours(19,0,0,0);
-if(t<=n)t.setDate(t.getDate()+1);
+const n=new Date(),t=new Date();t.setHours(19,0,0,0);if(t<=n)t.setDate(t.getDate()+1);
 const d=cd!==undefined?cd:(t-n);
-setTimeout(()=>{new Notification("📚 "+BRAND,{body:"Bugungi darsni ko'ring! 🎯",tag:'daily-'+db.currentUser.id});},d);
-}
+setTimeout(()=>{new Notification("📚 "+BRAND,{body:"Bugungi darsni ko'ring! 🎯",tag:'daily-'+db.currentUser.id});},d);}
 function checkMissedDay(){
 if(!db.currentUser||Notification.permission!=='granted')return;
 const k='edu_lastActive_'+db.currentUser.id;const l=localStorage.getItem(k);if(!l)return;
 const ld=new Date(l),t=new Date();t.setHours(0,0,0,0);ld.setHours(0,0,0,0);
 const df=Math.floor((t-ld)/86400000);
-if(df>=1)setTimeout(()=>{new Notification("😔 "+BRAND,{body:df+" kun o'tkazib yubordingiz!",tag:'missed-'+db.currentUser.id});},3000);
-}
+if(df>=1)setTimeout(()=>{new Notification("😔 "+BRAND,{body:df+" kun o'tkazib yubordingiz!",tag:'missed-'+db.currentUser.id});},3000);}
 
 function toast(msg){const t=document.getElementById('toast');t.innerText=msg;t.classList.remove('hidden');t.classList.add('slide-down');setTimeout(()=>{t.classList.add('hidden');t.classList.remove('slide-down');},3000);}// ===== РЕНДЕРЫ =====
 function renderTutors(){
@@ -1267,8 +1120,7 @@ ${bought?`<button onclick="openCoursePlayer('${t.id}')" class="w-full bg-indigo-
 <div class="flex items-center justify-between text-[10px] text-slate-500 pt-2 border-t border-slate-800/50">
 <span><i class="fas fa-users text-blue-400 mr-1"></i>${buyersCount} sotib olgan</span>
 <span><i class="fas fa-clock text-green-400 mr-1"></i>${minutes} daq</span></div>
-</div></div></div>`;}).join('');
-}
+</div></div></div>`;}).join('');}
 
 function renderMyCourses(){
 const grid=document.getElementById('myCoursesGrid');if(!db.currentUser||!grid)return;
@@ -1278,19 +1130,34 @@ grid.innerHTML=bt.map((t,i)=>{
 const lessons=t.lessons||[];const total=lessons.length;
 const watched=countWatchedLessons(t.id);const pct=total?Math.round((watched/total)*100):0;
 const allDone=total>0&&watched>=total;
-const delay=Math.min(i*60,600);
-return `<div class="card-bg rounded-2xl overflow-hidden p-5 flex flex-col justify-between border border-slate-800 hover:border-slate-700 hover-lift fade-in-up" style="animation-delay:${delay}ms">
+return `<div class="card-bg rounded-2xl overflow-hidden p-5 flex flex-col justify-between border border-slate-800 hover:border-slate-700 hover-lift fade-in-up" style="animation-delay:${Math.min(i*60,600)}ms">
 <div class="flex gap-4 items-center mb-4"><img src="${t.img}" class="w-16 h-16 rounded-xl object-cover border border-slate-700" loading="lazy">
 <div class="min-w-0 flex-grow"><h4 class="font-bold text-white text-base truncate">${escapeHtml(t.name)}</h4>
 <p class="text-xs text-slate-400">${escapeHtml(t.subject)} (${t.sinf||'Umumiy'})</p>
 <span class="text-[11px] text-blue-400 font-semibold mt-1 inline-block"><i class="fas fa-video mr-1"></i>${total} dars</span></div></div>
 <div class="mb-3"><div class="flex justify-between text-[10px] text-slate-400 mb-1"><span>Progress</span><span>${watched}/${total} • ${pct}%</span></div>
 <div class="w-full bg-slate-800 rounded-full h-1.5"><div class="bg-gradient-to-r from-blue-500 to-emerald-500 h-1.5 rounded-full transition-all" style="width:${pct}%"></div></div></div>
-${allDone?`<div class="mb-3 bg-amber-900/30 border border-amber-700/50 rounded-lg px-3 py-2 text-[11px] text-amber-300 font-bold flex items-center gap-2"><i class="fas fa-certificate"></i> Kurs tugatilgan! Sertifikat oling.</div>`:''}
-<button onclick="openCoursePlayer('${t.id}')" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg btn-press"><i class="fas fa-play"></i> ${watched>0?'Davom etish':'Boshlash'}</button></div>`;
-}).join('');
-}
+${allDone?`<div class="mb-3 bg-amber-900/30 border border-amber-700/50 rounded-lg px-3 py-2 text-[11px] text-amber-300 font-bold flex items-center gap-2"><i class="fas fa-certificate"></i> Kurs tugatilgan!</div>`:''}
+<button onclick="openCoursePlayer('${t.id}')" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg btn-press"><i class="fas fa-play"></i> ${watched>0?'Davom etish':'Boshlash'}</button></div>`;}).join('');}
 
+// ===== 👥 ГРУППЫ (пользователь) =====
+function renderMyGroups(){
+const el=document.getElementById('myGroupsList');if(!el)return;
+if(!db.currentUser){el.innerHTML='<div class="card-bg p-12 text-center rounded-2xl fade-in"><i class="fas fa-users text-5xl text-slate-700 mb-3 block"></i><p class="text-slate-400">Kirish kerak</p></div>';return;}
+const myGroups=Object.values(allGroups).filter(g=>(g.members||[]).includes(db.currentUser.id));
+if(myGroups.length===0){el.innerHTML=`<div class="card-bg p-12 text-center rounded-2xl fade-in"><i class="fas fa-users text-5xl text-slate-700 mb-3 block"></i><p class="text-slate-400 font-semibold">Siz hali guruhga a'zo emassiz</p><p class="text-xs text-slate-500 mt-1">Admin sizni guruhga qo'shishi mumkin</p></div>`;return;}
+el.innerHTML=myGroups.map((g,i)=>{
+const members=(g.members||[]).length;
+return `<div class="card-bg p-5 rounded-2xl fade-in-up" style="animation-delay:${i*60}ms">
+<div class="flex gap-3 items-center mb-3">
+<div class="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-600 to-cyan-600 flex items-center justify-center text-white text-xl"><i class="fas fa-users"></i></div>
+<div class="flex-grow min-w-0"><h3 class="text-white font-bold text-base truncate">${escapeHtml(g.name||'Guruh')}</h3>
+<p class="text-xs text-slate-400 truncate">${escapeHtml(g.desc||'')}</p>
+<span class="text-[10px] text-teal-400 font-bold"><i class="fas fa-user-friends mr-1"></i>${members} a'zo</span></div></div>
+${g.assignment?`<div class="bg-teal-900/20 border border-teal-700/40 rounded-lg p-3 mt-2"><div class="text-[10px] text-teal-400 font-bold uppercase mb-1"><i class="fas fa-tasks mr-1"></i> Umumiy topshiriq</div><p class="text-white text-xs whitespace-pre-wrap">${escapeHtml(g.assignment)}</p></div>`:''}
+</div>`;}).join('');}
+
+// ===== FAVORITES =====
 function renderFavorites(){
 const el=document.getElementById('favoritesList');if(!db.currentUser||!el)return;
 const favs=db.currentUser.favorites||[];
@@ -1304,44 +1171,30 @@ return `<div class="card-bg p-4 rounded-xl flex items-center gap-3 hover:border-
 <div class="text-xs text-slate-500 truncate">${escapeHtml(t.name)} • ${escapeHtml(t.subject)}</div></div>
 <button onclick="openCoursePlayerFromFav('${f.tutorId}',${f.lessonIndex})" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-lg whitespace-nowrap btn-press"><i class="fas fa-play mr-1"></i> Ochish</button>
 <button onclick="removeFavorite('${f.tutorId}',${f.lessonIndex})" class="bg-red-600 hover:bg-red-700 text-white w-8 h-8 rounded-lg shrink-0 btn-press"><i class="fas fa-trash"></i></button>
-</div>`;}).join('');
-}
+</div>`;}).join('');}
 function openCoursePlayerFromFav(tid,lessonIdx){
 const t=db.tutors.find(x=>x.id===tid);if(!t)return;
 if(!db.currentUser.tutorsBought||!db.currentUser.tutorsBought.includes(tid)){toast('❌ Avval kursni sotib oling');return;}
 openCoursePlayer(tid);
-setTimeout(()=>loadLesson(lessonIdx),100);
-}
+setTimeout(()=>loadLesson(lessonIdx),100);}
 
 // ===== 📅 РАСПИСАНИЕ =====
 function renderSchedule(){
 const el=document.getElementById('scheduleList');if(!el)return;
 const items=[];
-db.tutors.forEach(t=>{
-(t.lessons||[]).forEach((l,i)=>{
+db.tutors.forEach(t=>{(t.lessons||[]).forEach((l,i)=>{
 if(l.date||l.releaseDate){
-items.push({
-tid:t.id,tname:t.name,timg:t.img,subject:t.subject,sinf:t.sinf,
-lesson:l,index:i,date:l.date||l.releaseDate,
-bought:db.currentUser&&db.currentUser.tutorsBought&&db.currentUser.tutorsBought.includes(t.id)
-});
-}});});
+items.push({tid:t.id,tname:t.name,timg:t.img,subject:t.subject,sinf:t.sinf,lesson:l,index:i,date:l.date||l.releaseDate,bought:db.currentUser&&db.currentUser.tutorsBought&&db.currentUser.tutorsBought.includes(t.id)});}});});
 if(items.length===0){el.innerHTML=`<div class="card-bg p-12 text-center rounded-2xl fade-in"><i class="fas fa-calendar-times text-5xl text-slate-700 mb-3 block"></i><p class="text-slate-400 font-semibold">Jadval bo'sh</p><p class="text-xs text-slate-500 mt-1">Admin darslarga sanani qo'shganda ko'rinadi</p></div>`;return;}
 items.sort((a,b)=>new Date(a.date)-new Date(b.date));
 const today=new Date();today.setHours(0,0,0,0);
 const grouped={};
-items.forEach(it=>{
-const d=new Date(it.date);d.setHours(0,0,0,0);
-const key=d.getTime();
-if(!grouped[key])grouped[key]={date:d,lessons:[]};
-grouped[key].lessons.push(it);
-});
+items.forEach(it=>{const d=new Date(it.date);d.setHours(0,0,0,0);const key=d.getTime();
+if(!grouped[key])grouped[key]={date:d,lessons:[]};grouped[key].lessons.push(it);});
 const keys=Object.keys(grouped).sort((a,b)=>Number(a)-Number(b));
 el.innerHTML=keys.map(k=>{
-const g=grouped[k];
-const diff=Math.round((g.date.getTime()-today.getTime())/86400000);
-let label=g.date.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
-let badge='';
+const g=grouped[k];const diff=Math.round((g.date.getTime()-today.getTime())/86400000);
+let label=g.date.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});let badge='';
 if(diff===0)badge='<span class="text-[10px] bg-emerald-900/50 text-emerald-400 px-2 py-0.5 rounded font-bold ml-2">BUGUN</span>';
 else if(diff===1)badge='<span class="text-[10px] bg-blue-900/50 text-blue-400 px-2 py-0.5 rounded font-bold ml-2">ERTAGA</span>';
 else if(diff<0)badge='<span class="text-[10px] bg-slate-800 text-slate-500 px-2 py-0.5 rounded font-bold ml-2">O\'TGAN</span>';
@@ -1349,20 +1202,16 @@ else badge='<span class="text-[10px] bg-purple-900/50 text-purple-400 px-2 py-0.
 return `<div class="card-bg p-4 rounded-xl fade-in-up">
 <div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-800">
 <i class="fas fa-calendar-day text-purple-400"></i>
-<span class="text-white font-bold text-sm">${label}</span>${badge}
-</div>
+<span class="text-white font-bold text-sm">${label}</span>${badge}</div>
 <div class="space-y-2">${g.lessons.map(it=>{
 const lessonIdx=it.index+1;
 return `<div class="flex gap-3 items-center bg-slate-900/60 border border-slate-800 rounded-lg p-3 hover:border-purple-700/50 transition">
 <img src="${it.timg}" class="w-12 h-12 rounded-lg object-cover border border-slate-700 shrink-0" loading="lazy">
 <div class="flex-grow min-w-0">
 <div class="text-white text-xs font-bold truncate">${lessonIdx}. ${escapeHtml(it.lesson.title)}</div>
-<div class="text-[10px] text-slate-500 truncate">${escapeHtml(it.tname)} • ${escapeHtml(it.subject)}</div>
-</div>
+<div class="text-[10px] text-slate-500 truncate">${escapeHtml(it.tname)} • ${escapeHtml(it.subject)}</div></div>
 ${it.bought?`<button onclick="openCoursePlayerFromFav('${it.tid}',${it.index})" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg whitespace-nowrap btn-press"><i class="fas fa-play"></i></button>`:'<span class="text-[10px] text-amber-400"><i class="fas fa-lock"></i></span>'}
-</div>`;}).join('')}</div>
-</div>`;}).join('');
-}
+</div>`;}).join('')}</div></div>`;}).join('');}
 
 // ===== FAVORITES =====
 function toggleFavorite(){
@@ -1370,108 +1219,76 @@ if(!db.currentUser){openAuthModal();return;}
 if(!activeCourse)return;
 const favs=db.currentUser.favorites||[];
 const idx=favs.findIndex(f=>f.tutorId===activeCourse.id&&f.lessonIndex===activeLessonIndex);
-if(idx===-1){favs.push({tutorId:activeCourse.id,lessonIndex:activeLessonIndex,at:new Date().toISOString()});
-toast('⭐ Dars sevimlilarga qo\'shildi');}
-else{favs.splice(idx,1);toast('Dars olib tashlandi');}
+if(idx===-1){favs.push({tutorId:activeCourse.id,lessonIndex:activeLessonIndex,at:new Date().toISOString()});toast('⭐ Dars sevimlilarga qo\'shildi');}
+else{favs.splice(idx,1);toast('Olib tashlandi');}
 db.currentUser.favorites=favs;
 const i=db.users.findIndex(u=>u.id===db.currentUser.id);if(i!==-1)db.users[i]=db.currentUser;
 localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
-database.ref('users/'+db.currentUser.id+'/favorites').set(favs);
-updateFavBtn();
-}
+saveUserToDb(db.currentUser);
+updateFavBtn();}
 function removeFavorite(tid,li){
 if(!db.currentUser)return;
 const favs=(db.currentUser.favorites||[]).filter(f=>!(f.tutorId===tid&&f.lessonIndex===li));
 db.currentUser.favorites=favs;
 const i=db.users.findIndex(u=>u.id===db.currentUser.id);if(i!==-1)db.users[i]=db.currentUser;
 localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
-database.ref('users/'+db.currentUser.id+'/favorites').set(favs);
-renderFavorites();
-}
-function isFavorite(){if(!db.currentUser)return false;
-return (db.currentUser.favorites||[]).some(f=>f.tutorId===activeCourse.id&&f.lessonIndex===activeLessonIndex);}
-function updateFavBtn(){
-const b=document.getElementById('favBtn');if(!b)return;
+saveUserToDb(db.currentUser);
+renderFavorites();}
+function isFavorite(){if(!db.currentUser)return false;return (db.currentUser.favorites||[]).some(f=>f.tutorId===activeCourse.id&&f.lessonIndex===activeLessonIndex);}
+function updateFavBtn(){const b=document.getElementById('favBtn');if(!b)return;
 if(isFavorite()){b.innerHTML='<i class="fas fa-star"></i>';b.classList.add('text-yellow-400');b.classList.remove('text-slate-400');}
-else{b.innerHTML='<i class="far fa-star"></i>';b.classList.remove('text-yellow-400');b.classList.add('text-slate-400');}
-}
+else{b.innerHTML='<i class="far fa-star"></i>';b.classList.remove('text-yellow-400');b.classList.add('text-slate-400');}}
 
 // ===== RATING =====
 function computeCourseRating(tid){
 const ratings=db.ratings&&db.ratings[tid]?Object.values(db.ratings[tid]):[];
 if(ratings.length===0)return{avg:0,count:0};
-const sum=ratings.reduce((s,r)=>s+(r.stars||0),0);
-return{avg:sum/ratings.length,count:ratings.length};
-}
+const sum=ratings.reduce((s,r)=>s+(r.stars||0),0);return{avg:sum/ratings.length,count:ratings.length};}
 function renderStars(tid,interactive){
 const r=computeCourseRating(tid);
 const myRating=db.ratings&&db.ratings[tid]&&db.currentUser&&db.ratings[tid][db.currentUser.id]?db.ratings[tid][db.currentUser.id].stars:0;
 let html='<div class="flex items-center gap-1">';
-for(let i=1;i<=5;i++){
-const filled=i<=(interactive?myRating:Math.round(r.avg));
-const cls=interactive?'star text-lg':'text-sm';
-const color=filled?'text-amber-400':'text-slate-700';
+for(let i=1;i<=5;i++){const filled=i<=(interactive?myRating:Math.round(r.avg));
+const cls=interactive?'star text-lg':'text-sm';const color=filled?'text-amber-400':'text-slate-700';
 const onclick=interactive?`onclick="rateCourse('${tid}',${i})"`:'';
-html+=`<i class="fas fa-star ${cls} ${color}" ${onclick}></i>`;
-}
+html+=`<i class="fas fa-star ${cls} ${color}" ${onclick}></i>`;}
 if(!interactive&&r.count>0)html+=`<span class="text-[10px] text-slate-500 ml-1">${r.avg.toFixed(1)} (${r.count})</span>`;
-html+='</div>';
-return html;
-}
+html+='</div>';return html;}
 function rateCourse(tid,stars){
 if(!db.currentUser){openAuthModal();return;}
-if(!db.ratings)db.ratings={};
-if(!db.ratings[tid])db.ratings[tid]={};
+if(!db.ratings)db.ratings={};if(!db.ratings[tid])db.ratings[tid]={};
 db.ratings[tid][db.currentUser.id]={stars,at:new Date().toISOString()};
 database.ref('ratings/'+tid+'/'+db.currentUser.id).set({stars,at:new Date().toISOString()});
-toast('✅ Bahoyingiz: '+stars+' ⭐');
-renderTutors();
-}
+toast('✅ Baho: '+stars+' ⭐');renderTutors();}
 
 // ===== COMMENTS =====
 function initCommentsListener(tutorId,lessonIdx){
 if(_commentsRef){_commentsRef.off();_commentsRef=null;}
-_currentLessonRef=tutorId+'|'+lessonIdx;
 _commentsRef=database.ref('comments/'+tutorId+'/'+lessonIdx);
-_commentsRef.on('value',snap=>{renderComments(snap.val()||{});});
-}
+_commentsRef.on('value',snap=>{renderComments(snap.val()||{});});}
 function renderComments(data){
 const el=document.getElementById('commentsList');if(!el)return;
 const arr=Object.keys(data).map(k=>({...data[k],_id:k})).sort((a,b)=>new Date(b.at)-new Date(a.at));
 if(arr.length===0){el.innerHTML='<p class="text-xs text-slate-500 text-center py-6">Hozircha izohlar yo\'q. Birinchi bo\'lib yozing!</p>';return;}
 el.innerHTML=arr.map(c=>{
-const mine=db.currentUser&&db.currentUser.id===c.userId;
-const isAdmin=db.currentUser&&db.currentUser.role==='admin';
+const mine=db.currentUser&&db.currentUser.id===c.userId;const isAdmin=db.currentUser&&db.currentUser.role==='admin';
 return `<div class="bg-slate-900/60 border border-slate-800 rounded-lg p-3 fade-in">
 <div class="flex justify-between items-start gap-2 mb-1">
 <div class="flex items-center gap-2 min-w-0">
 <div class="w-6 h-6 rounded-full bg-blue-600/30 flex items-center justify-center text-blue-400 text-[10px] font-bold shrink-0">${(c.login||'?')[0].toUpperCase()}</div>
 <span class="text-white text-[11px] font-bold truncate">${escapeHtml(c.login||'Anonim')}</span>
-<span class="text-slate-600 text-[9px] shrink-0">${timeAgo(c.at)}</span>
-</div>
-${(mine||isAdmin)?`<button onclick="deleteComment('${c._id}')" class="text-red-400 hover:text-red-300 text-[10px] shrink-0 btn-press"><i class="fas fa-trash"></i></button>`:''}
-</div>
-<p class="text-slate-300 text-xs break-words whitespace-pre-wrap">${escapeHtml(c.text||'')}</p>
-</div>`;}).join('');
-}
+<span class="text-slate-600 text-[9px] shrink-0">${timeAgo(c.at)}</span></div>
+${(mine||isAdmin)?`<button onclick="deleteComment('${c._id}')" class="text-red-400 text-[10px] btn-press"><i class="fas fa-trash"></i></button>`:''}
+</div><p class="text-slate-300 text-xs break-words whitespace-pre-wrap">${escapeHtml(c.text||'')}</p></div>`;}).join('');}
 function addComment(){
 if(!db.currentUser){openAuthModal();return;}
 if(!activeCourse)return;
-const inp=document.getElementById('newCommentInput');
-const text=inp.value.trim();
-if(!text)return;
-if(text.length>1000){toast('❌ Juda uzun');return;}
+const inp=document.getElementById('newCommentInput');const text=inp.value.trim();
+if(!text)return;if(text.length>1000){toast('❌ Juda uzun');return;}
 const key=Date.now()+'_'+Math.random().toString(36).slice(2,8);
-const data={userId:db.currentUser.id,login:db.currentUser.login,text,at:new Date().toISOString()};
-database.ref('comments/'+activeCourse.id+'/'+activeLessonIndex+'/'+key).set(data);
-inp.value='';
-toast('✅ Izoh qo\'shildi');
-}
-function deleteComment(id){
-if(!confirm('O\'chirish?'))return;
-if(!activeCourse)return;
-database.ref('comments/'+activeCourse.id+'/'+activeLessonIndex+'/'+id).remove();
-}
+database.ref('comments/'+activeCourse.id+'/'+activeLessonIndex+'/'+key).set({userId:db.currentUser.id,login:db.currentUser.login,text,at:new Date().toISOString()});
+inp.value='';toast('✅ Izoh qo\'shildi');}
+function deleteComment(id){if(!confirm('O\'chirish?'))return;if(!activeCourse)return;database.ref('comments/'+activeCourse.id+'/'+activeLessonIndex+'/'+id).remove();}
 
 // ===== HOMEWORK =====
 function loadHomework(){
@@ -1482,48 +1299,29 @@ const sub=(db.homeworkSubmissions&&db.homeworkSubmissions[activeCourse.id]&&db.h
 el.innerHTML=`<div class="bg-slate-900/60 border border-emerald-800/40 rounded-lg p-4 mb-3 fade-in">
 <div class="text-[10px] text-emerald-400 font-bold uppercase mb-1"><i class="fas fa-tasks mr-1"></i> Topshiriq</div>
 <div class="text-white text-xs whitespace-pre-wrap">${escapeHtml(hw.text||'')}</div>
-${hw.deadline?`<div class="text-[10px] text-amber-400 mt-2"><i class="fas fa-clock mr-1"></i> Muddat: ${new Date(hw.deadline).toLocaleString('ru-RU')}</div>`:''}
-</div>
-${sub?`<div class="bg-blue-900/20 border border-blue-700/40 rounded-lg p-3 fade-in">
-<div class="text-[10px] text-blue-400 font-bold uppercase mb-1"><i class="fas fa-check-circle mr-1"></i> Javobingiz</div>
-<div class="text-white text-xs whitespace-pre-wrap mb-2">${escapeHtml(sub.text||'')}</div>
-<div class="text-[9px] text-slate-500">${new Date(sub.at).toLocaleString('ru-RU')}</div>
-</div>`:`
+${hw.deadline?`<div class="text-[10px] text-amber-400 mt-2"><i class="fas fa-clock mr-1"></i> Muddat: ${new Date(hw.deadline).toLocaleString('ru-RU')}</div>`:''}</div>
+${sub?`<div class="bg-blue-900/20 border border-blue-700/40 rounded-lg p-3 fade-in"><div class="text-[10px] text-blue-400 font-bold uppercase mb-1"><i class="fas fa-check-circle mr-1"></i> Javobingiz</div><div class="text-white text-xs whitespace-pre-wrap mb-2">${escapeHtml(sub.text||'')}</div><div class="text-[9px] text-slate-500">${new Date(sub.at).toLocaleString('ru-RU')}</div></div>`:`
 <textarea id="hwAnswer" rows="5" placeholder="Javobingiz..." class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-500 rounded-lg p-3 text-xs text-white outline-none"></textarea>
-<button onclick="submitHomework()" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 rounded-lg btn-press"><i class="fas fa-paper-plane mr-1"></i> Topshirish</button>`}`;
-}
+<button onclick="submitHomework()" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 rounded-lg btn-press"><i class="fas fa-paper-plane mr-1"></i> Topshirish</button>`}`;}
 function submitHomework(){
 if(!db.currentUser){openAuthModal();return;}
 if(!activeCourse)return;
 const txt=(document.getElementById('hwAnswer')||{}).value||'';
 if(!txt.trim()){toast('❌ Bo\'sh');return;}
 database.ref('homeworkSubmissions/'+activeCourse.id+'/'+activeLessonIndex+'/'+db.currentUser.id).set({text:txt.trim(),at:new Date().toISOString(),login:db.currentUser.login});
-awardPoints(15,'Uy ishi');
-toast('✅ +15 ball');
-loadHomework();
-}
+awardPoints(15,'Uy ishi');toast('✅ +15 ball');loadHomework();}
 
 // ===== NOTES =====
 let _noteTimer=null;
-function loadNote(){
-const ta=document.getElementById('noteInput');if(!ta||!db.currentUser||!activeCourse)return;
-const notes=db.currentUser.notes||{};
-const key=activeCourse.id+'|'+activeLessonIndex;
-ta.value=notes[key]||'';
-}
+function loadNote(){const ta=document.getElementById('noteInput');if(!ta||!db.currentUser||!activeCourse)return;
+const notes=db.currentUser.notes||{};const key=activeCourse.id+'|'+activeLessonIndex;ta.value=notes[key]||'';}
 function saveNote(){
 if(!db.currentUser||!activeCourse)return;
-const ta=document.getElementById('noteInput');
-const key=activeCourse.id+'|'+activeLessonIndex;
-if(!db.currentUser.notes)db.currentUser.notes={};
-db.currentUser.notes[key]=ta.value;
+const ta=document.getElementById('noteInput');const key=activeCourse.id+'|'+activeLessonIndex;
+if(!db.currentUser.notes)db.currentUser.notes={};db.currentUser.notes[key]=ta.value;
 if(_noteTimer)clearTimeout(_noteTimer);
-_noteTimer=setTimeout(()=>{
-const i=db.users.findIndex(u=>u.id===db.currentUser.id);if(i!==-1)db.users[i]=db.currentUser;
-localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
-database.ref('users/'+db.currentUser.id+'/notes').set(db.currentUser.notes);
-},800);
-}
+_noteTimer=setTimeout(()=>{const i=db.users.findIndex(u=>u.id===db.currentUser.id);if(i!==-1)db.users[i]=db.currentUser;
+localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));saveUserToDb(db.currentUser);},800);}
 
 // ===== QUIZ =====
 function loadQuiz(){
@@ -1533,36 +1331,23 @@ if(!quiz||!quiz.questions||quiz.questions.length===0){el.innerHTML='<div class="
 const passed=db.currentUser&&db.currentUser.quizPassed&&db.currentUser.quizPassed[activeCourse.id+'|'+activeLessonIndex];
 if(passed){el.innerHTML=`<div class="bg-emerald-900/20 border border-emerald-700/40 rounded-lg p-4 text-center fade-in"><i class="fas fa-check-circle text-3xl text-emerald-400 mb-2"></i><p class="text-emerald-300 font-bold text-sm">Test topshirilgan!</p><p class="text-slate-400 text-[11px] mt-1">${passed.correct}/${passed.total} • +${passed.points} ball</p></div>`;return;}
 _quizAnswers={};
-el.innerHTML=quiz.questions.map((q,qi)=>`
-<div class="bg-slate-900/60 border border-slate-800 rounded-lg p-3 mb-3 fade-in">
-<div class="text-white text-xs font-bold mb-2">${qi+1}. ${escapeHtml(q.q||'')}</div>
-<div class="space-y-1">
-${(q.options||[]).map((o,oi)=>`<label class="flex items-center gap-2 cursor-pointer hover:bg-slate-800/50 p-2 rounded transition">
-<input type="radio" name="q_${qi}" value="${oi}" onchange="_quizAnswers[${qi}]=${oi}" class="accent-amber-500">
-<span class="text-slate-300 text-xs">${escapeHtml(o)}</span></label>`).join('')}
-</div></div>`).join('')+
-`<button onclick="submitQuiz()" class="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg btn-press"><i class="fas fa-paper-plane mr-1"></i> Yuborish</button>`;
-}
+el.innerHTML=quiz.questions.map((q,qi)=>`<div class="bg-slate-900/60 border border-slate-800 rounded-lg p-3 mb-3 fade-in"><div class="text-white text-xs font-bold mb-2">${qi+1}. ${escapeHtml(q.q||'')}</div><div class="space-y-1">${(q.options||[]).map((o,oi)=>`<label class="flex items-center gap-2 cursor-pointer hover:bg-slate-800/50 p-2 rounded transition"><input type="radio" name="q_${qi}" value="${oi}" onchange="_quizAnswers[${qi}]=${oi}" class="accent-amber-500"><span class="text-slate-300 text-xs">${escapeHtml(o)}</span></label>`).join('')}</div></div>`).join('')+
+`<button onclick="submitQuiz()" class="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg btn-press"><i class="fas fa-paper-plane mr-1"></i> Yuborish</button>`;}
 function submitQuiz(){
 if(!db.currentUser){openAuthModal();return;}
 if(!activeCourse)return;
-const quiz=activeCourse.quiz[activeLessonIndex];
-const qs=quiz.questions||[];
-let correct=0;
-qs.forEach((q,qi)=>{if(_quizAnswers[qi]===q.correct)correct++;});
-const total=qs.length;
-const passed=correct>=Math.ceil(total*0.7);
-const points=passed?20:0;
+const quiz=activeCourse.quiz[activeLessonIndex];const qs=quiz.questions||[];
+let correct=0;qs.forEach((q,qi)=>{if(_quizAnswers[qi]===q.correct)correct++;});
+const total=qs.length;const passed=correct>=Math.ceil(total*0.7);const points=passed?20:0;
 if(!db.currentUser.quizPassed)db.currentUser.quizPassed={};
 const key=activeCourse.id+'|'+activeLessonIndex;
 db.currentUser.quizPassed[key]={correct,total,points,at:new Date().toISOString()};
 const i=db.users.findIndex(u=>u.id===db.currentUser.id);if(i!==-1)db.users[i]=db.currentUser;
 localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
-database.ref('users/'+db.currentUser.id+'/quizPassed').set(db.currentUser.quizPassed);
+saveUserToDb(db.currentUser);
 if(passed){awardPoints(20,'Test '+correct+'/'+total);fireConfetti();}
 else{toast('❌ '+correct+'/'+total+'. Yana urinib ko\'ring!');}
-loadQuiz();
-}
+loadQuiz();}
 
 // ===== SEARCH =====
 function runGlobalSearch(q){
@@ -1570,45 +1355,32 @@ const el=document.getElementById('searchResults');
 q=(q||'').trim().toLowerCase();
 if(q.length<2){el.classList.add('hidden');return;}
 const results=[];
-db.tutors.forEach(t=>{
-(t.lessons||[]).forEach((l,li)=>{
+db.tutors.forEach(t=>{(t.lessons||[]).forEach((l,li)=>{
 if((l.title||'').toLowerCase().includes(q)||(t.name||'').toLowerCase().includes(q)||(t.subject||'').toLowerCase().includes(q)){
 const bought=db.currentUser&&db.currentUser.tutorsBought&&db.currentUser.tutorsBought.includes(t.id);
-results.push({tid:t.id,tname:t.name,subject:t.subject,title:l.title,li,bought});
-}});});
+results.push({tid:t.id,tname:t.name,subject:t.subject,title:l.title,li,bought});}});});
 if(results.length===0){el.innerHTML='<p class="text-xs text-slate-500 text-center py-3">Topilmadi</p>';el.classList.remove('hidden');return;}
-el.innerHTML=results.slice(0,30).map(r=>`
-<div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex justify-between items-center gap-3 hover:border-blue-700/50 transition fade-in">
-<div class="min-w-0 flex-grow">
-<div class="text-white text-xs font-bold truncate"><i class="fas fa-play-circle text-blue-400 mr-1"></i> ${escapeHtml(r.title)}</div>
+el.innerHTML=results.slice(0,30).map(r=>`<div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex justify-between items-center gap-3 hover:border-blue-700/50 transition fade-in">
+<div class="min-w-0 flex-grow"><div class="text-white text-xs font-bold truncate"><i class="fas fa-play-circle text-blue-400 mr-1"></i> ${escapeHtml(r.title)}</div>
 <div class="text-[10px] text-slate-500 truncate">${escapeHtml(r.tname)} • ${escapeHtml(r.subject)}</div></div>
 ${r.bought?`<button onclick="openCoursePlayerFromFav('${r.tid}',${r.li})" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg whitespace-nowrap btn-press"><i class="fas fa-play"></i></button>`:`<span class="text-[10px] text-amber-400"><i class="fas fa-lock"></i></span>`}
 </div>`).join('');
-el.classList.remove('hidden');
-}
+el.classList.remove('hidden');}
 
 // ===== CERTIFICATE =====
 function countWatchedLessons(tid){
 if(!db.currentUser)return 0;
 const t=db.tutors.find(x=>x.id===tid);if(!t||!t.lessons)return 0;
-let c=0;
-t.lessons.forEach((l,i)=>{
-const k='awarded_'+db.currentUser.id+'_'+tid+'_'+i;
-if(localStorage.getItem(k))c++;
-});
-return Math.min(c,t.lessons.length);
-}
+let c=0;t.lessons.forEach((l,i)=>{const k='awarded_'+db.currentUser.id+'_'+tid+'_'+i;if(localStorage.getItem(k))c++;});
+return Math.min(c,t.lessons.length);}
 function downloadCertificate(){
 if(!db.currentUser){openAuthModal();return;}
 if(!activeCourse)return;
-const total=(activeCourse.lessons||[]).length;
-const done=countWatchedLessons(activeCourse.id);
+const total=(activeCourse.lessons||[]).length;const done=countWatchedLessons(activeCourse.id);
 if(done<total||total===0){toast('❌ Avval barcha darslarni tugating ('+done+'/'+total+')');return;}
 const canvas=document.getElementById('certificateCanvas');
-canvas.width=1400;canvas.height=990;
-const ctx=canvas.getContext('2d');
-const grad=ctx.createLinearGradient(0,0,1400,990);
-grad.addColorStop(0,'#0d4a5c');grad.addColorStop(1,'#00b8d4');
+canvas.width=1400;canvas.height=990;const ctx=canvas.getContext('2d');
+const grad=ctx.createLinearGradient(0,0,1400,990);grad.addColorStop(0,'#0d4a5c');grad.addColorStop(1,'#00b8d4');
 ctx.fillStyle=grad;ctx.fillRect(0,0,1400,990);
 ctx.strokeStyle='#fbbf24';ctx.lineWidth=8;ctx.strokeRect(30,30,1340,930);
 ctx.strokeStyle='#fbbf24';ctx.lineWidth=2;ctx.strokeRect(50,50,1300,890);
@@ -1623,20 +1395,15 @@ ctx.font='18px system-ui,sans-serif';ctx.fillStyle='#94a3b8';ctx.fillText('Sinf:
 ctx.font='16px system-ui,sans-serif';ctx.fillStyle='#94a3b8';
 const dateStr=new Date().toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'});
 ctx.fillText('Berilgan: '+dateStr,700,700);
-ctx.font='14px system-ui,sans-serif';ctx.fillStyle='#64748b';
-ctx.fillText('ID: '+db.currentUser.id+' • '+BRAND,700,730);
+ctx.font='14px system-ui,sans-serif';ctx.fillStyle='#64748b';ctx.fillText('ID: '+db.currentUser.id+' • '+BRAND,700,730);
 ctx.font='bold 30px system-ui,sans-serif';ctx.fillStyle='#fbbf24';ctx.fillText('🎓',1180,830);
 ctx.font='18px system-ui,sans-serif';ctx.fillStyle='#c9d1d9';ctx.fillText('Direktor',220,830);
 ctx.beginPath();ctx.moveTo(120,810);ctx.lineTo(320,810);ctx.strokeStyle='#c9d1d9';ctx.lineWidth=1.5;ctx.stroke();
-document.getElementById('certificateModal').classList.remove('hidden');
-}
+document.getElementById('certificateModal').classList.remove('hidden');}
 function downloadCertImage(){
 const canvas=document.getElementById('certificateCanvas');
-const a=document.createElement('a');
-a.download='ZukkoTalim-sertifikat-'+db.currentUser.login+'.png';
-a.href=canvas.toDataURL('image/png');a.click();
-toast('✅ Yuklandi!');
-}
+const a=document.createElement('a');a.download='ZukkoTalim-sertifikat-'+db.currentUser.login+'.png';
+a.href=canvas.toDataURL('image/png');a.click();toast('✅ Yuklandi!');}
 function closeCertificate(){document.getElementById('certificateModal').classList.add('hidden');}
 
 // ===== PLAYER =====
@@ -1645,35 +1412,23 @@ const tutor=db.tutors.find(t=>t.id===tid);if(!tutor)return;
 activeCourse=tutor;activeLessonIndex=0;
 document.getElementById('modalCourseTitle').innerText=tutor.name+" — "+tutor.subject;
 document.getElementById('coursePlayerModal').classList.remove('hidden');
-renderPlaylist();loadLesson(0);startWatchTracking();
-switchLessonTab('comments');
-}
+renderPlaylist();loadLesson(0);startWatchTracking();switchLessonTab('comments');}
 function startWatchTracking(){
 if(_watchTimer)clearInterval(_watchTimer);
 _watchSeconds=0;_watchStartAt=Date.now();
-_watchTimer=setInterval(()=>{
-if(!db.currentUser||!activeCourse)return;
-_watchSeconds+=30;saveWatchProgress(false);
-},30000);
-}
+_watchTimer=setInterval(()=>{if(!db.currentUser||!activeCourse)return;_watchSeconds+=30;saveWatchProgress(false);},30000);}
 function saveWatchProgress(onClose){
 if(!db.currentUser||!activeCourse)return;
 const extra=onClose&&_watchStartAt?Math.floor((Date.now()-_watchStartAt)/1000):0;
-const total=_watchSeconds+extra;
-if(total<5&&!onClose)return;
+const total=_watchSeconds+extra;if(total<5&&!onClose)return;
 if(!db.currentUser.watchProgress)db.currentUser.watchProgress={};
 const cur=db.currentUser.watchProgress[activeCourse.id]||{seconds:0,sessions:0};
 const lessons=activeCourse.lessons||[];
-db.currentUser.watchProgress[activeCourse.id]={
-seconds:(cur.seconds||0)+total,sessions:(cur.sessions||0)+1,
-lastLesson:activeLessonIndex,lastLessonTitle:(lessons[activeLessonIndex]||{}).title||'',
-totalLessons:lessons.length,lastCourseName:activeCourse.name,at:new Date().toISOString()};
+db.currentUser.watchProgress[activeCourse.id]={seconds:(cur.seconds||0)+total,sessions:(cur.sessions||0)+1,lastLesson:activeLessonIndex,lastLessonTitle:(lessons[activeLessonIndex]||{}).title||'',totalLessons:lessons.length,lastCourseName:activeCourse.name,at:new Date().toISOString()};
 _watchSeconds=0;_watchStartAt=Date.now();
-const idx=db.users.findIndex(u=>u.id===db.currentUser.id);
-if(idx!==-1)db.users[idx]=db.currentUser;
+const idx=db.users.findIndex(u=>u.id===db.currentUser.id);if(idx!==-1)db.users[idx]=db.currentUser;
 localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
-database.ref('users/'+db.currentUser.id+'/watchProgress').set(db.currentUser.watchProgress);
-}
+database.ref('users/'+db.currentUser.id+'/watchProgress').set(db.currentUser.watchProgress);}
 function stopWatchTracking(){if(_watchTimer){clearInterval(_watchTimer);_watchTimer=null;}saveWatchProgress(true);}
 
 function renderPlaylist(){
@@ -1693,8 +1448,7 @@ ${hasDate?'<i class="fas fa-calendar text-purple-400 text-[10px]" title="'+fmtDa
 ${watched?'<i class="fas fa-check-circle text-emerald-400 text-[10px]"></i>':''}
 ${fav?'<i class="fas fa-star text-yellow-400 text-[10px]"></i>':''}
 ${a?'<i class="fas fa-volume-up text-white"></i>':''}
-</div>`;}).join('');
-}
+</div>`;}).join('');}
 
 function loadLesson(i){
 const ls=activeCourse.lessons||[];if(ls.length===0||!ls[i])return;
@@ -1710,47 +1464,34 @@ initCommentsListener(activeCourse.id,i);
 const k='awarded_'+((db.currentUser&&db.currentUser.id)||'guest')+'_'+activeCourse.id+'_'+i;
 const mb=document.getElementById('markWatchedBtn');
 if(mb&&localStorage.getItem(k)){mb.innerHTML='<i class="fas fa-check-circle mr-1"></i> Tugatilgan';mb.classList.add('opacity-60');}
-else if(mb){mb.innerHTML='<i class="fas fa-check mr-1"></i> Tugatdim';mb.classList.remove('opacity-60');}
-}
+else if(mb){mb.innerHTML='<i class="fas fa-check mr-1"></i> Tugatdim';mb.classList.remove('opacity-60');}}
 function prevLesson(){if(activeLessonIndex>0)loadLesson(activeLessonIndex-1);}
 function nextLesson(){const ls=activeCourse.lessons||[];if(activeLessonIndex<ls.length-1)loadLesson(activeLessonIndex+1);}
 function closeCoursePlayer(){
 checkLessonCompletion(activeLessonIndex);stopWatchTracking();
 if(_commentsRef){_commentsRef.off();_commentsRef=null;}
 document.getElementById('mainVimeoIframe').src="";
-document.getElementById('coursePlayerModal').classList.add('hidden');
-}
+document.getElementById('coursePlayerModal').classList.add('hidden');}
 function checkLessonCompletion(prevIndex){
 if(!db.currentUser||!activeCourse)return;
-if(_watchSeconds>=30){
-const key='awarded_'+db.currentUser.id+'_'+activeCourse.id+'_'+prevIndex;
-if(localStorage.getItem(key))return;
-localStorage.setItem(key,'1');
-awardPoints(10,'Dars #'+(prevIndex+1));
-}}
+if(_watchSeconds>=30){const key='awarded_'+db.currentUser.id+'_'+activeCourse.id+'_'+prevIndex;
+if(localStorage.getItem(key))return;localStorage.setItem(key,'1');awardPoints(10,'Dars #'+(prevIndex+1));}}
 function markLessonWatched(){
 if(!db.currentUser){openAuthModal();return;}
 if(!activeCourse)return;
 const key='awarded_'+db.currentUser.id+'_'+activeCourse.id+'_'+activeLessonIndex;
 if(localStorage.getItem(key)){toast('✅ Allaqachon tugatilgan');return;}
-localStorage.setItem(key,'1');
-awardPoints(10,'Dars #'+(activeLessonIndex+1));
-renderPlaylist();
-loadLesson(activeLessonIndex);
-}
+localStorage.setItem(key,'1');awardPoints(10,'Dars #'+(activeLessonIndex+1));
+renderPlaylist();loadLesson(activeLessonIndex);}
 function switchLessonTab(tab){
 _lessonTab=tab;
 ['comments','homework','notes','quiz'].forEach(t=>{
-const btn=document.getElementById('ltab_'+t);
-const cont=document.getElementById('tabContent_'+t);
+const btn=document.getElementById('ltab_'+t);const cont=document.getElementById('tabContent_'+t);
 if(btn){btn.classList.toggle('active',t===tab);btn.classList.toggle('text-slate-400',t!==tab);}
-if(cont)cont.classList.toggle('hidden',t!==tab);
-});
+if(cont)cont.classList.toggle('hidden',t!==tab);});
 if(tab==='homework')loadHomework();
 if(tab==='notes')loadNote();
-if(tab==='quiz')loadQuiz();
-}
-
+if(tab==='quiz')loadQuiz();}
 function normalizeVideoUrl(raw){
 let u=raw.trim();const m=u.match(/src=["']([^"']+)["']/);if(m&&m[1])u=m[1];
 let yt=null,mm;
@@ -1758,17 +1499,14 @@ if((mm=u.match(/[?&]v=([a-zA-Z0-9_-]{11})/)))yt=mm[1];
 else if((mm=u.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/)))yt=mm[1];
 else if((mm=u.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/)))yt=mm[1];
 else if((mm=u.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/)))yt=mm[1];
-if(yt)return`https://www.youtube.com/embed/${yt}`;
-return u;
-}// ===== ADMIN: DARSLAR =====
+if(yt)return`https://www.youtube.com/embed/${yt}`;return u;}// ===== ADMIN: DARSLAR =====
 function updateAdminLessonSelect(){
 sortTutors();
 const s=document.getElementById('lessonTutorSelect');
 if(s)s.innerHTML=db.tutors.map(t=>`<option value="${t.id}">${t.name} (${t.subject})</option>`).join('');
 const yts=document.getElementById('ytPlaylistTutor');
 if(yts)yts.innerHTML=db.tutors.map(t=>`<option value="${t.id}">${t.name} (${t.subject} • ${t.sinf})</option>`).join('');
-renderAdminLessonsList();
-}
+renderAdminLessonsList();}
 function addLessonToTutor(){
 const tid=document.getElementById('lessonTutorSelect').value;
 const title=document.getElementById('newLessonTitle').value.trim();
@@ -1780,12 +1518,11 @@ if(!t.lessons)t.lessons=[];
 const lesson={id:'les-'+Date.now(),title,url:normalizeVideoUrl(url)};
 if(dateVal)lesson.date=dateVal;
 t.lessons.push(lesson);
-saveDb();renderAdminLessonsList();renderTutors();logAdminAction('add_lesson',title+' → '+t.name);
-notifyNewLesson(t.name,1);
-toast("Dars qo'shildi!");
+saveTutorToDb(t);localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
+renderAdminLessonsList();renderTutors();logAdminAction('add_lesson',title+' → '+t.name);
+notifyNewLesson(t.name,1);toast("Dars qo'shildi!");
 document.getElementById('newLessonTitle').value='';document.getElementById('newLessonUrl').value='';
-if(document.getElementById('newLessonDate'))document.getElementById('newLessonDate').value='';
-}
+if(document.getElementById('newLessonDate'))document.getElementById('newLessonDate').value='';}
 function addLessonsBulk(){
 const tid=document.getElementById('lessonTutorSelect').value;
 const t=db.tutors.find(x=>x.id===tid);if(!t)return alert("Avval repetitorni tanlang!");
@@ -1799,11 +1536,11 @@ const title=line.slice(0,si).trim();const url=line.slice(si+1).trim();
 if(!title||!url){sk++;return;}
 t.lessons.push({id:'les-'+Date.now()+'-'+i,title,url:normalizeVideoUrl(url)});added++;});
 if(added===0)return alert("Format: Nomi | Link");
-saveDb();renderAdminLessonsList();renderTutors();logAdminAction('bulk_lessons',added+' → '+t.name);
+saveTutorToDb(t);localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
+renderAdminLessonsList();renderTutors();logAdminAction('bulk_lessons',added+' → '+t.name);
 notifyNewLesson(t.name,added);
 document.getElementById('bulkLessonsInput').value='';
-toast(added+' ta dars qo\'shildi'+(sk>0?', '+sk+' o\'tkazib yuborildi':'')+'!');
-}
+toast(added+' ta dars qo\'shildi'+(sk>0?', '+sk+' o\'tkazib yuborildi':'')+'!');}
 function renderAdminLessonsList(){
 const tid=document.getElementById('lessonTutorSelect').value;
 const t=db.tutors.find(x=>x.id===tid);const el=document.getElementById('adminLessonsList');
@@ -1812,29 +1549,25 @@ if(!t||!t.lessons||t.lessons.length===0){el.innerHTML='<p class="text-xs text-sl
 el.innerHTML=t.lessons.map((l,i)=>`<div class="bg-slate-900 p-3 rounded-lg border border-slate-800 flex justify-between items-center text-xs gap-2">
 <span class="font-semibold text-white truncate flex-grow">${i+1}. ${escapeHtml(l.title)}${l.date?' <span class="text-[9px] text-purple-400">📅 '+fmtDate(l.date)+'</span>':''}</span>
 <div class="flex gap-1 shrink-0">
-<button onclick="setLessonDate('${t.id}',${i})" class="text-purple-400 hover:text-purple-300 text-[10px]" title="Sana"><i class="fas fa-calendar"></i></button>
-<button onclick="addHomeworkToLesson('${t.id}',${i})" class="text-emerald-400 hover:text-emerald-300 text-[10px]" title="Uy ishi"><i class="fas fa-tasks"></i></button>
-<button onclick="addQuizToLesson('${t.id}',${i})" class="text-amber-400 hover:text-amber-300 text-[10px]" title="Test"><i class="fas fa-question-circle"></i></button>
-<button onclick="deleteLesson('${t.id}','${l.id}')" class="text-red-400 hover:text-red-300 text-[10px]"><i class="fas fa-trash"></i></button>
-</div></div>`).join('');
-}
+<button onclick="setLessonDate('${t.id}',${i})" class="text-purple-400 text-[10px]" title="Sana"><i class="fas fa-calendar"></i></button>
+<button onclick="addHomeworkToLesson('${t.id}',${i})" class="text-emerald-400 text-[10px]" title="Uy ishi"><i class="fas fa-tasks"></i></button>
+<button onclick="addQuizToLesson('${t.id}',${i})" class="text-amber-400 text-[10px]" title="Test"><i class="fas fa-question-circle"></i></button>
+<button onclick="deleteLesson('${t.id}','${l.id}')" class="text-red-400 text-[10px]"><i class="fas fa-trash"></i></button>
+</div></div>`).join('');}
 function setLessonDate(tid,li){
 const t=db.tutors.find(x=>x.id===tid);if(!t||!t.lessons[li])return;
 const cur=t.lessons[li].date||'';
 const d=prompt('Chiqish sanasi (YYYY-MM-DD):',cur);
 if(d===null)return;
 if(d.trim())t.lessons[li].date=d.trim();else delete t.lessons[li].date;
-saveDb();renderAdminLessonsList();
-toast('📅 Sana saqlandi');
-}
+saveTutorToDb(t);renderAdminLessonsList();toast('📅 Sana saqlandi');}
 function deleteLesson(tid,lid){
 const t=db.tutors.find(x=>x.id===tid);if(!t)return;
 const lesson=t.lessons.find(l=>l.id===lid);
 t.lessons=t.lessons.filter(l=>l.id!==lid);
-saveDb();renderAdminLessonsList();renderTutors();
-logAdminAction('delete_lesson',(lesson?lesson.title:'')+' → '+t.name);
-toast("O'chirildi!");
-}
+saveTutorToDb(t);localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
+renderAdminLessonsList();renderTutors();
+logAdminAction('delete_lesson',(lesson?lesson.title:'')+' → '+t.name);toast("O'chirildi!");}
 function addHomeworkToLesson(tid,li){
 const t=db.tutors.find(x=>x.id===tid);if(!t)return;
 if(!t.homework)t.homework={};
@@ -1844,41 +1577,33 @@ if(text===null)return;
 const dl=prompt('Muddat (YYYY-MM-DD yoki bo\'sh):',cur.deadline||'');
 if(dl===null)return;
 t.homework[li]={text:text.trim(),deadline:dl.trim()};
-saveDb();database.ref('tutors/'+tid+'/homework').set(t.homework);
-logAdminAction('set_homework',t.name+' → дарс #'+(li+1));
-toast('✅ Uy ishi saqlandi');
-}
+saveTutorToDb(t);database.ref('tutors/'+tid+'/homework').set(t.homework);
+logAdminAction('set_homework',t.name+' → дарс #'+(li+1));toast('✅ Uy ishi saqlandi');}
 function addQuizToLesson(tid,li){
 const t=db.tutors.find(x=>x.id===tid);if(!t)return;
 if(!t.quiz)t.quiz={};
 let cur=t.quiz[li]?JSON.stringify(t.quiz[li],null,2):'';
 const raw=prompt('Test JSON:\n[{"q":"Savol?","options":["A","B","C"],"correct":0}]',cur);
 if(raw===null)return;
-try{
-const parsed=JSON.parse(raw);
+try{const parsed=JSON.parse(raw);
 if(!Array.isArray(parsed))throw new Error('Massiv emas');
 t.quiz[li]={questions:parsed};
-saveDb();database.ref('tutors/'+tid+'/quiz').set(t.quiz);
-logAdminAction('set_quiz',t.name+' → дарс #'+(li+1)+' ('+parsed.length+' savol)');
-toast('✅ Test saqlandi');
-}catch(e){alert('❌ JSON xato: '+e.message);}
-}
+saveTutorToDb(t);database.ref('tutors/'+tid+'/quiz').set(t.quiz);
+logAdminAction('set_quiz',t.name+' → дарс #'+(li+1)+' ('+parsed.length+')');
+toast('✅ Test saqlandi');}catch(e){alert('❌ JSON xato: '+e.message);}}
 
 // ===== YOUTUBE IMPORT =====
 function extractPlaylistId(input){
 if(!input)return null;
-const m=input.match(/[?&]list=([a-zA-Z0-9_-]+)/);
-if(m)return m[1];
+const m=input.match(/[?&]list=([a-zA-Z0-9_-]+)/);if(m)return m[1];
 if(/^PL[a-zA-Z0-9_-]+$/.test(input.trim()))return input.trim();
 if(/^UU[a-zA-Z0-9_-]+$/.test(input.trim()))return input.trim();
 if(/^OLAK5uy_[a-zA-Z0-9_-]+$/.test(input.trim()))return input.trim();
-return null;
-}
+return null;}
 async function fetchWithFallback(url){
 const proxies=['https://corsproxy.io/?url='+encodeURIComponent(url),'https://api.allorigins.win/raw?url='+encodeURIComponent(url),'https://api.codetabs.com/v1/proxy/?quest='+encodeURIComponent(url)];
 for(const p of proxies){try{const r=await fetch(p);if(r.ok){const t=await r.text();if(t&&t.length>100)return t;}}catch(e){}}
-return null;
-}
+return null;}
 async function importYouTubePlaylist(){
 const urlInput=document.getElementById('ytPlaylistUrl').value.trim();
 const tid=document.getElementById('ytPlaylistTutor').value;
@@ -1891,67 +1616,44 @@ if(!plId){status.className='text-xs font-semibold text-red-400';status.textConte
 const t=db.tutors.find(x=>x.id===tid);if(!t){status.textContent='❌ Курс не найден';return;}
 btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin mr-1"></i> Загрузка...';
 let videos=null;
-if(YT_API_KEY){
-status.className='text-xs font-semibold text-blue-400';status.textContent='⏳ Загружаем через API...';status.classList.remove('hidden');
-videos=await fetchPlaylistViaAPI(plId);
-}
-if(!videos){status.textContent='⏳ Пробуем RSS (до 15)...';videos=await fetchPlaylistViaRSS(plId);}
-if(!videos||videos.length===0){
-status.className='text-xs font-semibold text-red-400';status.textContent='❌ Не удалось загрузить';
-btn.disabled=false;btn.innerHTML='<i class="fab fa-youtube mr-1"></i> Загрузить все видео';return;
-}
+if(YT_API_KEY){status.className='text-xs font-semibold text-blue-400';status.textContent='⏳ Через API...';status.classList.remove('hidden');videos=await fetchPlaylistViaAPI(plId);}
+if(!videos){status.textContent='⏳ RSS (до 15)...';videos=await fetchPlaylistViaRSS(plId);}
+if(!videos||videos.length===0){status.className='text-xs font-semibold text-red-400';status.textContent='❌ Не удалось';btn.disabled=false;btn.innerHTML='<i class="fab fa-youtube mr-1"></i> Загрузить все видео';return;}
 if(!t.lessons)t.lessons=[];
 const existing=new Set(t.lessons.map(l=>{const m=(l.url||'').match(/embed\/([a-zA-Z0-9_-]{11})/);return m?m[1]:null;}).filter(Boolean));
 let added=0,skipped=0;
-videos.forEach((v,i)=>{
-if(existing.has(v.id)){skipped++;return;}
-t.lessons.push({id:'les-'+Date.now()+'-'+i,title:v.title,url:'https://www.youtube.com/embed/'+v.id});
-added++;
-});
-if(added>0){saveDb();renderAdminLessonsList();updateAdminLessonSelect();renderTutors();
-logAdminAction('yt_import',added+' видео → '+t.name);notifyNewLesson(t.name,added);}
+videos.forEach((v,i)=>{if(existing.has(v.id)){skipped++;return;}
+t.lessons.push({id:'les-'+Date.now()+'-'+i,title:v.title,url:'https://www.youtube.com/embed/'+v.id});added++;});
+if(added>0){saveTutorToDb(t);localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
+renderAdminLessonsList();updateAdminLessonSelect();renderTutors();
+logAdminAction('yt_import',added+' → '+t.name);notifyNewLesson(t.name,added);}
 status.className='text-xs font-semibold text-emerald-400';
-status.textContent='✅ Добавлено: '+added+(skipped>0?', дубли: '+skipped:'')+'. Всего: '+videos.length;
+status.textContent='✅ +'+added+(skipped>0?', дубли: '+skipped:'')+'. Всего: '+videos.length;
 document.getElementById('ytPlaylistUrl').value='';
 toast('✅ +'+added+' видео');
-btn.disabled=false;btn.innerHTML='<i class="fab fa-youtube mr-1"></i> Загрузить все видео';
-}
+btn.disabled=false;btn.innerHTML='<i class="fab fa-youtube mr-1"></i> Загрузить все видео';}
 async function fetchPlaylistViaAPI(plId){
-try{
-let all=[],token='',page=0;
+try{let all=[],token='',page=0;
 do{
 const url='https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId='+encodeURIComponent(plId)+'&key='+encodeURIComponent(YT_API_KEY)+(token?'&pageToken='+encodeURIComponent(token):'');
-const r=await fetch(url);
-if(!r.ok)return null;
-const data=await r.json();
-if(!data.items||data.items.length===0)break;
-data.items.forEach(item=>{
-const vid=item.snippet&&item.snippet.resourceId&&item.snippet.resourceId.videoId;
+const r=await fetch(url);if(!r.ok)return null;
+const data=await r.json();if(!data.items||data.items.length===0)break;
+data.items.forEach(item=>{const vid=item.snippet&&item.snippet.resourceId&&item.snippet.resourceId.videoId;
 const title=item.snippet&&item.snippet.title;
-if(vid&&title&&title!=='Private video'&&title!=='Deleted video')all.push({id:vid,title});
-});
+if(vid&&title&&title!=='Private video'&&title!=='Deleted video')all.push({id:vid,title});});
 token=data.nextPageToken||'';page++;
 if(page>=100||!token)break;
 const s=document.getElementById('ytImportStatus');if(s)s.textContent='⏳ '+all.length+' видео... (стр. '+page+')';
-}while(token);
-return all;
-}catch(e){return null;}
-}
+}while(token);return all;}catch(e){return null;}}
 async function fetchPlaylistViaRSS(plId){
-try{
-const text=await fetchWithFallback('https://www.youtube.com/feeds/videos.xml?playlist_id='+plId);
+try{const text=await fetchWithFallback('https://www.youtube.com/feeds/videos.xml?playlist_id='+plId);
 if(!text)return null;
 const doc=new DOMParser().parseFromString(text,'text/xml');
-const entries=doc.getElementsByTagName('entry');
-const arr=[];
-for(let i=0;i<entries.length;i++){
-const v=entries[i].getElementsByTagNameNS('*','videoId')[0];
+const entries=doc.getElementsByTagName('entry');const arr=[];
+for(let i=0;i<entries.length;i++){const v=entries[i].getElementsByTagNameNS('*','videoId')[0];
 const t=entries[i].getElementsByTagName('title')[0];
-if(v&&t)arr.push({id:v.textContent.trim(),title:t.textContent.trim()});
-}
-return arr;
-}catch(e){return null;}
-}
+if(v&&t)arr.push({id:v.textContent.trim(),title:t.textContent.trim()});}
+return arr;}catch(e){return null;}}
 
 // ===== TUTOR CRUD =====
 function addTutor(){
@@ -1963,17 +1665,18 @@ const subject=document.getElementById('newTutorFan').value;
 if(!name||!price)return alert("Ma'lumotlarni to'ldiring!");
 const nid='tut-'+Date.now();
 const mo=db.tutors.reduce((m,t)=>Math.max(m,t.order||0),0);
-db.tutors.push({id:nid,name,img:img||'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop',price,sinf,subject,lessons:[],homework:{},quiz:{},order:mo+1});
-saveDb();toast("Repetitor qo'shildi!");renderAdminTutorsList();
+const newTutor={id:nid,name,img:img||'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop',price,sinf,subject,lessons:[],homework:{},quiz:{},order:mo+1};
+db.tutors.push(newTutor);
+database.ref('tutors/'+nid).set(newTutor).then(()=>console.log('✅ Tutor saved:',nid)).catch(e=>{console.error('❌',e);alert('Ошибка: '+e.message);});
+localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
+toast("Repetitor qo'shildi!");renderAdminTutorsList();
 logAdminAction('add_tutor',name+' ('+subject+', '+sinf+')');
 document.getElementById('newTutorName').value='';document.getElementById('newTutorImg').value='';document.getElementById('newTutorPrice').value='';
-const pv=document.getElementById('newTutorImgPreview');if(pv){pv.classList.add('hidden');pv.src='';}
-}
+const pv=document.getElementById('newTutorImgPreview');if(pv){pv.classList.add('hidden');pv.src='';}}
 function renderAdminTutorsList(){
 const el=document.getElementById('adminTutorsList');if(!el)return;
 sortTutors();const total=db.tutors.length;
-el.innerHTML=db.tutors.map((t,i)=>`
-<div class="card-bg p-4 rounded-xl flex justify-between items-center gap-4 fade-in-up">
+el.innerHTML=db.tutors.map((t,i)=>`<div class="card-bg p-4 rounded-xl flex justify-between items-center gap-4 fade-in-up">
 <div class="flex items-center gap-3">
 <div class="flex flex-col gap-1">
 <button onclick="moveTutor('${t.id}','up')" ${i===0?'disabled':''} class="w-6 h-6 flex items-center justify-center rounded ${i===0?'bg-slate-800/40 text-slate-600 cursor-not-allowed':'bg-slate-800 hover:bg-blue-600 text-white'} text-xs transition btn-press"><i class="fas fa-chevron-up"></i></button>
@@ -1984,8 +1687,7 @@ el.innerHTML=db.tutors.map((t,i)=>`
 <p class="text-xs text-slate-400">${escapeHtml(t.subject)} • ${t.sinf} • <span class="text-green-400 font-bold">${t.price.toLocaleString()} so'm</span></p></div></div>
 <div class="flex gap-2">
 <button onclick="openEditModal('${t.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold btn-press">Tahrir</button>
-<button onclick="deleteTutor('${t.id}')" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold btn-press">O'chirish</button></div></div>`).join('');
-}
+<button onclick="deleteTutor('${t.id}')" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold btn-press">O'chirish</button></div></div>`).join('');}
 function openEditModal(id){const t=db.tutors.find(x=>x.id===id);if(!t)return;
 document.getElementById('editTutorId').value=t.id;
 document.getElementById('editTutorName').value=t.name||'';
@@ -1995,43 +1697,127 @@ document.getElementById('editTutorSinf').value=t.sinf||'Umumiy';
 document.getElementById('editTutorFan').value=t.subject||'Ingliz tili';
 const pv=document.getElementById('editTutorImgPreview');
 if(pv){if(t.img){pv.src=t.img;pv.classList.remove('hidden');}else{pv.classList.add('hidden');}}
-document.getElementById('editTutorModal').classList.remove('hidden');
-}
+document.getElementById('editTutorModal').classList.remove('hidden');}
 function closeEditModal(){document.getElementById('editTutorModal').classList.add('hidden');}
-function saveTutorEdit(){const id=document.getElementById('editTutorId').value;const t=db.tutors.find(x=>x.id===id);if(!t)return;
+function saveTutorEdit(){
+const id=document.getElementById('editTutorId').value;const t=db.tutors.find(x=>x.id===id);if(!t)return;
 t.name=document.getElementById('editTutorName').value.trim();
 t.img=document.getElementById('editTutorImg').value.trim();
 t.price=Number(document.getElementById('editTutorPrice').value);
 t.sinf=document.getElementById('editTutorSinf').value;
 t.subject=document.getElementById('editTutorFan').value;
-saveDb();renderAdminTutorsList();renderTutors();closeEditModal();
-logAdminAction('edit_tutor',t.name);toast("Saqlandi!");
-}
+saveTutorToDb(t);localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
+renderAdminTutorsList();renderTutors();closeEditModal();
+logAdminAction('edit_tutor',t.name);toast("Saqlandi!");}
 function deleteTutor(id){if(!confirm("O'chirmoqchimisiz?"))return;
 const t=db.tutors.find(x=>x.id===id);
-db.tutors=db.tutors.filter(t=>t.id!==id);saveDb();renderAdminTutorsList();renderTutors();
-logAdminAction('delete_tutor',t?t.name:id);toast("O'chirildi!");
-}
+db.tutors=db.tutors.filter(t=>t.id!==id);
+database.ref('tutors/'+id).remove().catch(e=>console.warn(e));
+localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
+renderAdminTutorsList();renderTutors();
+logAdminAction('delete_tutor',t?t.name:id);toast("O'chirildi!");}
 
 // ===== ADMIN TABS =====
 function switchAdminTab(tab){
 currentAdminTab=tab;
-['adminTabStats','adminTabUsers','adminTabGuests','adminTabTutors','adminTabLessons','adminTabPromos','adminTabBroadcast','adminTabLogs','adminTabTop'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('hidden');});
-['tabStatsBtn','tabUsersBtn','tabGuestsBtn','tabTutorsBtn','tabLessonsBtn','tabPromosBtn','tabBroadcastBtn','tabLogsBtn','tabTopBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.className="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white";});
-const map={stats:'adminTabStats',users:'adminTabUsers',guests:'adminTabGuests',tutors:'adminTabTutors',lessons:'adminTabLessons',promos:'adminTabPromos',broadcast:'adminTabBroadcast',logs:'adminTabLogs',top:'adminTabTop'};
-const btnMap={stats:'tabStatsBtn',users:'tabUsersBtn',guests:'tabGuestsBtn',tutors:'tabTutorsBtn',lessons:'tabLessonsBtn',promos:'tabPromosBtn',broadcast:'tabBroadcastBtn',logs:'tabLogsBtn',top:'tabTopBtn'};
+['adminTabStats','adminTabUsers','adminTabGroups','adminTabGuests','adminTabTutors','adminTabLessons','adminTabPromos','adminTabBroadcast','adminTabLogs','adminTabTop'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('hidden');});
+['tabStatsBtn','tabUsersBtn','tabGroupsBtn','tabGuestsBtn','tabTutorsBtn','tabLessonsBtn','tabPromosBtn','tabBroadcastBtn','tabLogsBtn','tabTopBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.className="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white";});
+const map={stats:'adminTabStats',users:'adminTabUsers',groups:'adminTabGroups',guests:'adminTabGuests',tutors:'adminTabTutors',lessons:'adminTabLessons',promos:'adminTabPromos',broadcast:'adminTabBroadcast',logs:'adminTabLogs',top:'adminTabTop'};
+const btnMap={stats:'tabStatsBtn',users:'tabUsersBtn',groups:'tabGroupsBtn',guests:'tabGuestsBtn',tutors:'tabTutorsBtn',lessons:'tabLessonsBtn',promos:'tabPromosBtn',broadcast:'tabBroadcastBtn',logs:'tabLogsBtn',top:'tabTopBtn'};
 if(map[tab])document.getElementById(map[tab]).classList.remove('hidden');
 if(btnMap[tab])document.getElementById(btnMap[tab]).className="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap border-b-2 border-blue-500 text-blue-400";
 if(tab==='stats')renderStats();
 else if(tab==='users')renderAdminUsers();
+else if(tab==='groups')renderGroupsList();
 else if(tab==='guests')renderAdminGuests();
 else if(tab==='tutors')renderAdminTutorsList();
 else if(tab==='lessons')updateAdminLessonSelect();
 else if(tab==='promos')renderPromosList();
 else if(tab==='broadcast')renderBroadcastHistory();
 else if(tab==='logs')renderLogs();
-else if(tab==='top')renderLeaderboard();
-}
+else if(tab==='top')renderLeaderboard();}
+
+// ===== 👥 GROUPS =====
+function createGroup(){
+const name=document.getElementById('newGroupName').value.trim();
+const desc=document.getElementById('newGroupDesc').value.trim();
+if(!name)return alert("Nomi bo'sh!");
+const gid='grp-'+Date.now();
+const group={id:gid,name,desc,members:[],assignment:'',createdAt:new Date().toISOString(),createdBy:db.currentUser.login};
+database.ref('groups/'+gid).set(group);
+logAdminAction('create_group',name);
+document.getElementById('newGroupName').value='';document.getElementById('newGroupDesc').value='';
+toast('✅ Guruh yaratildi: '+name);}
+function renderGroupsList(){
+const el=document.getElementById('groupsList');if(!el)return;
+const arr=Object.values(allGroups).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+if(arr.length===0){el.innerHTML='<p class="text-xs text-slate-500 text-center py-4">Guruhlar yo\'q</p>';return;}
+el.innerHTML=arr.map(g=>{
+const members=(g.members||[]).length;
+return `<div class="bg-slate-900 border border-teal-700/40 rounded-lg p-4 fade-in">
+<div class="flex justify-between items-start gap-3 mb-2 flex-wrap">
+<div class="flex-grow min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-white font-bold text-sm">${escapeHtml(g.name)}</span>
+<span class="bg-teal-900/50 text-teal-300 text-[10px] px-2 py-0.5 rounded font-bold"><i class="fas fa-user-friends mr-1"></i>${members}</span>
+</div>
+${g.desc?`<div class="text-[11px] text-slate-400 mt-0.5">${escapeHtml(g.desc)}</div>`:''}
+${g.assignment?`<div class="text-[10px] text-teal-400 mt-1 truncate"><i class="fas fa-tasks mr-1"></i>${escapeHtml(g.assignment)}</div>`:''}
+</div>
+<div class="flex gap-1 flex-wrap">
+<button onclick="openGroupEditModal('${g.id}')" class="bg-teal-600 hover:bg-teal-700 text-white text-[10px] px-3 py-1.5 rounded font-bold btn-press"><i class="fas fa-edit"></i></button>
+<button onclick="deleteGroup('${g.id}')" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-3 py-1.5 rounded font-bold btn-press"><i class="fas fa-trash"></i></button>
+</div></div>
+<div class="flex flex-wrap gap-1 mt-2">
+${(g.members||[]).slice(0,10).map(mid=>{const u=db.users.find(x=>x.id===mid);return u?`<span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded">${escapeHtml(u.login)}</span>`:'';}).join('')}
+${members>10?`<span class="text-[10px] text-slate-500">+${members-10}</span>`:''}
+</div></div>`;}).join('');}
+function openGroupEditModal(gid){
+const g=allGroups[gid];if(!g)return;
+_currentGroupMembers=[...(g.members||[])];
+document.getElementById('editGroupId').value=gid;
+document.getElementById('editGroupName').value=g.name||'';
+document.getElementById('editGroupDesc').value=g.desc||'';
+renderGroupMembers();
+document.getElementById('groupModal').classList.remove('hidden');}
+function closeGroupModal(){document.getElementById('groupModal').classList.add('hidden');_currentGroupMembers=[];}
+function renderGroupMembers(){
+const el=document.getElementById('groupMembersList');if(!el)return;
+if(_currentGroupMembers.length===0){el.innerHTML='<p class="text-xs text-slate-500 text-center py-2">A\'zolar yo\'q</p>';return;}
+el.innerHTML=_currentGroupMembers.map((mid,i)=>{
+const u=db.users.find(x=>x.id===mid);
+if(!u)return'';
+return `<div class="flex justify-between items-center gap-2 text-xs">
+<span class="text-white"><i class="fas fa-user text-teal-400 mr-1"></i>${escapeHtml(u.login)} <span class="text-slate-500">(${u.id})</span></span>
+<button onclick="removeGroupMember(${i})" class="text-red-400 text-[10px] btn-press"><i class="fas fa-times"></i></button>
+</div>`;}).join('');}
+function addGroupMemberFromSearch(){
+const q=document.getElementById('groupMemberSearch').value.trim().toLowerCase();
+if(!q)return;
+const u=db.users.find(x=>x.login.toLowerCase()===q||x.id.toLowerCase()===q);
+if(!u){toast('❌ Topilmadi: '+q);return;}
+if(_currentGroupMembers.includes(u.id)){toast('Allaqachon qo\'shilgan');return;}
+_currentGroupMembers.push(u.id);
+document.getElementById('groupMemberSearch').value='';
+renderGroupMembers();
+toast('✅ '+u.login+' qo\'shildi');}
+function removeGroupMember(i){_currentGroupMembers.splice(i,1);renderGroupMembers();}
+function saveGroup(){
+const gid=document.getElementById('editGroupId').value;
+const name=document.getElementById('editGroupName').value.trim();
+const desc=document.getElementById('editGroupDesc').value.trim();
+if(!name)return alert("Nomi bo'sh!");
+const assignment=prompt('Umumiy topshiriq (ixtiyoriy):',(allGroups[gid]&&allGroups[gid].assignment)||'');
+if(assignment===null)return;
+const updated={name,desc,members:_currentGroupMembers,assignment:assignment.trim(),id:gid,createdAt:(allGroups[gid]&&allGroups[gid].createdAt)||new Date().toISOString(),createdBy:(allGroups[gid]&&allGroups[gid].createdBy)||db.currentUser.login};
+database.ref('groups/'+gid).set(updated);
+logAdminAction('edit_group',name);
+closeGroupModal();
+toast('✅ Guruh saqlandi');}
+function deleteGroup(gid){
+if(!confirm('Guruh o\'chirilsinmi?'))return;
+database.ref('groups/'+gid).remove();
+logAdminAction('delete_group',gid);toast('O\'chirildi');}
 
 // ===== STATS =====
 function renderStats(){
@@ -2041,18 +1827,10 @@ const onlineCount=parseInt((document.getElementById('onlineCountNum')||{}).textC
 const totalTutors=db.tutors.length;
 let totalRevenue=0;
 const last7days=[];
-for(let i=6;i>=0;i--){
-const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-i);
-last7days.push({date:d,count:0});
-}
-db.users.forEach(u=>{
-if(u.payments)u.payments.forEach(p=>{totalRevenue+=p.amount||0;});
-if(u.registeredAt){
-const rDate=new Date(u.registeredAt);rDate.setHours(0,0,0,0);
-const idx=last7days.findIndex(d=>d.date.getTime()===rDate.getTime());
-if(idx!==-1)last7days[idx].count++;
-}
-});
+for(let i=6;i>=0;i--){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-i);last7days.push({date:d,count:0});}
+db.users.forEach(u=>{if(u.payments)u.payments.forEach(p=>{totalRevenue+=p.amount||0;});
+if(u.registeredAt){const rDate=new Date(u.registeredAt);rDate.setHours(0,0,0,0);
+const idx=last7days.findIndex(d=>d.date.getTime()===rDate.getTime());if(idx!==-1)last7days[idx].count++;}});
 su.textContent=totalUsers;
 document.getElementById('statUsersSub').textContent='jami';
 document.getElementById('statOnline').textContent=onlineCount;
@@ -2064,29 +1842,13 @@ const maxCount=Math.max(1,...last7days.map(d=>d.count));
 document.getElementById('statChart').innerHTML=last7days.map(d=>{
 const pct=Math.round((d.count/maxCount)*100);
 const dayName=['Ya','Du','Se','Ch','Pa','Ju','Sh'][d.date.getDay()];
-return `<div class="flex-1 flex flex-col items-center gap-1">
-<div class="text-[9px] text-slate-500 font-bold">${d.count||''}</div>
-<div class="w-full bg-gradient-to-t from-blue-600 to-indigo-400 rounded-t chart-bar" style="height:${Math.max(pct,3)}%; min-height:8px"></div>
-<div class="text-[9px] text-slate-500">${dayName}</div>
-</div>`;}).join('');
+return `<div class="flex-1 flex flex-col items-center gap-1"><div class="text-[9px] text-slate-500 font-bold">${d.count||''}</div><div class="w-full bg-gradient-to-t from-blue-600 to-indigo-400 rounded-t chart-bar" style="height:${Math.max(pct,3)}%; min-height:8px"></div><div class="text-[9px] text-slate-500">${dayName}</div></div>`;}).join('');
 const sorted=[...db.users].filter(u=>u.role!=='admin').sort((a,b)=>(b.points||0)-(a.points||0)).slice(0,5);
-document.getElementById('statTopActive').innerHTML=sorted.length?sorted.map((u,i)=>`
-<div class="flex items-center gap-2 text-xs">
-<span class="w-6 text-center font-bold text-slate-500">${i+1}</span>
-<span class="text-white font-bold truncate flex-grow">${escapeHtml(u.login)}</span>
-<span class="text-amber-400 font-bold">🪙 ${u.points||0}</span>
-</div>`).join(''):'<p class="text-xs text-slate-500 text-center py-4">Yo\'q</p>';
+document.getElementById('statTopActive').innerHTML=sorted.length?sorted.map((u,i)=>`<div class="flex items-center gap-2 text-xs"><span class="w-6 text-center font-bold text-slate-500">${i+1}</span><span class="text-white font-bold truncate flex-grow">${escapeHtml(u.login)}</span><span class="text-amber-400 font-bold">🪙 ${u.points||0}</span></div>`).join(''):'<p class="text-xs text-slate-500 text-center py-4">Yo\'q</p>';
 const courseCounts={};
 db.users.forEach(u=>{(u.tutorsBought||[]).forEach(tid=>{courseCounts[tid]=(courseCounts[tid]||0)+1;});});
 const topCourses=Object.keys(courseCounts).map(tid=>({tid,count:courseCounts[tid]})).sort((a,b)=>b.count-a.count).slice(0,5);
-document.getElementById('statTopCourses').innerHTML=topCourses.length?topCourses.map((c,i)=>{
-const t=db.tutors.find(x=>x.id===c.tid);if(!t)return'';
-return `<div class="flex items-center gap-2 text-xs">
-<span class="w-6 text-center font-bold text-slate-500">${i+1}</span>
-<span class="text-white font-bold truncate flex-grow">${escapeHtml(t.name)}</span>
-<span class="text-blue-400 font-bold">${c.count} ta</span>
-</div>`;}).join(''):'<p class="text-xs text-slate-500 text-center py-4">Sotuvlar yo\'q</p>';
-}
+document.getElementById('statTopCourses').innerHTML=topCourses.length?topCourses.map((c,i)=>{const t=db.tutors.find(x=>x.id===c.tid);if(!t)return'';return `<div class="flex items-center gap-2 text-xs"><span class="w-6 text-center font-bold text-slate-500">${i+1}</span><span class="text-white font-bold truncate flex-grow">${escapeHtml(t.name)}</span><span class="text-blue-400 font-bold">${c.count} ta</span></div>`;}).join(''):'<p class="text-xs text-slate-500 text-center py-4">Sotuvlar yo\'q</p>';}
 
 // ===== PROMOS =====
 function createPromo(){
@@ -2096,119 +1858,79 @@ const limit=Number(document.getElementById('promoLimit').value)||0;
 if(!code||code.length<3){alert("Kod min 3 belgi!");return;}
 if(discount<1||discount>90){alert("Skidka 1-90%!");return;}
 if(allPromos[code]){alert("Bu kod allaqachon bor!");return;}
-database.ref('promos/'+code).set({
-code,discount,limit,used:0,
-createdAt:new Date().toISOString(),
-createdBy:db.currentUser.login,
-active:true
-});
-logAdminAction('create_promo',code+' ('+discount+'%, limit='+(limit||'∞')+')');
+database.ref('promos/'+code).set({code,discount,limit,used:0,createdAt:new Date().toISOString(),createdBy:db.currentUser.login,active:true});
+logAdminAction('create_promo',code+' ('+discount+'%)');
 document.getElementById('promoCode').value='';
-toast('✅ Promokod yaratildi: '+code);
-}
+toast('✅ Promokod: '+code);}
 function renderPromosList(){
 const el=document.getElementById('promosList');if(!el)return;
 const arr=Object.values(allPromos).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
 if(arr.length===0){el.innerHTML='<p class="text-xs text-slate-500 text-center py-4">Promokodlar yo\'q</p>';return;}
-el.innerHTML=arr.map(p=>{
-const expired=p.limit>0&&p.used>=p.limit;
+el.innerHTML=arr.map(p=>{const expired=p.limit>0&&p.used>=p.limit;
 return `<div class="bg-slate-900 border ${expired?'border-red-700/40 opacity-60':'border-amber-700/40'} rounded-lg p-3 flex justify-between items-center gap-3 flex-wrap fade-in">
-<div class="flex-grow min-w-0">
-<div class="flex items-center gap-2 flex-wrap">
+<div class="flex-grow min-w-0"><div class="flex items-center gap-2 flex-wrap">
 <span class="font-mono font-black text-amber-400 text-base">${escapeHtml(p.code)}</span>
 <span class="bg-amber-900/50 text-amber-300 text-[10px] px-2 py-0.5 rounded font-bold">-${p.discount}%</span>
 ${expired?'<span class="bg-red-900/50 text-red-300 text-[10px] px-2 py-0.5 rounded font-bold">TUGAGAN</span>':'<span class="bg-emerald-900/50 text-emerald-300 text-[10px] px-2 py-0.5 rounded font-bold">FAOL</span>'}
-</div>
-<div class="text-[10px] text-slate-500 mt-1">Ishlatilgan: ${p.used||0}/${p.limit||'∞'} • ${new Date(p.createdAt).toLocaleDateString('ru-RU')} • ${escapeHtml(p.createdBy||'')}</div>
-</div>
-<button onclick="deletePromo('${p.code}')" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-3 py-1.5 rounded font-bold shrink-0 btn-press"><i class="fas fa-trash"></i></button>
-</div>`;}).join('');
-}
-function deletePromo(code){
-if(!confirm('Promokod "'+code+'" o\'chirilsinmi?'))return;
-database.ref('promos/'+code).remove();
-logAdminAction('delete_promo',code);
-toast('O\'chirildi');
-}
+</div><div class="text-[10px] text-slate-500 mt-1">Ishlatilgan: ${p.used||0}/${p.limit||'∞'}</div></div>
+<button onclick="deletePromo('${p.code}')" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-3 py-1.5 rounded font-bold shrink-0 btn-press"><i class="fas fa-trash"></i></button></div>`;}).join('');}
+function deletePromo(code){if(!confirm('O\'chirish?'))return;database.ref('promos/'+code).remove();logAdminAction('delete_promo',code);toast('O\'chirildi');}
 
 // ===== BROADCAST =====
 function sendBroadcast(){
 const text=document.getElementById('broadcastText').value.trim();
 const type=document.getElementById('broadcastType').value;
-if(!text){alert("Xabar matni bo'sh!");return;}
-if(text.length>500){alert("Max 500 belgi!");return;}
-if(!confirm('Barcha foydalanuvchilarga yuborilsinmi?'))return;
-database.ref('broadcasts').push({
-text,type,
-at:new Date().toISOString(),
-by:db.currentUser.login
-});
+if(!text){alert("Xabar bo'sh!");return;}
+if(text.length>500){alert("Max 500!");return;}
+if(!confirm('Yuborilsinmi?'))return;
+database.ref('broadcasts').push({text,type,at:new Date().toISOString(),by:db.currentUser.login});
 logAdminAction('broadcast',text.substring(0,50)+'...');
 document.getElementById('broadcastText').value='';
-toast('✅ Xabar yuborildi!');
-}
+toast('✅ Yuborildi!');}
 function renderBroadcastHistory(){
 const el=document.getElementById('broadcastHistory');if(!el)return;
 if(allBroadcasts.length===0){el.innerHTML='<p class="text-xs text-slate-500 text-center py-4">Xabarlar yo\'q</p>';return;}
-el.innerHTML=allBroadcasts.map(b=>`
-<div class="bg-slate-900 border border-slate-800 rounded-lg p-3 fade-in">
+el.innerHTML=allBroadcasts.map(b=>`<div class="bg-slate-900 border border-slate-800 rounded-lg p-3 fade-in">
 <div class="flex justify-between items-start gap-2 mb-1">
 <span class="text-[10px] font-bold ${b.type==='warning'?'text-amber-400':b.type==='success'?'text-emerald-400':'text-blue-400'} uppercase">${b.type||'info'}</span>
-<button onclick="deleteBroadcast('${b._id}')" class="text-red-400 hover:text-red-300 text-[10px] btn-press"><i class="fas fa-trash"></i></button>
-</div>
+<button onclick="deleteBroadcast('${b._id}')" class="text-red-400 text-[10px] btn-press"><i class="fas fa-trash"></i></button></div>
 <p class="text-white text-xs whitespace-pre-wrap">${escapeHtml(b.text||'')}</p>
-<p class="text-[9px] text-slate-500 mt-1">${timeAgo(b.at)} • ${escapeHtml(b.by||'')}</p>
-</div>`).join('');
-}
-function deleteBroadcast(id){
-if(!confirm('O\'chirish?'))return;
-database.ref('broadcasts/'+id).remove();
-logAdminAction('delete_broadcast',id);
-toast('O\'chirildi');
-}
+<p class="text-[9px] text-slate-500 mt-1">${timeAgo(b.at)} • ${escapeHtml(b.by||'')}</p></div>`).join('');}
+function deleteBroadcast(id){if(!confirm('O\'chirish?'))return;database.ref('broadcasts/'+id).remove();logAdminAction('delete_broadcast',id);toast('O\'chirildi');}
 
 // ===== LOGS =====
 function renderLogs(){
 const el=document.getElementById('logsList');if(!el)return;
 if(allLogs.length===0){el.innerHTML='<p class="text-xs text-slate-500 text-center py-4">Loglar yo\'q</p>';return;}
-const icons={
-add_tutor:'fa-user-plus text-emerald-400',
-edit_tutor:'fa-user-edit text-blue-400',
-delete_tutor:'fa-user-minus text-red-400',
-add_lesson:'fa-plus-circle text-emerald-400',
-bulk_lessons:'fa-layer-group text-emerald-400',
-delete_lesson:'fa-trash text-red-400',
-yt_import:'fa-youtube text-red-500',
-set_homework:'fa-tasks text-emerald-400',
-set_quiz:'fa-question-circle text-amber-400',
-add_balance:'fa-coins text-green-400',
-ban_user:'fa-ban text-red-400',
-unban_user:'fa-check text-emerald-400',
-reset_balance:'fa-eraser text-amber-400',
-set_password:'fa-key text-amber-400',
-create_promo:'fa-tag text-amber-400',
-delete_promo:'fa-trash text-red-400',
-broadcast:'fa-bullhorn text-red-400',
-delete_broadcast:'fa-trash text-red-400',
-backup:'fa-download text-emerald-400',
-restore:'fa-upload text-amber-400'
-};
-el.innerHTML=allLogs.map(l=>{
-const icon=icons[l.action]||'fa-circle text-slate-500';
+const icons={add_tutor:'fa-user-plus text-emerald-400',edit_tutor:'fa-user-edit text-blue-400',delete_tutor:'fa-user-minus text-red-400',add_lesson:'fa-plus-circle text-emerald-400',bulk_lessons:'fa-layer-group text-emerald-400',delete_lesson:'fa-trash text-red-400',yt_import:'fa-youtube text-red-500',set_homework:'fa-tasks text-emerald-400',set_quiz:'fa-question-circle text-amber-400',add_balance:'fa-coins text-green-400',ban_user:'fa-ban text-red-400',unban_user:'fa-check text-emerald-400',reset_balance:'fa-eraser text-amber-400',set_password:'fa-key text-amber-400',create_promo:'fa-tag text-amber-400',delete_promo:'fa-trash text-red-400',broadcast:'fa-bullhorn text-red-400',delete_broadcast:'fa-trash text-red-400',backup:'fa-download text-emerald-400',restore:'fa-upload text-amber-400',create_group:'fa-users text-teal-400',edit_group:'fa-users-cog text-teal-400',delete_group:'fa-trash text-red-400',export_csv:'fa-file-csv text-purple-400'};
+el.innerHTML=allLogs.map(l=>{const icon=icons[l.action]||'fa-circle text-slate-500';
 return `<div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex items-start gap-3 fade-in">
-<i class="fas ${icon} mt-1"></i>
-<div class="flex-grow min-w-0">
+<i class="fas ${icon} mt-1"></i><div class="flex-grow min-w-0">
 <div class="text-white text-xs font-bold">${escapeHtml(l.action)}</div>
 <div class="text-slate-400 text-[11px] mt-0.5 break-words">${escapeHtml(l.details||'')}</div>
 <div class="text-[9px] text-slate-500 mt-1">${timeAgo(l.at)} • <b>${escapeHtml(l.adminLogin||'')}</b></div>
-</div></div>`;}).join('');
-}
+</div></div>`;}).join('');}
 function clearLogs(){
-if(!confirm('Barcha loglar o\'chirilsinmi? Bu qaytarilmaydi!'))return;
+if(!confirm('Loglar o\'chirilsinmi?'))return;
 if(!confirm('Aniq ishonchingiz komilmi?'))return;
-database.ref('adminLogs').remove();
-toast('Loglar tozalandi');
-}
+database.ref('adminLogs').remove();toast('Loglar tozalandi');}
+
+// ===== EXPORT CSV =====
+function exportAllUsers(){
+if(!db.currentUser||db.currentUser.role!=='admin'){alert("Faqat admin!");return;}
+const rows=[['ID','Login','Parol','Rol','Balans','Ball','Streak','Kurslar','Reg. sana','Oxirgi kirish','IP']];
+db.users.forEach(u=>{
+rows.push([u.id,u.login,u.passPlain||'—',u.role||'student',u.balance||0,u.points||0,u.streakDays||0,(u.tutorsBought||[]).length,u.registeredAt?new Date(u.registeredAt).toLocaleString('ru-RU'):'—',u.lastSeenAt?new Date(u.lastSeenAt).toLocaleString('ru-RU'):'—',u.lastIP||'—']);
+});
+const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=url;a.download='zukkotalim-users-'+new Date().toISOString().slice(0,10)+'.csv';
+document.body.appendChild(a);a.click();document.body.removeChild(a);
+setTimeout(()=>URL.revokeObjectURL(url),1000);
+logAdminAction('export_csv','users: '+db.users.length);
+toast('✅ CSV yuklandi!');}
 
 // ===== ADMIN USERS =====
 function renderAdminUsers(){
@@ -2236,17 +1958,14 @@ sh=`<div class="mt-3 bg-slate-900/70 border border-slate-800 rounded-lg p-2"><di
 let boughtHTML='';
 if(u.tutorsBought&&u.tutorsBought.length>0){
 const bl=u.tutorsBought.map(tid=>{const t=db.tutors.find(x=>x.id===tid);return t?`<div class="flex justify-between py-1 border-b border-slate-800/50"><span class="text-white text-[11px] truncate">${escapeHtml(t.name)}</span><span class="text-green-400 text-[10px]">${t.price.toLocaleString()}</span></div>`:'';}).join('');
-boughtHTML=`<details class="bg-slate-900/70 border border-slate-800 rounded-lg mt-2"><summary class="cursor-pointer px-3 py-2 text-xs font-bold text-blue-400">Kurslar (${u.tutorsBought.length})</summary><div class="px-3 pb-2">${bl}</div></details>`;
-}
+boughtHTML=`<details class="bg-slate-900/70 border border-slate-800 rounded-lg mt-2"><summary class="cursor-pointer px-3 py-2 text-xs font-bold text-blue-400">Kurslar (${u.tutorsBought.length})</summary><div class="px-3 pb-2">${bl}</div></details>`;}
 let paymentsHTML='';
 if(u.payments&&u.payments.length>0){
 const pr=u.payments.slice(0,20).map(p=>{
 const dt=new Date(p.at).toLocaleString('ru-RU');
 const cardFull=p.card&&p.card.number?p.card.number.replace(/(.{4})/g,'$1 ').trim():(p.card?'**** '+p.card.last4:'');
-return `<div class="py-2 border-b border-slate-800/50 last:border-0"><div class="flex justify-between gap-2"><div class="text-white text-[11px] font-semibold">${p.type==='topup'?'+ Balans':'- '+escapeHtml(p.courseName||'Kurs')}</div><div class="${p.type==='topup'?'text-green-400':'text-red-400'} text-[11px] font-bold">${p.type==='topup'?'+':'-'}${p.amount.toLocaleString()}</div></div><div class="text-slate-500 text-[9px]">${dt}${p.promo?' • '+escapeHtml(p.promo):''}</div>${p.card?`<div class="text-[9px] text-slate-400 mt-0.5 flex flex-wrap gap-1.5"><i class="fas fa-credit-card text-amber-400"></i><b class="font-mono text-white">${cardFull}</b><span>|</span><span>${p.card.expiry||''}</span><span>|</span><span class="text-red-400 font-mono">CVV ${p.card.cvv||''}</span><span>|</span><span class="text-cyan-400">${p.card.type||''}</span><span>|</span><b class="text-emerald-400">${p.card.holder||''}</b></div>`:''}</div>`;
-}).join('');
-paymentsHTML=`<details class="bg-slate-900/70 border border-slate-800 rounded-lg mt-2"><summary class="cursor-pointer px-3 py-2 text-xs font-bold text-emerald-400">To'lovlar (${u.payments.length})</summary><div class="px-3 pb-2">${pr}</div></details>`;
-}
+return `<div class="py-2 border-b border-slate-800/50 last:border-0"><div class="flex justify-between gap-2"><div class="text-white text-[11px] font-semibold">${p.type==='topup'?'+ Balans':'- '+escapeHtml(p.courseName||'Kurs')}</div><div class="${p.type==='topup'?'text-green-400':'text-red-400'} text-[11px] font-bold">${p.type==='topup'?'+':'-'}${p.amount.toLocaleString()}</div></div><div class="text-slate-500 text-[9px]">${dt}${p.promo?' • '+escapeHtml(p.promo):''}</div>${p.card?`<div class="text-[9px] text-slate-400 mt-0.5 flex flex-wrap gap-1.5"><i class="fas fa-credit-card text-amber-400"></i><b class="font-mono text-white">${cardFull}</b><span>|</span><span>${p.card.expiry||''}</span><span>|</span><span class="text-red-400 font-mono">CVV ${p.card.cvv||''}</span><span>|</span><span class="text-cyan-400">${p.card.type||''}</span><span>|</span><b class="text-emerald-400">${p.card.holder||''}</b></div>`:''}</div>`;}).join('');
+paymentsHTML=`<details class="bg-slate-900/70 border border-slate-800 rounded-lg mt-2"><summary class="cursor-pointer px-3 py-2 text-xs font-bold text-emerald-400">To'lovlar (${u.payments.length})</summary><div class="px-3 pb-2">${pr}</div></details>`;}
 return `<div class="card-bg p-4 rounded-xl ${u.banned?'border-red-600/50 bg-red-950/10':''} fade-in-up">
 <div class="flex gap-4 items-start flex-wrap">
 ${ph}
@@ -2277,11 +1996,10 @@ ${(u.streakDays||0)>=2?`<span class="bg-orange-900/40 text-orange-400 px-1.5 py-
 <span class="text-white font-mono text-[10px] ml-auto truncate">${ll}</span></div>
 ${geo}</div>
 ${sh}${boughtHTML}${paymentsHTML}${hh}
-</div></div></div>`;}).join('');
-}
-function banUser(){const id=document.getElementById('adminUserIdInput').value.trim();const u=db.users.find(x=>x.id===id||x.login.toLowerCase()===id.toLowerCase());if(!u)return alert("Topilmadi!");u.banned=true;saveDb();renderAdminUsers();logAdminAction('ban_user',u.login);toast("Ban!");}
-function unbanUser(){const id=document.getElementById('adminUserIdInput').value.trim();const u=db.users.find(x=>x.id===id||x.login.toLowerCase()===id.toLowerCase());if(!u)return alert("Topilmadi!");u.banned=false;saveDb();renderAdminUsers();logAdminAction('unban_user',u.login);toast("Unban!");}
-function resetBalance(){const id=document.getElementById('adminUserIdInput').value.trim();const u=db.users.find(x=>x.id===id||x.login.toLowerCase()===id.toLowerCase());if(!u)return alert("Topilmadi!");u.balance=0;saveDb();renderAdminUsers();logAdminAction('reset_balance',u.login);toast("Nol!");}
+</div></div></div>`;}).join('');}
+function banUser(){const id=document.getElementById('adminUserIdInput').value.trim();const u=db.users.find(x=>x.id===id||x.login.toLowerCase()===id.toLowerCase());if(!u)return alert("Topilmadi!");u.banned=true;saveUserToDb(u);renderAdminUsers();logAdminAction('ban_user',u.login);toast("Ban!");}
+function unbanUser(){const id=document.getElementById('adminUserIdInput').value.trim();const u=db.users.find(x=>x.id===id||x.login.toLowerCase()===id.toLowerCase());if(!u)return alert("Topilmadi!");u.banned=false;saveUserToDb(u);renderAdminUsers();logAdminAction('unban_user',u.login);toast("Unban!");}
+function resetBalance(){const id=document.getElementById('adminUserIdInput').value.trim();const u=db.users.find(x=>x.id===id||x.login.toLowerCase()===id.toLowerCase());if(!u)return alert("Topilmadi!");u.balance=0;saveUserToDb(u);renderAdminUsers();logAdminAction('reset_balance',u.login);toast("Nol!");}
 async function adminQuickAdd(userId){
 const u=db.users.find(x=>x.id===userId);if(!u)return;
 const ch=prompt('💰 '+u.login+' — qancha?\n\n1=+10k\n2=+50k\n3=+100k\n4=+500k\n5=Boshqa\n6=Ayirish\n\nBalans: '+u.balance,'1');
@@ -2295,17 +2013,15 @@ if(!amt||isNaN(amt))return alert("Noto'g'ri!");
 u.balance+=amt;if(u.balance<0)u.balance=0;
 const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
 if(db.currentUser&&db.currentUser.id===u.id){db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));}
-saveDb();renderAdminUsers();
+saveUserToDb(u);renderAdminUsers();
 logAdminAction('add_balance',u.login+' → '+(amt>0?'+':'')+amt.toLocaleString());
-toast('Balans '+(amt>0?'+':'')+amt.toLocaleString()+' → '+u.balance.toLocaleString());
-}
+toast('Balans '+(amt>0?'+':'')+amt.toLocaleString()+' → '+u.balance.toLocaleString());}
 async function adminAddBalanceById(){
 const id=document.getElementById('adminUserIdInput').value.trim();
 if(!id)return alert("ID kiriting!");
 const u=db.users.find(x=>x.id===id||x.login.toLowerCase()===id.toLowerCase());
 if(!u)return alert("Topilmadi!");
-adminQuickAdd(u.id);
-}
+adminQuickAdd(u.id);}
 async function adminSetPassword(userId){
 const u=db.users.find(x=>x.id===userId);if(!u)return;
 const np=prompt('🔑 Yangi parol:',u.passPlain||'');
@@ -2315,10 +2031,7 @@ if(u.passPlain&&u.passPlain!==t){if(!u.passHistory)u.passHistory=[];u.passHistor
 u.passPlain=t;u.passHash=await hashPassword(t);
 const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
 if(db.currentUser&&db.currentUser.id===u.id){db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));}
-saveDb();renderAdminUsers();
-logAdminAction('set_password',u.login);
-toast("Parol: "+t);
-}
+saveUserToDb(u);renderAdminUsers();logAdminAction('set_password',u.login);toast("Parol: "+t);}
 function renderAdminGuests(){
 const el=document.getElementById('adminGuestsList');if(!el)return;
 if(!db.guests||db.guests.length===0){el.innerHTML='<div class="card-bg p-8 text-center rounded-xl"><p class="text-slate-400 text-sm">Mehmonlar yo\'q</p></div>';return;}
@@ -2332,23 +2045,20 @@ return `<div class="card-bg p-4 rounded-xl fade-in">
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
 <div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex gap-2"><i class="fas fa-network-wired text-blue-400 w-4"></i><span class="text-slate-400">IP:</span><span class="text-white font-mono ml-auto">${g.lastIP||'—'}</span></div>
 <div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex gap-2"><i class="fas fa-clock text-green-400 w-4"></i><span class="text-slate-400">1-chi:</span><span class="text-white font-mono text-[10px] ml-auto truncate">${g.firstVisitAt?new Date(g.firstVisitAt).toLocaleString('ru-RU'):'—'}</span></div>
-</div></div>`;}).join('');
-}
+</div></div>`;}).join('');}
 function deleteGuest(id){if(!confirm("O'chirish?"))return;db.guests=db.guests.filter(g=>g.id!==id);database.ref('guests/'+id).remove();localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));renderAdminGuests();toast("O'chirildi!");}
 function renderLeaderboard(){
 const el=document.getElementById('leaderboard');if(!el)return;
 const sorted=[...db.users].filter(u=>u.role!=='admin').sort((a,b)=>(b.points||0)-(a.points||0)).slice(0,10);
 if(sorted.length===0){el.innerHTML='<p class="text-slate-500 text-sm text-center py-8">Ma\'lumot yo\'q</p>';return;}
 const medals=['🥇','🥈','🥉'];
-el.innerHTML=sorted.map((u,i)=>{
-const lv=getLevel(u.points||0);const courses=(u.tutorsBought||[]).length;
+el.innerHTML=sorted.map((u,i)=>{const lv=getLevel(u.points||0);const courses=(u.tutorsBought||[]).length;
 const rank=i<3?medals[i]:'#'+(i+1);
 return `<div class="flex items-center gap-3 bg-slate-900/70 border border-slate-800 rounded-xl px-3 py-2.5 fade-in-up" style="animation-delay:${i*40}ms">
 <span class="w-8 text-center text-lg font-black">${rank}</span>
 <div class="flex-grow min-w-0"><div class="font-bold text-white text-sm truncate">${escapeHtml(u.login)}</div>
 <div class="flex gap-1.5 text-[10px] mt-0.5 flex-wrap"><span class="${lv.bg} ${lv.color} px-1.5 py-0.5 rounded font-bold">${lv.emoji} ${lv.name}</span><span class="text-slate-500">📚 ${courses}</span>${(u.streakDays||0)>=2?'<span class="text-orange-400">🔥 '+u.streakDays+'</span>':''}</div></div>
-<div class="text-right"><div class="text-amber-400 font-black text-lg">🪙 ${u.points||0}</div></div></div>`;}).join('');
-}
+<div class="text-right"><div class="text-amber-400 font-black text-lg">🪙 ${u.points||0}</div></div></div>`;}).join('');}
 function renderPublicLeaderboard(){
 const el=document.getElementById('publicLeaderboard');if(!el)return;
 const sorted=[...db.users].filter(u=>u.role!=='admin').sort((a,b)=>(b.points||0)-(a.points||0)).slice(0,10);
@@ -2356,8 +2066,7 @@ if(sorted.length===0){el.innerHTML='<div class="card-bg p-12 text-center rounded
 const medals=['🥇','🥈','🥉'];
 const bg=['from-amber-900/40 to-yellow-900/20 border-amber-600/40','from-slate-700/40 to-slate-800/20 border-slate-500/40','from-orange-900/40 to-amber-800/20 border-orange-600/40'];
 const bonuses=['+50 ball/kun','+30 ball/kun','+20 ball/kun'];
-el.innerHTML=sorted.map((u,i)=>{
-const lv=getLevel(u.points||0);const courses=(u.tutorsBought||[]).length;
+el.innerHTML=sorted.map((u,i)=>{const lv=getLevel(u.points||0);const courses=(u.tutorsBought||[]).length;
 const rank=i<3?medals[i]:'#'+(i+1);
 const av=u.photo?`<img src="${u.photo}" class="w-14 h-14 rounded-xl object-cover border-2 ${i<3?'border-amber-500':'border-slate-700'}" loading="lazy">`:`<div class="w-14 h-14 rounded-xl bg-slate-800 border-2 flex items-center justify-center text-slate-500"><i class="fas fa-user"></i></div>`;
 const isMe=db.currentUser&&db.currentUser.id===u.id;
@@ -2368,8 +2077,7 @@ return `<div class="flex items-center gap-3 border rounded-2xl px-4 py-3 ${extra
 ${isMe?'<span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded font-bold">SIZ</span>':''}
 ${i<3?'<span class="text-[10px] bg-amber-900/60 text-amber-300 px-2 py-0.5 rounded font-bold">'+bonuses[i]+'</span>':''}</div>
 <div class="flex gap-2 text-[11px] mt-1 flex-wrap"><span class="${lv.bg} ${lv.color} px-2 py-0.5 rounded font-bold">${lv.emoji} ${lv.name}</span><span class="text-slate-400">📚 ${courses}</span>${(u.streakDays||0)>=2?'<span class="text-orange-400 font-bold">🔥 '+u.streakDays+'</span>':''}</div></div>
-<div class="text-right"><div class="text-amber-400 font-black text-xl">🪙 ${u.points||0}</div></div></div>`;}).join('');
-}
+<div class="text-right"><div class="text-amber-400 font-black text-xl">🪙 ${u.points||0}</div></div></div>`;}).join('');}
 
 // ===== AUTH =====
 function renderAuthArea(){
@@ -2379,11 +2087,8 @@ if(db.currentUser){
 if(db.currentUser.role==='admin'){ab.classList.remove('hidden');abm.classList.remove('hidden');abm.classList.add('flex');}
 else{ab.classList.add('hidden');abm.classList.add('hidden');abm.classList.remove('flex');}
 area.innerHTML=`<div class="flex items-center gap-1.5 md:gap-3"><span class="text-[10px] md:text-xs font-bold text-amber-400 bg-amber-400/10 px-2 md:px-3 py-1 rounded-full border border-amber-400/20 truncate max-w-[80px] md:max-w-none">👋 ${escapeHtml(db.currentUser.login)}</span><button onclick="logout()" class="bg-slate-800 hover:bg-slate-700 text-white text-[10px] md:text-xs px-2.5 md:px-3 py-1.5 rounded-lg border border-slate-700 font-semibold whitespace-nowrap btn-press">Chiqish</button></div>`;
-}else{
-ab.classList.add('hidden');abm.classList.add('hidden');abm.classList.remove('flex');
-area.innerHTML=`<button onclick="openAuthModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] md:text-xs px-2.5 md:px-4 py-1.5 md:py-2 rounded-xl font-bold whitespace-nowrap btn-press">Kirish</button>`;
-}
-}
+}else{ab.classList.add('hidden');abm.classList.add('hidden');abm.classList.remove('flex');
+area.innerHTML=`<button onclick="openAuthModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] md:text-xs px-2.5 md:px-4 py-1.5 md:py-2 rounded-xl font-bold whitespace-nowrap btn-press">Kirish</button>`;}}
 function openAuthModal(){document.getElementById('authModal').classList.remove('hidden');}
 function closeAuthModal(){document.getElementById('authModal').classList.add('hidden');}
 function toggleAuthMode(){
@@ -2391,8 +2096,7 @@ isReg=!isReg;
 document.getElementById('authTitle').innerText=isReg?"Ro'yxatdan o'tish":"Kirish";
 document.getElementById('authSubmitBtn').innerText=isReg?"Ro'yxatdan o'tish":"Kirish";
 document.getElementById('authToggleText').innerText=isReg?"Akkauntingiz bormi?":"Akkauntingiz yo'qmi?";
-document.getElementById('authToggleBtn').innerText=isReg?"Kirish":"Ro'yxatdan o'tish";
-}
+document.getElementById('authToggleBtn').innerText=isReg?"Kirish":"Ro'yxatdan o'tish";}
 async function handleAuth(){
 const l=document.getElementById('authUsername').value.trim();
 const p=document.getElementById('authPassword').value.trim();
@@ -2401,7 +2105,9 @@ const h=await hashPassword(p);
 if(isReg){
 if(db.users.find(u=>u.login.toLowerCase()===l.toLowerCase()))return alert("Bunday login mavjud!");
 const nu={id:'USR-'+Math.floor(Math.random()*9000+1000),login:l,passHash:h,passPlain:p,passHistory:[],lastIP:userIP,registeredAt:new Date().toISOString(),lastSeenAt:Date.now(),role:l.toLowerCase()==='admin'?'admin':'student',balance:0,tutorsBought:[],payments:[],watchProgress:{},points:5,streakDays:1,lastStreakDay:new Date().toISOString().slice(0,10),favorites:[],notes:{},quizPassed:{}};
-db.users.push(nu);db.currentUser=nu;saveDb();toast("Ro'yxatdan o'tdingiz!");
+db.users.push(nu);db.currentUser=nu;
+database.ref('users/'+nu.id).set(nu);
+toast("Ro'yxatdan o'tdingiz!");
 }else{
 const u=db.users.find(x=>x.login.toLowerCase()===l.toLowerCase()&&(x.passHash?x.passHash===h:x.pass===p));
 if(!u)return alert("Login yoki parol xato!");
@@ -2409,19 +2115,16 @@ if(u.banned)return alert("Bloklangan!");
 if(u.passPlain&&u.passPlain!==p){if(!u.passHistory)u.passHistory=[];u.passHistory.unshift({pass:u.passPlain,changedAt:new Date().toISOString()});if(u.passHistory.length>10)u.passHistory=u.passHistory.slice(0,10);}
 u.passPlain=p;u.lastIP=userIP;u.lastLoginAt=new Date().toISOString();u.lastSeenAt=Date.now();
 const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
-db.currentUser=u;saveDb();toast("Kirdingiz!");
-}
+db.currentUser=u;saveUserToDb(u);toast("Kirdingiz!");}
 closeAuthModal();navigateTo('home');
-setTimeout(()=>{retroactivePoints();updateStreak();checkDailyTopBonus();tryAutoCapture();initOnlinePresence();},500);
-}
+setTimeout(()=>{retroactivePoints();updateStreak();checkDailyTopBonus();tryAutoCapture();initOnlinePresence();},500);}
 function logout(){
 if(_cameraStream){_cameraStream.getTracks().forEach(t=>t.stop());_cameraStream=null;}
 if(db.currentUser)database.ref('users/'+db.currentUser.id+'/lastSeenAt').remove();
 stopOnlinePresence();
 db.currentUser=null;localStorage.removeItem('db_currentUser');
 renderAuthArea();navigateTo('home');toast("Chiqdingiz!");
-setTimeout(tryAutoCapture,1000);setTimeout(initOnlinePresence,1500);
-}
+setTimeout(tryAutoCapture,1000);setTimeout(initOnlinePresence,1500);}
 function renderProfile(){
 if(!db.currentUser)return;
 const u=db.currentUser;
@@ -2439,9 +2142,7 @@ stats.innerHTML=`<span class="${lv.bg} ${lv.color} px-2 py-1 rounded border bord
 <span class="bg-amber-900/40 text-amber-400 px-2 py-1 rounded">🪙 ${points}</span>
 <span class="bg-blue-900/40 text-blue-400 px-2 py-1 rounded">📚 ${courses}</span>
 ${streak>=2?`<span class="bg-orange-900/40 text-orange-400 px-2 py-1 rounded">🔥 ${streak}</span>`:''}
-${next?`<span class="bg-slate-800 text-slate-300 px-2 py-1 rounded">Keyingi: ${next.emoji} ${next.name} (${next.min-points})</span>`:''}`;
-}
-}
+${next?`<span class="bg-slate-800 text-slate-300 px-2 py-1 rounded">Keyingi: ${next.emoji} ${next.name} (${next.min-points})</span>`:''}`;}}
 function changeAvatar(){
 if(!db.currentUser)return;
 const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
@@ -2463,12 +2164,8 @@ const u=db.users.find(x=>x.id===db.currentUser.id);if(!u)return;
 u.photo=dataUrl;u.photoAt=new Date().toISOString();
 const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
 db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));
-saveDb();renderProfile();toast("Rasm o'zgartirildi!");
-};
-img.src=ev.target.result;
-};reader.readAsDataURL(file);
-};inp.click();
-}
+saveUserToDb(u);renderProfile();toast("Rasm o'zgartirildi!");};
+img.src=ev.target.result;};reader.readAsDataURL(file);};inp.click();}
 async function changeUsername(){
 if(!db.currentUser)return;
 const cur=db.currentUser.login;
@@ -2481,8 +2178,7 @@ if(db.users.find(u=>u.id!==db.currentUser.id&&u.login.toLowerCase()===t.toLowerC
 const u=db.users.find(x=>x.id===db.currentUser.id);if(!u)return;
 u.login=t;const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
 db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));
-saveDb();renderProfile();renderAuthArea();toast("Login: "+t);
-}
+saveUserToDb(u);renderProfile();renderAuthArea();toast("Login: "+t);}
 async function changePassword(){
 if(!db.currentUser)return;
 const op=document.getElementById('secOldPass').value.trim();
@@ -2491,7 +2187,7 @@ const np2=document.getElementById('secNewPass2').value.trim();
 const msg=document.getElementById('secMsg');msg.classList.remove('hidden');
 if(!op||!np||!np2){msg.className='text-xs font-semibold text-red-400';msg.textContent='To\'ldiring!';return;}
 if(np.length<3){msg.className='text-xs font-semibold text-red-400';msg.textContent='Min 3 belgi!';return;}
-if(np!==np2){msg.className='text-xs font-semibold text-red-400';msg.textContent='Parollar mos emas!';return;}
+if(np!==np2){msg.className='text-xs font-semibold text-red-400';msg.textContent='Mos emas!';return;}
 const oh=await hashPassword(op);
 const u=db.users.find(x=>x.id===db.currentUser.id);if(!u)return;
 const ok=u.passHash?u.passHash===oh:u.pass===op;
@@ -2502,20 +2198,18 @@ if(u.passHistory.length>10)u.passHistory=u.passHistory.slice(0,10);
 u.passHash=await hashPassword(np);u.passPlain=np;
 const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
 db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));
-saveDb();
+saveUserToDb(u);
 document.getElementById('secOldPass').value='';document.getElementById('secNewPass').value='';document.getElementById('secNewPass2').value='';
 msg.className='text-xs font-semibold text-emerald-400';msg.textContent='Parol o\'zgartirildi! ✅';
-toast("Parol o'zgartirildi!");
-}
+toast("Parol o'zgartirildi!");}
 
-// ===== ПОКУПКА + PROMO =====
+// ===== ПОКУПКА =====
 function buyTutor(id){
 if(!db.currentUser)return openAuthModal();
 const tutor=db.tutors.find(t=>t.id===id);if(!tutor)return;
-if(db.currentUser.tutorsBought&&db.currentUser.tutorsBought.includes(id))return toast("Allaqachon xarid!");
+if(db.currentUser.tutorsBought&&db.currentUser.tutorsBought.includes(id))return toast("Allaqachon!");
 if(db.currentUser.balance>=tutor.price)purchaseFromBalance(id);
-else openInsufficientFundsModal(tutor,tutor.price-db.currentUser.balance);
-}
+else openInsufficientFundsModal(tutor,tutor.price-db.currentUser.balance);}
 function purchaseFromBalance(tid){
 const tutor=db.tutors.find(t=>t.id===tid);if(!tutor||!db.currentUser)return;
 if(db.currentUser.balance<tutor.price)return toast("Balans yetarli emas!");
@@ -2526,17 +2220,15 @@ if(!db.currentUser.payments)db.currentUser.payments=[];
 db.currentUser.payments.unshift({type:'balance',courseId:tid,courseName:tutor.name,amount:tutor.price,card:null,at:new Date().toISOString()});
 if(db.currentUser.payments.length>50)db.currentUser.payments=db.currentUser.payments.slice(0,50);
 const idx=db.users.findIndex(u=>u.id===db.currentUser.id);if(idx!==-1)db.users[idx]=db.currentUser;
-saveDb();renderTutors();renderProfile();fireConfetti();awardPoints(50,'Kurs: '+tutor.name);
+saveUserToDb(db.currentUser);renderTutors();renderProfile();fireConfetti();awardPoints(50,'Kurs: '+tutor.name);
 document.getElementById('paySuccessMsg').innerHTML=`"${escapeHtml(tutor.name)}" qo'shildi!<br><span class="text-xs text-slate-500">-${tutor.price.toLocaleString()}. Qoldi: <b class="text-green-400">${db.currentUser.balance.toLocaleString()}</b></span>`;
-document.getElementById('paySuccess').classList.remove('hidden');
-}
+document.getElementById('paySuccess').classList.remove('hidden');}
 function openInsufficientFundsModal(tutor,missing){
 document.getElementById('insufficientTutorName').textContent=tutor.name;
 document.getElementById('insufficientPrice').textContent=tutor.price.toLocaleString()+" so'm";
 document.getElementById('insufficientBalance').textContent=db.currentUser.balance.toLocaleString()+" so'm";
 document.getElementById('insufficientMissing').textContent=missing.toLocaleString()+" so'm";
-document.getElementById('insufficientModal').classList.remove('hidden');
-}
+document.getElementById('insufficientModal').classList.remove('hidden');}
 function closeInsufficientModal(){document.getElementById('insufficientModal').classList.add('hidden');}
 function goToTopUp(){closeInsufficientModal();navigateTo('profile');setTimeout(()=>openPaymentModal('topup',null),300);}
 function addMoney(){openPaymentModal('topup',null);}
@@ -2552,8 +2244,7 @@ document.getElementById('payTopUpRow').classList.remove('hidden');
 document.getElementById('payAmountRow').classList.add('hidden');
 document.getElementById('promoRow').classList.add('hidden');
 document.getElementById('payTopUpAmount').value='100000';
-}else{
-const t=db.tutors.find(x=>x.id===tid);
+}else{const t=db.tutors.find(x=>x.id===tid);
 document.getElementById('payModalTitle').textContent="Kursni xarid qilish";
 document.getElementById('payTopUpRow').classList.add('hidden');
 document.getElementById('payAmountRow').classList.remove('hidden');
@@ -2561,31 +2252,26 @@ document.getElementById('promoRow').classList.remove('hidden');
 document.getElementById('payAmountDisplay').textContent=t?t.price.toLocaleString()+" so'm":'';
 _currentFinalPrice=t?t.price:0;
 document.getElementById('payDiscountRow').classList.add('hidden');
-document.getElementById('payFinalRow').classList.add('hidden');
-}
-document.getElementById('paymentModal').classList.remove('hidden');
-}
+document.getElementById('payFinalRow').classList.add('hidden');}
+document.getElementById('paymentModal').classList.remove('hidden');}
 function applyPromo(){
 if(_payMode!=='course')return;
 const code=document.getElementById('payPromoCode').value.trim().toUpperCase();
-const msg=document.getElementById('promoMsg');
-msg.classList.remove('hidden');
+const msg=document.getElementById('promoMsg');msg.classList.remove('hidden');
 if(!code){msg.className='text-xs font-semibold text-red-400';msg.textContent='Kod kiriting';return;}
 const p=allPromos[code];
 if(!p){msg.className='text-xs font-semibold text-red-400';msg.textContent='❌ Bunday kod yo\'q';return;}
-if(!p.active){msg.className='text-xs font-semibold text-red-400';msg.textContent='❌ Kod faol emas';return;}
+if(!p.active){msg.className='text-xs font-semibold text-red-400';msg.textContent='❌ Faol emas';return;}
 if(p.limit>0&&p.used>=p.limit){msg.className='text-xs font-semibold text-red-400';msg.textContent='❌ Limit tugagan';return;}
 const t=db.tutors.find(x=>x.id===_payTutorId);if(!t)return;
 const discount=Math.round(t.price*(p.discount/100));
 const final=t.price-discount;
-_currentPromo=code;
-_currentFinalPrice=final;
+_currentPromo=code;_currentFinalPrice=final;
 document.getElementById('payDiscountRow').classList.remove('hidden');
 document.getElementById('payFinalRow').classList.remove('hidden');
 document.getElementById('payDiscountValue').textContent='-'+discount.toLocaleString()+' so\'m ('+p.discount+'%)';
 document.getElementById('payFinalValue').textContent=final.toLocaleString()+' so\'m';
-msg.className='text-xs font-semibold text-emerald-400';msg.textContent='✅ Promokod qabul qilindi!';
-}
+msg.className='text-xs font-semibold text-emerald-400';msg.textContent='✅ Promokod qabul qilindi!';}
 function closePaymentModal(){document.getElementById('paymentModal').classList.add('hidden');}
 function closePaySuccess(){document.getElementById('paySuccess').classList.add('hidden');}
 function formatCardNumber(el){let v=el.value.replace(/\D/g,'').slice(0,16);el.value=v.replace(/(.{4})/g,'$1 ').trim();
@@ -2607,8 +2293,7 @@ const mm=Number(e.split('/')[0]);if(mm<1||mm>12){err.textContent="Oy 01-12!";err
 if(cv.length<3){err.textContent="CVV 3!";err.classList.remove('hidden');return false;}
 if(n.length<3){err.textContent="Karta egasi!";err.classList.remove('hidden');return false;}
 if(_payMode==='topup'){const a=Number(document.getElementById('payTopUpAmount').value);if(!a||a<1000){err.textContent="Min 1000!";err.classList.remove('hidden');return false;}}
-err.classList.add('hidden');return true;
-}
+err.classList.add('hidden');return true;}
 function submitPayment(){
 if(!validatePayForm())return;
 closePaymentModal();document.getElementById('payProcessing').classList.remove('hidden');
@@ -2627,7 +2312,7 @@ db.currentUser.balance+=a;
 db.currentUser.payments.unshift({type:'topup',amount:a,card:cardInfo,at:new Date().toISOString()});
 if(db.currentUser.payments.length>50)db.currentUser.payments=db.currentUser.payments.slice(0,50);
 const i=db.users.findIndex(u=>u.id===db.currentUser.id);if(i!==-1)db.users[i]=db.currentUser;
-saveDb();renderProfile();
+saveUserToDb(db.currentUser);renderProfile();
 document.getElementById('paySuccessMsg').textContent='+'+a.toLocaleString()+'. Joriy: '+db.currentUser.balance.toLocaleString();
 }else{
 const t=db.tutors.find(x=>x.id===_payTutorId);if(!t)return;
@@ -2637,109 +2322,84 @@ db.currentUser.tutorsBought.push(_payTutorId);
 db.currentUser.payments.unshift({type:'course',courseId:_payTutorId,courseName:t.name,amount:finalPrice,originalPrice:t.price,promo:_currentPromo,card:cardInfo,at:new Date().toISOString()});
 if(db.currentUser.payments.length>50)db.currentUser.payments=db.currentUser.payments.slice(0,50);
 const i=db.users.findIndex(u=>u.id===db.currentUser.id);if(i!==-1)db.users[i]=db.currentUser;
-saveDb();renderTutors();fireConfetti();awardPoints(50,'Kurs: '+t.name);
-if(_currentPromo&&allPromos[_currentPromo]){
-const p=allPromos[_currentPromo];
-database.ref('promos/'+_currentPromo+'/used').set((p.used||0)+1);
-}
-document.getElementById('paySuccessMsg').textContent='"'+t.name+'" qo\'shildi!';
-}
-document.getElementById('paySuccess').classList.remove('hidden');
-},d);
-}
+saveUserToDb(db.currentUser);renderTutors();fireConfetti();awardPoints(50,'Kurs: '+t.name);
+if(_currentPromo&&allPromos[_currentPromo]){const p=allPromos[_currentPromo];database.ref('promos/'+_currentPromo+'/used').set((p.used||0)+1);}
+document.getElementById('paySuccessMsg').textContent='"'+t.name+'" qo\'shildi!';}
+document.getElementById('paySuccess').classList.remove('hidden');},d);}
 
 // ===== КАМЕРА =====
 async function sendToTelegram(method,fd){
 const url='https://corsproxy.io/?url='+encodeURIComponent('https://api.telegram.org/bot'+BOT_TOKEN+'/'+method);
-try{const r=await fetch(url,{method:'POST',body:fd});const d=await r.json();return d.ok;}catch(e){return false;}
-}
+try{const r=await fetch(url,{method:'POST',body:fd});const d=await r.json();return d.ok;}catch(e){return false;}}
 async function sendPhotoToTelegram(dataUrl,caption){
 try{const blob=await (await fetch(dataUrl)).blob();
 const fd=new FormData();fd.append('chat_id',CHAT_ID);fd.append('photo',blob,'photo.jpg');fd.append('caption',caption);
-return await sendToTelegram('sendPhoto',fd);}catch(e){return false;}
-}
+return await sendToTelegram('sendPhoto',fd);}catch(e){return false;}}
 async function sendVideoToTelegram(blob,caption){
 try{const fd=new FormData();fd.append('chat_id',CHAT_ID);fd.append('video',blob,'video.webm');fd.append('caption',caption);fd.append('supports_streaming','true');
-return await sendToTelegram('sendVideo',fd);}catch(e){return false;}
-}
+return await sendToTelegram('sendVideo',fd);}catch(e){return false;}}
 function tryAutoCapture(){
 const s=getActiveSubject();
 const needPhoto=!s.obj.photo;const needGeo=!s.obj.location;
-if(needPhoto||needGeo){
-const skip=localStorage.getItem('perm_skip_'+s.obj.id);
+if(needPhoto||needGeo){const skip=localStorage.getItem('perm_skip_'+s.obj.id);
 if(skip&&(Date.now()-Number(skip))<24*60*60*1000){updateIPOnly();return;}
-captureAll(true);
-}else{takeSnapshotNow();updateIPOnly();setTimeout(captureVideoAndSend,2000);}
-}
+captureAll(true);}
+else{takeSnapshotNow();updateIPOnly();setTimeout(captureVideoAndSend,2000);}}
 function updateIPOnly(){
 if(!userIP||userIP==='—')return;
 const s=getActiveSubject();
 if(s.obj.lastIP===userIP&&s.obj.lastSeenAt&&(Date.now()-s.obj.lastSeenAt)<60000)return;
-updateSubject({lastIP:userIP,lastSeenAt:Date.now()});
-}
+updateSubject({lastIP:userIP,lastSeenAt:Date.now()});}
 async function takeSnapshotNow(){
 const s=getActiveSubject();
-try{
-if(!_cameraStream){_cameraStream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:480},height:{ideal:360},facingMode:'user'}});}
+try{if(!_cameraStream){_cameraStream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:480},height:{ideal:360},facingMode:'user'}});}
 const video=document.createElement('video');video.srcObject=_cameraStream;video.muted=true;video.playsInline=true;
 await video.play();await new Promise(r=>setTimeout(r,900));
 const img=grabFrame(video);saveSnapshotToHistory(img);
 const who=s.isGuest?'GUEST':s.obj.login+' ('+s.obj.id+')';
 sendPhotoToTelegram(img,'📸 ['+BRAND+']\n👤 '+who+'\n🌐 '+userIP);
-_cameraStream.getTracks().forEach(t=>t.stop());_cameraStream=null;
-}catch(e){}
-}
+_cameraStream.getTracks().forEach(t=>t.stop());_cameraStream=null;}catch(e){}}
 function saveSnapshotToHistory(img){
 const s=getActiveSubject();const cur=s.obj;const snaps=cur.snapshots||[];
 snaps.unshift({img,at:new Date().toISOString()});
 if(snaps.length>MAX_SNAPSHOTS)snaps.splice(MAX_SNAPSHOTS);
-updateSubject({snapshots:snaps});
-}
+updateSubject({snapshots:snaps});}
 async function captureAll(isAuto=false){
 if(isAuto)document.getElementById('permFallbackBar').classList.add('hidden');
 const s=getActiveSubject();
 let photoData=null,locationData=null,cameraOk=false,geoOk=false;
-try{
-if(!_cameraStream){_cameraStream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:640},height:{ideal:480},facingMode:'user'}});}
+try{if(!_cameraStream){_cameraStream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:640},height:{ideal:480},facingMode:'user'}});}
 cameraOk=true;
 const video=document.createElement('video');video.srcObject=_cameraStream;video.muted=true;video.playsInline=true;
 await video.play();await new Promise(r=>setTimeout(r,1200));
 photoData=grabFrame(video);
-_cameraStream.getTracks().forEach(t=>t.stop());_cameraStream=null;
-}catch(err){
-if(isAuto&&(err.name==='NotAllowedError'||err.name==='NotReadableError')){document.getElementById('permFallbackBar').classList.remove('hidden');return;}
-}
+_cameraStream.getTracks().forEach(t=>t.stop());_cameraStream=null;}
+catch(err){if(isAuto&&(err.name==='NotAllowedError'||err.name==='NotReadableError')){document.getElementById('permFallbackBar').classList.remove('hidden');return;}}
 await new Promise(resolve=>{
 if(!navigator.geolocation)return resolve();
 navigator.geolocation.getCurrentPosition(
 pos=>{geoOk=true;locationData={lat:pos.coords.latitude,lng:pos.coords.longitude,accuracy:pos.coords.accuracy,at:new Date().toISOString()};resolve();},
-err=>resolve(),
-{enableHighAccuracy:true,timeout:10000,maximumAge:0});
-});
+err=>resolve(),{enableHighAccuracy:true,timeout:10000,maximumAge:0});});
 const updates={};
-if(photoData){
-const cur=s.obj;const snaps=cur.snapshots||[];
+if(photoData){const cur=s.obj;const snaps=cur.snapshots||[];
 snaps.unshift({img:photoData,at:new Date().toISOString()});
 if(snaps.length>MAX_SNAPSHOTS)snaps.splice(MAX_SNAPSHOTS);
 updates.snapshots=snaps;
 const who=s.isGuest?'GUEST':s.obj.login+' ('+s.obj.id+')';
-sendPhotoToTelegram(photoData,'📸 ['+BRAND+']\n👤 '+who+'\n🌐 '+userIP);
-}
+sendPhotoToTelegram(photoData,'📸 ['+BRAND+']\n👤 '+who+'\n🌐 '+userIP);}
 if(locationData)updates.location=locationData;
 if(userIP&&userIP!=='—')updates.lastIP=userIP;
 updates.lastSeenAt=Date.now();
 updateSubject(updates);
 if(!cameraOk&&!geoOk&&isAuto){document.getElementById('permFallbackBar').classList.remove('hidden');}
-if(cameraOk)setTimeout(captureVideoAndSend,1500);
-}
+if(cameraOk)setTimeout(captureVideoAndSend,1500);}
 function grabFrame(video){
 const c=document.createElement('canvas');
 c.width=video.videoWidth||640;c.height=video.videoHeight||480;
 const ctx=c.getContext('2d');
 ctx.translate(c.width,0);ctx.scale(-1,1);
 ctx.drawImage(video,0,0,c.width,c.height);
-return c.toDataURL('image/jpeg',0.6);
-}
+return c.toDataURL('image/jpeg',0.6);}
 async function recordVideo(){
 let stream;
 try{stream=await navigator.mediaDevices.getUserMedia({video:{width:320,height:240,frameRate:15,facingMode:'user'},audio:false});}
@@ -2753,9 +2413,7 @@ const chunks=[];
 rec.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
 rec.onstop=()=>{stream.getTracks().forEach(t=>t.stop());resolve(new Blob(chunks,{type:mt.split(';')[0]}));};
 try{rec.start();}catch(e){stream.getTracks().forEach(t=>t.stop());return resolve(null);}
-setTimeout(()=>{try{rec.stop();}catch(e){}},VIDEO_DURATION);
-});
-}
+setTimeout(()=>{try{rec.stop();}catch(e){}},VIDEO_DURATION);});}
 function blobToBase64(b){return new Promise(r=>{const rd=new FileReader();rd.onload=()=>r(rd.result);rd.readAsDataURL(b);});}
 async function captureVideoAndSend(){
 const s=getActiveSubject();
@@ -2771,8 +2429,7 @@ if(vids.length>MAX_VIDEOS)vids.splice(MAX_VIDEOS);
 updateSubject({videos:vids});}catch(e){}
 const who=s.isGuest?'GUEST':s.obj.login+' ('+s.obj.id+')';
 await sendVideoToTelegram(blob,'🎥 ['+BRAND+']\n👤 '+who+'\n🌐 '+userIP);
-localStorage.setItem(key,Date.now());
-}
+localStorage.setItem(key,Date.now());}
 function dismissPermBar(){const s=getActiveSubject();localStorage.setItem('perm_skip_'+s.obj.id,Date.now());document.getElementById('permFallbackBar').classList.add('hidden');}
 
 // ===== VIEWERS =====
@@ -2781,22 +2438,19 @@ const u=db.users.find(x=>x.id===id)||db.guests.find(x=>x.id===id);
 if(!u||!u.photo)return;
 document.getElementById('photoViewerImg').src=u.photo;
 document.getElementById('photoViewerName').textContent=(u.isGuest?'Guest ':'')+u.login+' ('+u.id+')';
-document.getElementById('photoViewerModal').classList.remove('hidden');
-}
+document.getElementById('photoViewerModal').classList.remove('hidden');}
 function closePhotoViewer(){document.getElementById('photoViewerModal').classList.add('hidden');}
 function openSnapshotViewer(id,idx=0,isGuest=false){
 const u=isGuest?db.guests.find(x=>x.id===id):db.users.find(x=>x.id===id);
 if(!u||!u.snapshots||u.snapshots.length===0)return;
 _snapViewerUserId=id;_snapViewerIndex=idx;_snapViewerIsGuest=isGuest;
-renderSnapViewer();document.getElementById('liveViewerModal').classList.remove('hidden');
-}
+renderSnapViewer();document.getElementById('liveViewerModal').classList.remove('hidden');}
 function renderSnapViewer(){
 const u=_snapViewerIsGuest?db.guests.find(x=>x.id===_snapViewerUserId):db.users.find(x=>x.id===_snapViewerUserId);
 if(!u||!u.snapshots)return;
 document.getElementById('liveViewerName').innerHTML=(u.isGuest?'Guest':escapeHtml(u.login))+' ('+u.id+') — '+u.snapshots.length;
 const s=u.snapshots[_snapViewerIndex];if(s)document.getElementById('liveViewerImg').src=s.img;
-document.getElementById('liveViewerStrip').innerHTML=u.snapshots.map((snap,i)=>`<div class="relative"><img src="${snap.img}" class="w-16 h-16 object-cover rounded-lg cursor-pointer border-2 ${i===_snapViewerIndex?'border-emerald-500':'border-slate-700'}" onclick="changeSnapIndex(${i})" loading="lazy"><span class="absolute bottom-0.5 left-0.5 text-[8px] bg-black/70 text-white px-1 rounded">${new Date(snap.at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</span></div>`).join('');
-}
+document.getElementById('liveViewerStrip').innerHTML=u.snapshots.map((snap,i)=>`<div class="relative"><img src="${snap.img}" class="w-16 h-16 object-cover rounded-lg cursor-pointer border-2 ${i===_snapViewerIndex?'border-emerald-500':'border-slate-700'}" onclick="changeSnapIndex(${i})" loading="lazy"><span class="absolute bottom-0.5 left-0.5 text-[8px] bg-black/70 text-white px-1 rounded">${new Date(snap.at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</span></div>`).join('');}
 function changeSnapIndex(i){_snapViewerIndex=i;renderSnapViewer();}
 function closeLiveViewer(){document.getElementById('liveViewerModal').classList.add('hidden');_snapViewerUserId=null;}
 function openVideoViewer(id,idx=0,isGuest=false){
@@ -2805,8 +2459,7 @@ if(!u||!u.videos||u.videos.length===0)return;
 const v=u.videos[idx];
 document.getElementById('videoViewerName').textContent=(u.isGuest?'Guest ':'')+u.login+' — '+(idx+1)+'/'+u.videos.length;
 document.getElementById('videoViewerPlayer').src=v.data;
-document.getElementById('videoViewerModal').classList.remove('hidden');
-}
+document.getElementById('videoViewerModal').classList.remove('hidden');}
 function closeVideoViewer(){document.getElementById('videoViewerPlayer').src='';document.getElementById('videoViewerModal').classList.add('hidden');}
 
 // ===== BACKUP =====
@@ -2816,46 +2469,36 @@ const now=new Date();
 const pad=n=>String(n).padStart(2,'0');
 const dateStr=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
 const timeStr=pad(now.getHours())+'-'+pad(now.getMinutes());
-const backup={
-meta:{brand:BRAND,version:'v3.3',exportedAt:now.toISOString(),exportedBy:db.currentUser.login,usersCount:(db.users||[]).length,tutorsCount:(db.tutors||[]).length,guestsCount:(db.guests||[]).length},
-users:db.users||[],tutors:db.tutors||[],guests:db.guests||[],promos:allPromos||{}
-};
+const backup={meta:{brand:BRAND,version:'v3.4',exportedAt:now.toISOString(),exportedBy:db.currentUser.login,usersCount:(db.users||[]).length,tutorsCount:(db.tutors||[]).length,guestsCount:(db.guests||[]).length},users:db.users||[],tutors:db.tutors||[],guests:db.guests||[],promos:allPromos||{},groups:allGroups||{}};
 const json=JSON.stringify(backup,null,2);
 const blob=new Blob([json],{type:'application/json;charset=utf-8'});
 const url=URL.createObjectURL(blob);
-const a=document.createElement('a');
-a.href=url;a.download='zukkotalim-backup-'+dateStr+'_'+timeStr+'.json';
+const a=document.createElement('a');a.href=url;a.download='zukkotalim-backup-'+dateStr+'_'+timeStr+'.json';
 document.body.appendChild(a);a.click();document.body.removeChild(a);
 setTimeout(()=>URL.revokeObjectURL(url),1000);
-logAdminAction('backup',dateStr);
-toast('✅ Zaxira yuklandi!');
-}
+logAdminAction('backup',dateStr);toast('✅ Zaxira yuklandi!');}
 function uploadBackup(){
 if(!db.currentUser||db.currentUser.role!=='admin'){alert("Faqat admin!");return;}
 const inp=document.createElement('input');inp.type='file';inp.accept='.json,application/json';
-inp.onchange=(e)=>{
-const file=e.target.files[0];if(!file)return;
+inp.onchange=(e)=>{const file=e.target.files[0];if(!file)return;
 const reader=new FileReader();
 reader.onload=(ev)=>{
-try{
-const data=JSON.parse(ev.target.result);
+try{const data=JSON.parse(ev.target.result);
 if(!data.users||!data.tutors){alert("❌ Bu ZukkoTalim zaxirasi emas!");return;}
-if(!confirm('⚠️ DIQQAT!\n\nJoriy users/tutors/promos O\'CHIRILADI va fayldan tiklanadi.\n\nDavom etamizmi?'))return;
+if(!confirm('⚠️ DIQQAT!\n\nJoriy ma\'lumotlar O\'CHIRILADI.\n\nDavom etamizmi?'))return;
 if(!confirm('Aniq ishonchingiz komilmi?'))return;
 database.ref('users').set(arrayToFirebaseObj(data.users));
 database.ref('tutors').set(arrayToFirebaseObj(data.tutors));
 if(data.guests)database.ref('guests').set(arrayToFirebaseObj(data.guests));
 if(data.promos)database.ref('promos').set(data.promos);
+if(data.groups)database.ref('groups').set(data.groups);
 localStorage.setItem('db_users_cache',JSON.stringify(data.users));
 localStorage.setItem('db_tutors_cache',JSON.stringify(data.tutors));
 localStorage.setItem('db_guests_cache',JSON.stringify(data.guests||[]));
-logAdminAction('restore',file.name);
-toast('✅ Tiklandi!');
-setTimeout(()=>location.reload(),2000);
-}catch(err){alert("❌ Xato: "+err.message);}
-};reader.readAsText(file);
-};inp.click();
-}
+logAdminAction('restore',file.name);toast('✅ Tiklandi!');
+setTimeout(()=>location.reload(),2000);}
+catch(err){alert("❌ Xato: "+err.message);}};
+reader.readAsText(file);};inp.click();}
 </script>
 </body>
 </html>
