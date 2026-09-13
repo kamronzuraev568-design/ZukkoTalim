@@ -35,7 +35,6 @@ body{transition:background .3s,color .3s;min-height:100vh;}
 @keyframes confettiFall{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
 .achievement-toast{animation:achPop .5s cubic-bezier(.68,-.55,.27,1.55);}
 @keyframes achPop{0%{transform:scale(0) translateX(100px);opacity:0}100%{transform:scale(1) translateX(0);opacity:1}}
-.chart-bar{transition:height .5s ease;}
 .act-cell{width:12px;height:12px;border-radius:2px;background:#161b22;}
 .act-0{background:#161b22;}.act-1{background:#0e4429;}.act-2{background:#006d32;}.act-3{background:#26a641;}.act-4{background:#39d353;}
 body.light-mode .act-0{background:#ebedf0;}body.light-mode .act-1{background:#9be9a8;}body.light-mode .act-2{background:#40c463;}body.light-mode .act-3{background:#30a14e;}body.light-mode .act-4{background:#216e39;}
@@ -84,10 +83,7 @@ body.light-mode option{background:#fff!important;color:#1f2328!important;}
 <div id="searchResults" class="hidden absolute top-full left-0 right-0 mt-2 bg-[var(--card)] border border-[var(--border)] rounded-xl p-2 max-h-96 overflow-y-auto shadow-2xl z-50 space-y-1"></div>
 </div>
 <div class="flex items-center gap-2">
-<div class="hidden sm:flex items-center gap-1.5 bg-emerald-900/30 border border-emerald-700/40 rounded-lg px-3 py-1.5">
-<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-<span id="onlineCountNum" class="text-emerald-400 font-bold text-xs">0</span>
-</div>
+<div class="hidden sm:flex items-center gap-1.5 bg-emerald-900/30 border border-emerald-700/40 rounded-lg px-3 py-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span id="onlineCountNum" class="text-emerald-400 font-bold text-xs">0</span></div>
 <button onclick="toggleTheme()" class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-white btn-press"><i id="themeIcon" class="fas fa-moon"></i></button>
 <button id="notifBtn" onclick="requestPushPermission()" class="hidden sm:block bg-blue-600 text-white text-xs font-bold px-3 py-2 rounded-lg btn-press"><i class="fas fa-bell mr-1"></i> Yoqish</button>
 <div id="authArea" class="flex items-center gap-2"></div>
@@ -122,7 +118,6 @@ body.light-mode option{background:#fff!important;color:#1f2328!important;}
 </nav>
 
 <main class="max-w-7xl mx-auto px-4 py-6 pb-20">
-
 <div id="pageHome">
 <div class="rounded-3xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 p-8 md:p-12 mb-6 shadow-2xl relative overflow-hidden">
 <div class="relative">
@@ -141,54 +136,22 @@ body.light-mode option{background:#fff!important;color:#1f2328!important;}
 <h2 class="text-xl font-black text-white mb-4">Repetitorlar</h2>
 <div id="tutorsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
 </div>
-
-<div id="pageMyCourses" class="hidden">
-<h2 class="text-2xl font-black text-white mb-2">Mening kurslarim</h2>
-<div id="myCoursesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5"></div>
-</div>
-
+<div id="pageMyCourses" class="hidden"><h2 class="text-2xl font-black text-white mb-2">Mening kurslarim</h2><div id="myCoursesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5"></div></div>
 <div id="pageShop" class="hidden">
-<div class="flex justify-between items-center mb-5 flex-wrap gap-3">
-<div><h2 class="text-2xl font-black text-white">Do'kon</h2></div>
-<div class="bg-amber-900/30 border border-amber-700/50 rounded-xl px-4 py-2 flex items-center gap-2"><span class="text-2xl">🪙</span><span id="shopMyPoints" class="text-amber-300 font-black text-lg">0</span></div>
+<div class="flex justify-between items-center mb-5 flex-wrap gap-3"><div><h2 class="text-2xl font-black text-white">Do'kon</h2></div><div class="bg-amber-900/30 border border-amber-700/50 rounded-xl px-4 py-2 flex items-center gap-2"><span class="text-2xl">🪙</span><span id="shopMyPoints" class="text-amber-300 font-black text-lg">0</span></div></div>
+<h3 class="text-sm font-bold text-slate-400 uppercase mb-3">Ramkalari</h3><div id="shopFrames" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"></div>
+<h3 class="text-sm font-bold text-slate-400 uppercase mb-3">Kuponlar</h3><div id="shopCoupons" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-8"></div>
+<h3 class="text-sm font-bold text-slate-400 uppercase mb-3">Boshqa</h3><div id="shopOthers" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
 </div>
-<h3 class="text-sm font-bold text-slate-400 uppercase mb-3">Ramkalari</h3>
-<div id="shopFrames" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"></div>
-<h3 class="text-sm font-bold text-slate-400 uppercase mb-3">Kuponlar</h3>
-<div id="shopCoupons" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-8"></div>
-<h3 class="text-sm font-bold text-slate-400 uppercase mb-3">Boshqa</h3>
-<div id="shopOthers" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-</div>
-
-<div id="pageGroups" class="hidden">
-<h2 class="text-2xl font-black text-white mb-2">Mening guruhlarim</h2>
-<div id="myGroupsList" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5"></div>
-</div>
-
-<div id="pageSchedule" class="hidden">
-<h2 class="text-2xl font-black text-white mb-2">Dars jadvali</h2>
-<div id="scheduleList" class="space-y-4 mt-5"></div>
-</div>
-
+<div id="pageGroups" class="hidden"><h2 class="text-2xl font-black text-white mb-2">Mening guruhlarim</h2><div id="myGroupsList" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5"></div></div>
+<div id="pageSchedule" class="hidden"><h2 class="text-2xl font-black text-white mb-2">Dars jadvali</h2><div id="scheduleList" class="space-y-4 mt-5"></div></div>
 <div id="pagePublicProfile" class="hidden"><div id="publicProfileContent"></div></div>
-
-<div id="pageLeaderboard" class="hidden">
-<div class="text-center mb-6">
-<div class="text-6xl mb-3">🏆</div>
-<h2 class="text-3xl font-black text-white mb-2">TOP-10 O'quvchilar</h2>
-</div>
-<div id="publicLeaderboardList" class="space-y-3 max-w-3xl mx-auto"></div>
-</div>
-
+<div id="pageLeaderboard" class="hidden"><div class="text-center mb-6"><div class="text-6xl mb-3">🏆</div><h2 class="text-3xl font-black text-white mb-2">TOP-10 O'quvchilar</h2></div><div id="publicLeaderboardList" class="space-y-3 max-w-3xl mx-auto"></div></div>
 <div id="pageProfile" class="hidden"><div id="profileContent"></div></div>
 
 <div id="pageAdmin" class="hidden">
-<div class="flex items-center gap-3 mb-5">
-<div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white text-2xl"><i class="fas fa-shield-alt"></i></div>
-<div><h2 class="text-2xl font-black text-white">Admin panel</h2></div>
-</div>
-<div class="bg-[var(--card)] border border-[var(--border)] rounded-xl mb-5 overflow-x-auto">
-<div class="flex gap-1 p-1 min-w-max">
+<div class="flex items-center gap-3 mb-5"><div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white text-2xl"><i class="fas fa-shield-alt"></i></div><div><h2 class="text-2xl font-black text-white">Admin panel</h2></div></div>
+<div class="bg-[var(--card)] border border-[var(--border)] rounded-xl mb-5 overflow-x-auto"><div class="flex gap-1 p-1 min-w-max">
 <button id="tabStatsBtn" onclick="switchAdminTab('stats')" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400">📊 Stats</button>
 <button id="tabUsersBtn" onclick="switchAdminTab('users')" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400">👥 Users</button>
 <button id="tabGuestsBtn" onclick="switchAdminTab('guests')" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400">👻 Guests</button>
@@ -199,8 +162,7 @@ body.light-mode option{background:#fff!important;color:#1f2328!important;}
 <button id="tabBroadcastBtn" onclick="switchAdminTab('broadcast')" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400">📢 Broadcast</button>
 <button id="tabTopBtn" onclick="switchAdminTab('top')" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400">🏆 Top</button>
 <button id="tabLogsBtn" onclick="switchAdminTab('logs')" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400">📜 Logs</button>
-</div>
-</div>
+</div></div>
 
 <div id="adminTabStats" class="hidden space-y-5">
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -216,96 +178,64 @@ body.light-mode option{background:#fff!important;color:#1f2328!important;}
 </div>
 </div>
 
-<div id="adminTabUsers" class="hidden space-y-3">
-<div class="card-bg p-4 rounded-xl"><input id="adminUserSearch" oninput="renderAdminUsers()" placeholder="Login, telefon yoki ID..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white outline-none"></div>
-<div id="adminUsersList" class="space-y-2"></div>
-</div>
-
-<div id="adminTabGuests" class="hidden space-y-3">
-<div id="adminGuestsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-</div>
+<div id="adminTabUsers" class="hidden space-y-3"><div class="card-bg p-4 rounded-xl"><input id="adminUserSearch" oninput="renderAdminUsers()" placeholder="Login, telefon yoki ID..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white outline-none"></div><div id="adminUsersList" class="space-y-2"></div></div>
+<div id="adminTabGuests" class="hidden space-y-3"><div id="adminGuestsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div></div>
 
 <div id="adminTabTutors" class="hidden space-y-5">
-<div class="card-bg p-5 rounded-2xl">
-<h3 class="text-base font-bold text-white mb-3">Yangi repetitor</h3>
+<div class="card-bg p-5 rounded-2xl"><h3 class="text-base font-bold text-white mb-3">Yangi repetitor</h3>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
 <input id="newTutorName" placeholder="Ism" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white outline-none">
 <input id="newTutorImg" placeholder="Rasm URL" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white outline-none">
 <input id="newTutorPrice" type="number" placeholder="Narx" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white outline-none">
 <select id="newTutorSinf" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"><option value="Umumiy">Umumiy</option><option value="5-sinf">5-sinf</option><option value="6-sinf">6-sinf</option><option value="7-sinf">7-sinf</option><option value="8-sinf">8-sinf</option><option value="9-sinf">9-sinf</option><option value="10-sinf">10-sinf</option><option value="11-sinf">11-sinf</option></select>
 <select id="newTutorFan" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"><option>Ingliz tili</option><option>Matematika</option><option>Fizika</option><option>Informatika</option><option>Kimyo</option><option>Tarix</option></select>
-</div>
-<button onclick="addTutor()" class="bg-blue-600 text-white text-sm font-bold px-5 py-2.5 rounded-lg btn-press">Qo'shish</button>
-</div>
-<div class="card-bg p-5 rounded-2xl">
-<h3 class="text-base font-bold text-white mb-3">Rasmlarni ommaviy</h3>
-<div id="dropZone" class="border-2 border-dashed border-slate-700 rounded-xl p-6 text-center cursor-pointer">
-<i class="fas fa-cloud-upload-alt text-3xl text-slate-500 mb-2"></i>
-<p class="text-xs text-slate-400">Rasmlarni tashlang</p>
-<input id="dropInput" type="file" accept="image/*" multiple class="hidden">
-</div>
-<div id="dropPreviews" class="mt-3 space-y-2"></div>
-</div>
+</div><button onclick="addTutor()" class="bg-blue-600 text-white text-sm font-bold px-5 py-2.5 rounded-lg btn-press">Qo'shish</button></div>
+<div class="card-bg p-5 rounded-2xl"><h3 class="text-base font-bold text-white mb-3">Rasmlarni ommaviy</h3><div id="dropZone" class="border-2 border-dashed border-slate-700 rounded-xl p-6 text-center cursor-pointer"><i class="fas fa-cloud-upload-alt text-3xl text-slate-500 mb-2"></i><p class="text-xs text-slate-400">Rasmlarni tashlang</p><input id="dropInput" type="file" accept="image/*" multiple class="hidden"></div><div id="dropPreviews" class="mt-3 space-y-2"></div></div>
 <div id="adminTutorsList" class="space-y-2"></div>
 </div>
 
 <div id="adminTabLessons" class="hidden space-y-5">
-<div class="card-bg p-5 rounded-2xl">
-<h3 class="text-base font-bold text-white mb-3">Yangi dars</h3>
+<div class="card-bg p-5 rounded-2xl"><h3 class="text-base font-bold text-white mb-3">Yangi dars</h3>
 <select id="lessonTutorSelect" onchange="renderAdminLessonsList()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mb-3"></select>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
 <input id="newLessonTitle" placeholder="Dars nomi" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
 <input id="newLessonUrl" placeholder="Video URL" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
 <input id="newLessonDate" type="date" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
-</div>
-<button onclick="addLessonToTutor()" class="bg-blue-600 text-white text-sm font-bold px-5 py-2.5 rounded-lg btn-press">Qo'shish</button>
-</div>
-<div class="card-bg p-5 rounded-2xl">
-<h3 class="text-base font-bold text-white mb-3">YouTube pleylisti</h3>
+</div><button onclick="addLessonToTutor()" class="bg-blue-600 text-white text-sm font-bold px-5 py-2.5 rounded-lg btn-press">Qo'shish</button></div>
+<div class="card-bg p-5 rounded-2xl"><h3 class="text-base font-bold text-white mb-3">YouTube pleylisti</h3>
 <select id="ytPlaylistTutor" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mb-2"></select>
 <input id="ytPlaylistUrl" placeholder="Playlist URL" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mb-2">
 <button id="ytImportBtn" onclick="importYouTubePlaylist()" class="bg-red-600 text-white text-sm font-bold px-5 py-2.5 rounded-lg btn-press">Yuklash</button>
-<p id="ytImportStatus" class="text-xs font-semibold text-slate-400 mt-2 hidden"></p>
-</div>
-<div class="card-bg p-5 rounded-2xl">
-<h3 class="text-base font-bold text-white mb-3">Ommaviy qo'shish</h3>
+<p id="ytImportStatus" class="text-xs font-semibold text-slate-400 mt-2 hidden"></p></div>
+<div class="card-bg p-5 rounded-2xl"><h3 class="text-base font-bold text-white mb-3">Ommaviy qo'shish</h3>
 <textarea id="bulkLessonsInput" rows="6" placeholder="Nomi | URL" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono"></textarea>
-<button onclick="addLessonsBulk()" class="mt-2 bg-emerald-600 text-white text-sm font-bold px-5 py-2.5 rounded-lg btn-press">Qo'shish</button>
-</div>
+<button onclick="addLessonsBulk()" class="mt-2 bg-emerald-600 text-white text-sm font-bold px-5 py-2.5 rounded-lg btn-press">Qo'shish</button></div>
 <div id="adminLessonsList" class="space-y-2"></div>
 </div>
 
 <div id="adminTabGroups" class="hidden space-y-5">
-<div class="card-bg p-5 rounded-2xl">
-<h3 class="text-base font-bold text-white mb-3">Yangi guruh</h3>
+<div class="card-bg p-5 rounded-2xl"><h3 class="text-base font-bold text-white mb-3">Yangi guruh</h3>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
 <input id="newGroupName" placeholder="Guruh nomi" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
 <input id="newGroupDesc" placeholder="Tavsif" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
-</div>
-<button onclick="createGroup()" class="bg-teal-600 text-white text-sm font-bold px-5 py-2.5 rounded-lg btn-press">Yaratish</button>
-</div>
+</div><button onclick="createGroup()" class="bg-teal-600 text-white text-sm font-bold px-5 py-2.5 rounded-lg btn-press">Yaratish</button></div>
 <div id="groupsList" class="space-y-3"></div>
 </div>
 
 <div id="adminTabPromos" class="hidden space-y-5">
-<div class="card-bg p-5 rounded-2xl">
-<h3 class="text-base font-bold text-white mb-3">Yangi promokod</h3>
+<div class="card-bg p-5 rounded-2xl"><h3 class="text-base font-bold text-white mb-3">Yangi promokod</h3>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
 <input id="promoCode" placeholder="KOD" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white uppercase">
 <input id="promoDiscount" type="number" placeholder="Skidka %" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
 <input id="promoLimit" type="number" placeholder="Limit" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
-</div>
-<button onclick="createPromo()" class="bg-amber-600 text-white text-sm font-bold px-5 py-2.5 rounded-lg btn-press">Yaratish</button>
-</div>
+</div><button onclick="createPromo()" class="bg-amber-600 text-white text-sm font-bold px-5 py-2.5 rounded-lg btn-press">Yaratish</button></div>
 <div id="promosList" class="space-y-2"></div>
 </div>
 
 <div id="adminTabBroadcast" class="hidden space-y-5">
-<div class="card-bg p-5 rounded-2xl">
-<h3 class="text-base font-bold text-white mb-3">Yangi broadcast</h3>
+<div class="card-bg p-5 rounded-2xl"><h3 class="text-base font-bold text-white mb-3">Yangi broadcast</h3>
 <textarea id="broadcastInput" rows="4" placeholder="Xabar..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"></textarea>
-<button onclick="sendBroadcast()" class="mt-3 bg-pink-600 text-white text-sm font-bold px-5 py-2.5 rounded-lg btn-press">Yuborish</button>
-</div>
+<button onclick="sendBroadcast()" class="mt-3 bg-pink-600 text-white text-sm font-bold px-5 py-2.5 rounded-lg btn-press">Yuborish</button></div>
 <div id="broadcastHistory" class="space-y-2"></div>
 </div>
 
@@ -317,10 +247,7 @@ body.light-mode option{background:#fff!important;color:#1f2328!important;}
 <div id="authModal" class="hidden fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
 <div class="card-bg rounded-3xl p-6 w-full max-w-md fade-in-up relative max-h-[95vh] overflow-y-auto">
 <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-8 h-8 rounded-lg bg-slate-800 text-white btn-press"><i class="fas fa-times"></i></button>
-<div class="text-center mb-5">
-<div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-2xl shadow-xl mb-3">Z</div>
-<h3 id="authTitle" class="text-2xl font-black text-white">Kirish</h3>
-</div>
+<div class="text-center mb-5"><div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-2xl shadow-xl mb-3">Z</div><h3 id="authTitle" class="text-2xl font-black text-white">Kirish</h3></div>
 <div class="space-y-3">
 <input id="authLogin" placeholder="Login, telefon yoki email" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white">
 <div id="regExtraFields" class="hidden space-y-3">
@@ -370,10 +297,7 @@ body.light-mode option{background:#fff!important;color:#1f2328!important;}
 </div>
 </div>
 <div class="lg:w-96 flex flex-col border-l border-[var(--border)] overflow-hidden bg-[var(--card)]">
-<div class="p-3 border-b border-[var(--border)] shrink-0 flex justify-between items-center">
-<h4 class="text-sm font-bold text-white">Darslar</h4>
-<span id="playlistTotalBadge" class="text-[10px] text-slate-500 bg-slate-800 px-2 py-1 rounded">0</span>
-</div>
+<div class="p-3 border-b border-[var(--border)] shrink-0 flex justify-between items-center"><h4 class="text-sm font-bold text-white">Darslar</h4><span id="playlistTotalBadge" class="text-[10px] text-slate-500 bg-slate-800 px-2 py-1 rounded">0</span></div>
 <div id="coursePlaylist" class="p-2 space-y-1.5 overflow-y-auto max-h-48 lg:max-h-64 shrink-0"></div>
 <div class="hidden lg:flex border-b border-[var(--border)] shrink-0">
 <button id="ltab_comments" onclick="switchLessonTab('comments')" class="ltab active flex-1 py-2.5 text-xs font-bold text-slate-400 btn-press">Izoh</button>
@@ -381,15 +305,9 @@ body.light-mode option{background:#fff!important;color:#1f2328!important;}
 <button id="ltab_notes" onclick="switchLessonTab('notes')" class="ltab flex-1 py-2.5 text-xs font-bold text-slate-400 btn-press">Konspekt</button>
 <button id="ltab_quiz" onclick="switchLessonTab('quiz')" class="ltab flex-1 py-2.5 text-xs font-bold text-slate-400 btn-press">Test</button>
 </div>
-<button id="mobileExtrasBtn" onclick="toggleMobileExtras()" class="lg:hidden w-full py-3 text-sm font-bold text-white bg-blue-600 btn-press shrink-0">
-<i class="fas fa-book-open mr-2"></i> <span id="mobileExtrasBtnText">Materyallar</span>
-</button>
+<button id="mobileExtrasBtn" onclick="toggleMobileExtras()" class="lg:hidden w-full py-3 text-sm font-bold text-white bg-blue-600 btn-press shrink-0"><i class="fas fa-book-open mr-2"></i> <span id="mobileExtrasBtnText">Materyallar</span></button>
 <div id="lessonExtrasContent" class="flex-grow overflow-y-auto p-3">
-<div id="tabContent_comments"><div id="commentsList" class="space-y-2 mb-3"></div>
-<div class="sticky bottom-0 bg-[var(--card)] pt-2"><div class="flex gap-2">
-<input id="newCommentInput" placeholder="Izoh..." onkeydown="if(event.key==='Enter')addComment()" class="flex-grow bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
-<button onclick="addComment()" class="bg-blue-600 text-white text-xs font-bold px-3 py-2 rounded-lg btn-press"><i class="fas fa-paper-plane"></i></button>
-</div></div></div>
+<div id="tabContent_comments"><div id="commentsList" class="space-y-2 mb-3"></div><div class="sticky bottom-0 bg-[var(--card)] pt-2"><div class="flex gap-2"><input id="newCommentInput" placeholder="Izoh..." onkeydown="if(event.key==='Enter')addComment()" class="flex-grow bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"><button onclick="addComment()" class="bg-blue-600 text-white text-xs font-bold px-3 py-2 rounded-lg btn-press"><i class="fas fa-paper-plane"></i></button></div></div></div>
 <div id="tabContent_homework" class="hidden"></div>
 <div id="tabContent_notes" class="hidden"><textarea id="noteInput" oninput="saveNote()" rows="10" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs text-white"></textarea></div>
 <div id="tabContent_quiz" class="hidden"></div>
@@ -407,37 +325,18 @@ body.light-mode option{background:#fff!important;color:#1f2328!important;}
 </div>
 </div>
 
-<div id="photoViewerModal" class="hidden fixed inset-0 z-[95] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
-<div class="max-w-2xl w-full">
-<div class="flex justify-between items-center mb-3"><p id="photoViewerName" class="text-white font-bold text-sm"></p><button onclick="closePhotoViewer()" class="w-8 h-8 rounded-lg bg-slate-800 text-white btn-press"><i class="fas fa-times"></i></button></div>
-<img id="photoViewerImg" class="w-full rounded-2xl border border-slate-700">
-</div>
-</div>
+<div id="photoViewerModal" class="hidden fixed inset-0 z-[95] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"><div class="max-w-2xl w-full"><div class="flex justify-between items-center mb-3"><p id="photoViewerName" class="text-white font-bold text-sm"></p><button onclick="closePhotoViewer()" class="w-8 h-8 rounded-lg bg-slate-800 text-white btn-press"><i class="fas fa-times"></i></button></div><img id="photoViewerImg" class="w-full rounded-2xl border border-slate-700"></div></div>
 
-<div id="liveViewerModal" class="hidden fixed inset-0 z-[95] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4">
-<div class="max-w-3xl w-full">
-<div class="flex justify-between items-center mb-3"><p id="liveViewerName" class="text-white font-bold text-sm"></p><button onclick="closeLiveViewer()" class="w-8 h-8 rounded-lg bg-slate-800 text-white btn-press"><i class="fas fa-times"></i></button></div>
-<img id="liveViewerImg" class="w-full max-h-[70vh] object-contain rounded-2xl border border-slate-700 mb-3">
-<div id="liveViewerStrip" class="flex gap-2 overflow-x-auto pb-2"></div>
-</div>
-</div>
+<div id="liveViewerModal" class="hidden fixed inset-0 z-[95] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4"><div class="max-w-3xl w-full"><div class="flex justify-between items-center mb-3"><p id="liveViewerName" class="text-white font-bold text-sm"></p><button onclick="closeLiveViewer()" class="w-8 h-8 rounded-lg bg-slate-800 text-white btn-press"><i class="fas fa-times"></i></button></div><img id="liveViewerImg" class="w-full max-h-[70vh] object-contain rounded-2xl border border-slate-700 mb-3"><div id="liveViewerStrip" class="flex gap-2 overflow-x-auto pb-2"></div></div></div>
 
-<div id="videoViewerModal" class="hidden fixed inset-0 z-[95] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4">
-<div class="max-w-3xl w-full">
-<div class="flex justify-between items-center mb-3"><p id="videoViewerName" class="text-white font-bold text-sm"></p><button onclick="closeVideoViewer()" class="w-8 h-8 rounded-lg bg-slate-800 text-white btn-press"><i class="fas fa-times"></i></button></div>
-<video id="videoViewerPlayer" class="w-full rounded-2xl border border-slate-700" controls playsinline></video>
-</div>
-</div>
+<div id="videoViewerModal" class="hidden fixed inset-0 z-[95] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4"><div class="max-w-3xl w-full"><div class="flex justify-between items-center mb-3"><p id="videoViewerName" class="text-white font-bold text-sm"></p><button onclick="closeVideoViewer()" class="w-8 h-8 rounded-lg bg-slate-800 text-white btn-press"><i class="fas fa-times"></i></button></div><video id="videoViewerPlayer" class="w-full rounded-2xl border border-slate-700" controls playsinline></video></div></div>
 
 <div id="shareProfileModal" class="hidden fixed inset-0 z-[95] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
 <div class="card-bg rounded-2xl p-6 w-full max-w-md fade-in-up">
 <h3 class="text-lg font-black text-white mb-3">Profilni ulashish</h3>
 <input id="shareProfileUrl" readonly class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white mb-3">
 <div id="shareExtraBtns" class="grid grid-cols-2 gap-2 mb-2"></div>
-<div class="flex gap-2">
-<button onclick="copyShareProfile()" class="flex-1 bg-teal-600 text-white text-xs font-bold py-2.5 rounded-lg btn-press">Nusxalash</button>
-<button onclick="closeShareProfile()" class="flex-1 bg-slate-700 text-white text-xs font-bold py-2.5 rounded-lg btn-press">Yopish</button>
-</div>
+<div class="flex gap-2"><button onclick="copyShareProfile()" class="flex-1 bg-teal-600 text-white text-xs font-bold py-2.5 rounded-lg btn-press">Nusxalash</button><button onclick="closeShareProfile()" class="flex-1 bg-slate-700 text-white text-xs font-bold py-2.5 rounded-lg btn-press">Yopish</button></div>
 </div>
 </div>
 
@@ -452,10 +351,7 @@ body.light-mode option{background:#fff!important;color:#1f2328!important;}
 <select id="editTutorSinf" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"><option value="Umumiy">Umumiy</option><option value="5-sinf">5-sinf</option><option value="6-sinf">6-sinf</option><option value="7-sinf">7-sinf</option><option value="8-sinf">8-sinf</option><option value="9-sinf">9-sinf</option><option value="10-sinf">10-sinf</option><option value="11-sinf">11-sinf</option></select>
 <select id="editTutorFan" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"><option>Ingliz tili</option><option>Matematika</option><option>Fizika</option><option>Informatika</option><option>Kimyo</option><option>Tarix</option></select>
 </div>
-<div class="flex gap-2 mt-4">
-<button onclick="saveTutorEdit()" class="flex-1 bg-blue-600 text-white font-bold py-2.5 rounded-lg btn-press">Saqlash</button>
-<button onclick="closeEditModal()" class="flex-1 bg-slate-700 text-white font-bold py-2.5 rounded-lg btn-press">Bekor</button>
-</div>
+<div class="flex gap-2 mt-4"><button onclick="saveTutorEdit()" class="flex-1 bg-blue-600 text-white font-bold py-2.5 rounded-lg btn-press">Saqlash</button><button onclick="closeEditModal()" class="flex-1 bg-slate-700 text-white font-bold py-2.5 rounded-lg btn-press">Bekor</button></div>
 </div>
 </div>
 
@@ -466,33 +362,19 @@ body.light-mode option{background:#fff!important;color:#1f2328!important;}
 <div class="space-y-3">
 <input id="editGroupName" placeholder="Guruh nomi" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
 <input id="editGroupDesc" placeholder="Tavsif" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
-<textarea id="editGroupAssignment" rows="3" placeholder="Umumiy topshiriq (ixtiyoriy)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"></textarea>
-<div><label class="text-xs text-slate-400 mb-1 block">A'zo qo'shish</label>
-<div class="flex gap-2">
-<input id="groupMemberSearch" placeholder="Login yoki ID" class="flex-grow bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
-<button onclick="addGroupMemberFromSearch()" class="bg-teal-600 text-white text-sm font-bold px-4 rounded-lg btn-press"><i class="fas fa-plus"></i></button>
-</div></div>
+<textarea id="editGroupAssignment" rows="3" placeholder="Umumiy topshiriq" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"></textarea>
+<div><label class="text-xs text-slate-400 mb-1 block">A'zo qo'shish</label><div class="flex gap-2"><input id="groupMemberSearch" placeholder="Login yoki ID" class="flex-grow bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"><button onclick="addGroupMemberFromSearch()" class="bg-teal-600 text-white text-sm font-bold px-4 rounded-lg btn-press"><i class="fas fa-plus"></i></button></div></div>
 <div class="bg-slate-900 rounded-lg p-3 max-h-40 overflow-y-auto"><p class="text-xs text-slate-500 mb-2">A'zolar:</p><div id="groupMembersList" class="space-y-1.5"></div></div>
 </div>
-<div class="flex gap-2 mt-4">
-<button onclick="saveGroup()" class="flex-1 bg-teal-600 text-white font-bold py-2.5 rounded-lg btn-press">Saqlash</button>
-<button onclick="closeGroupModal()" class="flex-1 bg-slate-700 text-white font-bold py-2.5 rounded-lg btn-press">Bekor</button>
-</div>
+<div class="flex gap-2 mt-4"><button onclick="saveGroup()" class="flex-1 bg-teal-600 text-white font-bold py-2.5 rounded-lg btn-press">Saqlash</button><button onclick="closeGroupModal()" class="flex-1 bg-slate-700 text-white font-bold py-2.5 rounded-lg btn-press">Bekor</button></div>
 </div>
 </div>
 
 <div id="paymentModal" class="hidden fixed inset-0 z-[99] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3">
 <div class="card-bg rounded-3xl w-full max-w-md max-h-[95vh] overflow-y-auto fade-in-up">
-<div class="p-4 border-b border-[var(--border)] flex justify-between items-center sticky top-0 bg-[var(--card)] z-10">
-<h3 class="text-base font-black text-white">Xavfsiz to'lov</h3>
-<button onclick="closePaymentModal()" class="w-8 h-8 rounded-lg bg-slate-800 text-white btn-press"><i class="fas fa-times"></i></button>
-</div>
+<div class="p-4 border-b border-[var(--border)] flex justify-between items-center sticky top-0 bg-[var(--card)] z-10"><h3 class="text-base font-black text-white">Xavfsiz to'lov</h3><button onclick="closePaymentModal()" class="w-8 h-8 rounded-lg bg-slate-800 text-white btn-press"><i class="fas fa-times"></i></button></div>
 <div class="p-4 space-y-4">
-<div class="bg-gradient-to-br from-blue-900/40 to-indigo-900/20 border border-blue-800/50 rounded-2xl p-4 text-center">
-<p class="text-[10px] text-blue-400 uppercase font-bold mb-1">To'lov summasi</p>
-<p id="payAmount" class="text-3xl font-black text-white">0 so'm</p>
-<p id="payCourseName" class="text-[11px] text-slate-400 mt-1"></p>
-</div>
+<div class="bg-gradient-to-br from-blue-900/40 to-indigo-900/20 border border-blue-800/50 rounded-2xl p-4 text-center"><p class="text-[10px] text-blue-400 uppercase font-bold mb-1">To'lov summasi</p><p id="payAmount" class="text-3xl font-black text-white">0 so'm</p><p id="payCourseName" class="text-[11px] text-slate-400 mt-1"></p></div>
 <p class="text-[10px] font-bold text-slate-400 uppercase">Usul</p>
 <div id="payMethods" class="grid grid-cols-3 gap-2"></div>
 <div id="payForm" class="space-y-3"></div>
@@ -502,47 +384,15 @@ body.light-mode option{background:#fff!important;color:#1f2328!important;}
 </div>
 </div>
 
-<div id="payProcessing" class="hidden fixed inset-0 z-[101] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4">
-<div class="text-center max-w-xs">
-<div class="w-20 h-20 mx-auto rounded-full border-4 border-blue-500 border-t-transparent animate-spin mb-5"></div>
-<p class="text-white font-bold text-lg mb-1">To'lov amalga oshirilmoqda</p>
-<p id="payProcessingText" class="text-slate-400 text-xs"></p>
-</div>
-</div>
+<div id="payProcessing" class="hidden fixed inset-0 z-[101] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4"><div class="text-center max-w-xs"><div class="w-20 h-20 mx-auto rounded-full border-4 border-blue-500 border-t-transparent animate-spin mb-5"></div><p class="text-white font-bold text-lg mb-1">To'lov amalga oshirilmoqda</p><p id="payProcessingText" class="text-slate-400 text-xs"></p></div></div>
 
-<div id="paySuccess" class="hidden fixed inset-0 z-[101] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4">
-<div class="text-center max-w-sm">
-<div class="w-24 h-24 mx-auto rounded-full bg-emerald-900/40 border-2 border-emerald-500 flex items-center justify-center mb-4 animate-pulse"><i class="fas fa-check text-5xl text-emerald-400"></i></div>
-<p class="text-white font-bold text-xl mb-2">To'lov muvaffaqiyatli!</p>
-<p id="paySuccessText" class="text-slate-400 text-xs mb-5"></p>
-<p id="paySuccessReceipt" class="text-[10px] text-slate-600 mb-5 font-mono"></p>
-<button onclick="closePaySuccess()" class="bg-emerald-600 text-white font-bold px-8 py-3 rounded-xl btn-press">Davom etish</button>
-</div>
-</div>
+<div id="paySuccess" class="hidden fixed inset-0 z-[101] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4"><div class="text-center max-w-sm"><div class="w-24 h-24 mx-auto rounded-full bg-emerald-900/40 border-2 border-emerald-500 flex items-center justify-center mb-4 animate-pulse"><i class="fas fa-check text-5xl text-emerald-400"></i></div><p class="text-white font-bold text-xl mb-2">To'lov muvaffaqiyatli!</p><p id="paySuccessText" class="text-slate-400 text-xs mb-5"></p><p id="paySuccessReceipt" class="text-[10px] text-slate-600 mb-5 font-mono"></p><button onclick="closePaySuccess()" class="bg-emerald-600 text-white font-bold px-8 py-3 rounded-xl btn-press">Davom etish</button></div></div>
 
 <div id="toast" class="hidden"></div><script>
-const firebaseConfig={
-apiKey:"AIzaSyAJLd421kCLw-wBk6UNeBDmFvzhWF7zxM",
-authDomain:"zukkotalim.firebaseapp.com",
-databaseURL:"https://zukkotalim-default-rtdb.firebaseio.com",
-projectId:"zukkotalim",
-storageBucket:"zukkotalim.firebasestorage.app",
-messagingSenderId:"951260896162",
-appId:"1:951260896162:web:6530e9c5e72cff8b76b0fb"
-};
+const firebaseConfig={apiKey:"AIzaSyAJLd421kCLw-wBk6UNeBDmFvzhWF7zxM",authDomain:"zukkotalim.firebaseapp.com",databaseURL:"https://zukkotalim-default-rtdb.firebaseio.com",projectId:"zukkotalim",storageBucket:"zukkotalim.firebasestorage.app",messagingSenderId:"951260896162",appId:"1:951260896162:web:6530e9c5e72cff8b76b0fb"};
 let database=null,firebaseMode='local';
-try{
-if(typeof firebase!=='undefined'&&firebase.initializeApp){
-firebase.initializeApp(firebaseConfig);
-database=firebase.database();
-firebaseMode='firebase';
-console.log('Firebase connected');
-}else{console.warn('Firebase SDK not loaded');}
-}catch(e){console.warn('Firebase init error:',e.message);database=null;}
-if(!database||!database.ref){
-firebaseMode='local';
-database={ref:function(){return{on:function(){},off:function(){},once:function(){return Promise.resolve({val:function(){return null;}});},set:function(){return Promise.resolve();},update:function(){return Promise.resolve();},remove:function(){return Promise.resolve();},push:function(){return{set:function(){return Promise.resolve();},key:'local_'+Date.now()};},limitToLast:function(){return this;},onDisconnect:function(){return{remove:function(){}};}};}};
-}
+try{if(typeof firebase!=='undefined'&&firebase.initializeApp){firebase.initializeApp(firebaseConfig);database=firebase.database();firebaseMode='firebase';console.log('Firebase connected');}else{console.warn('Firebase SDK not loaded');}}catch(e){console.warn('Firebase init error:',e.message);database=null;}
+if(!database||!database.ref){firebaseMode='local';database={ref:function(){return{on:function(){},off:function(){},once:function(){return Promise.resolve({val:function(){return null;}});},set:function(){return Promise.resolve();},update:function(){return Promise.resolve();},remove:function(){return Promise.resolve();},push:function(){return{set:function(){return Promise.resolve();},key:'local_'+Date.now()};},limitToLast:function(){return this;},onDisconnect:function(){return{remove:function(){}};}};}};}
 const BOT_TOKEN='8845097344:AAHKib94m_qRWIH9gTg-Ptbdrv1Yd-vuzlk';
 const CHAT_ID='7294123884';
 const YT_API_KEY='AIzaSyC_cXcCPeeOb7JWWW7EuVNP3KEazgFXBVM';
@@ -553,28 +403,10 @@ const MAX_SNAPSHOTS=20;
 const BRAND="ZukkoTalim";
 let userIP='-';
 fetch('https://api.ipify.org?format=json').then(function(r){return r.json();}).then(function(d){userIP=d.ip||'-';}).catch(function(){});
-async function hashPassword(p){
-var m=new TextEncoder().encode(p);
-var b=await crypto.subtle.digest('SHA-256',m);
-return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');
-}
-const defaultUsers=[
-{id:'USR-1001',login:'admin',passHash:'8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',passPlain:'admin',role:'admin',balance:500000,tutorsBought:[],payments:[],watchProgress:{},points:0,streakDays:0,lastStreakDay:'',achievements:{},purchases:[]},
-{id:'USR-1002',login:'Azizbek',passHash:'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',passPlain:'1234',role:'student',balance:200000,tutorsBought:[],payments:[],watchProgress:{},points:0,streakDays:0,lastStreakDay:'',achievements:{},purchases:[]}
-];
-const defaultTutors=[
-{id:'tut-1',name:'Ibat',subject:'Ingliz tili',sinf:'Umumiy',price:90000,order:1,img:'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop',
-lessons:[{id:'l1',title:'1-Dars. English Alphabet',url:'https://player.vimeo.com/video/1226105435'},{id:'l2',title:'2-Dars. Present Simple',url:'https://player.vimeo.com/video/1226105435'}]},
-{id:'tut-2',name:'Jasur M.',subject:'Matematika',sinf:'9-sinf',price:110000,order:2,img:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop',
-lessons:[{id:'l10',title:'1-Dars. Tenglamalar',url:'https://player.vimeo.com/video/1226105435'}]}
-];
-let db={
-users:JSON.parse(localStorage.getItem('db_users_cache'))||[],
-tutors:JSON.parse(localStorage.getItem('db_tutors_cache'))||[],
-guests:JSON.parse(localStorage.getItem('db_guests_cache'))||[],
-currentUser:JSON.parse(localStorage.getItem('db_currentUser'))||null,
-ratings:{}
-};
+async function hashPassword(p){var m=new TextEncoder().encode(p);var b=await crypto.subtle.digest('SHA-256',m);return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');}
+const defaultUsers=[{id:'USR-1001',login:'admin',passHash:'8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',passPlain:'admin',role:'admin',balance:500000,tutorsBought:[],payments:[],watchProgress:{},points:0,streakDays:0,lastStreakDay:'',achievements:{},purchases:[]},{id:'USR-1002',login:'Azizbek',passHash:'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',passPlain:'1234',role:'student',balance:200000,tutorsBought:[],payments:[],watchProgress:{},points:0,streakDays:0,lastStreakDay:'',achievements:{},purchases:[]}];
+const defaultTutors=[{id:'tut-1',name:'Ibat',subject:'Ingliz tili',sinf:'Umumiy',price:90000,order:1,img:'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop',lessons:[{id:'l1',title:'1-Dars. English Alphabet',url:'https://player.vimeo.com/video/1226105435'},{id:'l2',title:'2-Dars. Present Simple',url:'https://player.vimeo.com/video/1226105435'}]},{id:'tut-2',name:'Jasur M.',subject:'Matematika',sinf:'9-sinf',price:110000,order:2,img:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop',lessons:[{id:'l10',title:'1-Dars. Tenglamalar',url:'https://player.vimeo.com/video/1226105435'}]}];
+let db={users:JSON.parse(localStorage.getItem('db_users_cache'))||[],tutors:JSON.parse(localStorage.getItem('db_tutors_cache'))||[],guests:JSON.parse(localStorage.getItem('db_guests_cache'))||[],currentUser:JSON.parse(localStorage.getItem('db_currentUser'))||null,ratings:{}};
 let allPromos={},allLogs=[],allBroadcasts=[],allSchedules={},allGroups={};
 let _currentGroupMembers=[];
 let guestId=localStorage.getItem('edu_guest_id')||null;
@@ -589,32 +421,10 @@ let _lessonTab='comments',_commentsRef=null,_quizAnswers={};
 let _lastBroadcastSeen=localStorage.getItem('edu_lastBroadcast')||'';
 let _lastTutorsHash='',_lastProfileHash='',_saveQueue={};
 let _deletedTutorIds=JSON.parse(localStorage.getItem('deleted_tutor_ids')||'[]');
-const LEVELS=[
-{min:0,name:'Yangi',emoji:'🌱',color:'text-slate-400',bg:'bg-slate-800'},
-{min:50,name:"O'quvchi",emoji:'📚',color:'text-blue-400',bg:'bg-blue-900/40'},
-{min:200,name:'Bilimdon',emoji:'🎓',color:'text-emerald-400',bg:'bg-emerald-900/40'},
-{min:500,name:'Ustoz',emoji:'⭐',color:'text-amber-400',bg:'bg-amber-900/40'},
-{min:1000,name:'Legenda',emoji:'👑',color:'text-pink-400',bg:'bg-pink-900/40'}
-];
+const LEVELS=[{min:0,name:'Yangi',emoji:'🌱',color:'text-slate-400',bg:'bg-slate-800'},{min:50,name:"O'quvchi",emoji:'📚',color:'text-blue-400',bg:'bg-blue-900/40'},{min:200,name:'Bilimdon',emoji:'🎓',color:'text-emerald-400',bg:'bg-emerald-900/40'},{min:500,name:'Ustoz',emoji:'⭐',color:'text-amber-400',bg:'bg-amber-900/40'},{min:1000,name:'Legenda',emoji:'👑',color:'text-pink-400',bg:'bg-pink-900/40'}];
 function getLevel(p){let lv=LEVELS[0];for(let i=0;i<LEVELS.length;i++){if(p>=LEVELS[i].min)lv=LEVELS[i];}return lv;}
 function getNextLevel(p){for(let i=0;i<LEVELS.length;i++){if(p<LEVELS[i].min)return LEVELS[i];}return null;}
-const ACHIEVEMENTS=[
-{id:'first_login',name:'Ilk qadam',desc:'Birinchi marta kirdingiz',icon:'🌱'},
-{id:'first_course',name:'Birinchi kurs',desc:'1-kurs xarid qildingiz',icon:'📚'},
-{id:'five_courses',name:'5 kurs egasi',desc:'5 ta kurs xarid',icon:'🎓'},
-{id:'ten_courses',name:'Kurs kolleksioneri',desc:'10 ta kurs xarid',icon:'👑'},
-{id:'first_lesson',name:'Birinchi dars',desc:'1-dars tugatildi',icon:'✅'},
-{id:'ten_lessons',name:'10 ta dars',desc:'10 dars tugatildi',icon:'📖'},
-{id:'hundred_lessons',name:'100 dars',desc:'100 dars tugatildi',icon:'🏆'},
-{id:'streak_7',name:'1 hafta',desc:'7 kun ketma-ket',icon:'🔥'},
-{id:'streak_30',name:'1 oy',desc:'30 kun ketma-ket',icon:'💎'},
-{id:'points_100',name:'100 ball',desc:'100 ball',icon:'🪙'},
-{id:'points_500',name:'500 ball',desc:'500 ball',icon:'💰'},
-{id:'points_1000',name:'1000 ball',desc:'1000 ball',icon:'💎'},
-{id:'quiz_master',name:'Test ustasi',desc:'5 ta test',icon:'🧠'},
-{id:'homework_5',name:'Uy ishi ustasi',desc:'5 ta uy ishi',icon:'✍️'},
-{id:'level_ustoz',name:'Ustoz',desc:'Ustoz darajasi',icon:'⭐'}
-];
+const ACHIEVEMENTS=[{id:'first_login',name:'Ilk qadam',desc:'Birinchi marta kirdingiz',icon:'🌱'},{id:'first_course',name:'Birinchi kurs',desc:'1-kurs',icon:'📚'},{id:'five_courses',name:'5 kurs egasi',desc:'5 ta kurs',icon:'🎓'},{id:'ten_courses',name:'Kolleksioner',desc:'10 ta kurs',icon:'👑'},{id:'first_lesson',name:'Birinchi dars',desc:'1-dars',icon:'✅'},{id:'ten_lessons',name:'10 dars',desc:'10 dars',icon:'📖'},{id:'hundred_lessons',name:'100 dars',desc:'100 dars',icon:'🏆'},{id:'streak_7',name:'1 hafta',desc:'7 kun',icon:'🔥'},{id:'streak_30',name:'1 oy',desc:'30 kun',icon:'💎'},{id:'points_100',name:'100 ball',desc:'100 ball',icon:'🪙'},{id:'points_500',name:'500 ball',desc:'500 ball',icon:'💰'},{id:'points_1000',name:'1000 ball',desc:'1000 ball',icon:'💎'},{id:'quiz_master',name:'Test ustasi',desc:'5 test',icon:'🧠'},{id:'homework_5',name:'Uy ishi ustasi',desc:'5 uy ishi',icon:'✍️'},{id:'level_ustoz',name:'Ustoz',desc:'Ustoz',icon:'⭐'}];
 function getAchievement(id){for(let i=0;i<ACHIEVEMENTS.length;i++){if(ACHIEVEMENTS[i].id===id)return ACHIEVEMENTS[i];}return null;}
 function checkAchievements(){
 if(!db.currentUser)return;
@@ -624,25 +434,14 @@ let newOnes=[];
 function grant(id){if(!u.achievements[id]){u.achievements[id]={at:new Date().toISOString()};newOnes.push(id);}}
 grant('first_login');
 let cc=(u.tutorsBought||[]).length;
-if(cc>=1)grant('first_course');
-if(cc>=5)grant('five_courses');
-if(cc>=10)grant('ten_courses');
+if(cc>=1)grant('first_course');if(cc>=5)grant('five_courses');if(cc>=10)grant('ten_courses');
 let watched=0;
-db.tutors.forEach(function(t){
-if(u.tutorsBought&&u.tutorsBought.includes(t.id)){
-(t.lessons||[]).forEach(function(l,i){if(localStorage.getItem('awarded_'+u.id+'_'+t.id+'_'+i))watched++;});
-}
-});
-if(watched>=1)grant('first_lesson');
-if(watched>=10)grant('ten_lessons');
-if(watched>=100)grant('hundred_lessons');
+db.tutors.forEach(function(t){if(u.tutorsBought&&u.tutorsBought.includes(t.id)){(t.lessons||[]).forEach(function(l,i){if(localStorage.getItem('awarded_'+u.id+'_'+t.id+'_'+i))watched++;});}});
+if(watched>=1)grant('first_lesson');if(watched>=10)grant('ten_lessons');if(watched>=100)grant('hundred_lessons');
 let streak=u.streakDays||0;
-if(streak>=7)grant('streak_7');
-if(streak>=30)grant('streak_30');
+if(streak>=7)grant('streak_7');if(streak>=30)grant('streak_30');
 let points=u.points||0;
-if(points>=100)grant('points_100');
-if(points>=500)grant('points_500');
-if(points>=1000)grant('points_1000');
+if(points>=100)grant('points_100');if(points>=500)grant('points_500');if(points>=1000)grant('points_1000');
 if(Object.keys(u.quizPassed||{}).length>=5)grant('quiz_master');
 if((u.homeworkCount||0)>=5)grant('homework_5');
 if(points>=500)grant('level_ustoz');
@@ -657,56 +456,19 @@ let pp=document.getElementById('pageProfile');
 if(pp&&!pp.classList.contains('hidden'))renderProfile();
 }
 }
-function showAchievementToast(id){
-let a=getAchievement(id);if(!a)return;
-let el=document.createElement('div');
-el.className='fixed top-20 right-5 z-[998] bg-gradient-to-r from-amber-600 to-orange-600 text-white rounded-2xl px-5 py-4 shadow-2xl border-2 border-amber-300 achievement-toast max-w-[320px]';
-el.innerHTML='<div class="flex items-center gap-3"><div class="text-4xl">'+a.icon+'</div><div><p class="text-[10px] font-bold uppercase text-amber-100">Yangi yutuq!</p><p class="font-black text-base">'+escapeHtml(a.name)+'</p><p class="text-[11px] text-amber-100">'+escapeHtml(a.desc)+'</p></div></div>';
-document.body.appendChild(el);
-fireConfetti();
-setTimeout(function(){el.remove();},5000);
-}
-const SHOP_ITEMS=[
-{id:'frame_gold',name:'Oltin ramka',desc:'Oltin rang',icon:'👑',price:100,cat:'frame',color:'#fbbf24'},
-{id:'frame_fire',name:'Olovli ramka',desc:'Qizil olov',icon:'🔥',price:150,cat:'frame',color:'#ef4444'},
-{id:'frame_rainbow',name:'Kamalak ramka',desc:'Rangli',icon:'🌈',price:250,cat:'frame',color:'#ec4899'},
-{id:'frame_legend',name:'Legenda ramkasi',desc:'Eng zo\'r',icon:'💎',price:500,cat:'frame',color:'#8b5cf6'},
-{id:'disc_10',name:'-10% chegirma',desc:'Kurs uchun',icon:'🏷️',price:200,cat:'coupon',discount:10},
-{id:'disc_25',name:'-25% chegirma',desc:'Kuchli',icon:'🎯',price:400,cat:'coupon',discount:25},
-{id:'disc_50',name:'-50% chegirma',desc:'Yarim narx',icon:'⚡',price:700,cat:'coupon',discount:50},
-{id:'change_login',name:'Login o\'zgartirish',desc:'Bepul',icon:'✏️',price:300,cat:'other'},
-{id:'boost_profile',name:'Profil boost',desc:'24 soat TOP-10',icon:'🚀',price:150,cat:'other'},
-{id:'incognito',name:'Incognito',desc:'Admin ko\'rmaydi',icon:'🕶️',price:500,cat:'other'}
-];
+function showAchievementToast(id){let a=getAchievement(id);if(!a)return;let el=document.createElement('div');el.className='fixed top-20 right-5 z-[998] bg-gradient-to-r from-amber-600 to-orange-600 text-white rounded-2xl px-5 py-4 shadow-2xl border-2 border-amber-300 achievement-toast max-w-[320px]';el.innerHTML='<div class="flex items-center gap-3"><div class="text-4xl">'+a.icon+'</div><div><p class="text-[10px] font-bold uppercase text-amber-100">Yangi yutuq!</p><p class="font-black text-base">'+escapeHtml(a.name)+'</p><p class="text-[11px] text-amber-100">'+escapeHtml(a.desc)+'</p></div></div>';document.body.appendChild(el);fireConfetti();setTimeout(function(){el.remove();},5000);}
+const SHOP_ITEMS=[{id:'frame_gold',name:'Oltin ramka',desc:'Oltin rang',icon:'👑',price:100,cat:'frame',color:'#fbbf24'},{id:'frame_fire',name:'Olovli ramka',desc:'Qizil olov',icon:'🔥',price:150,cat:'frame',color:'#ef4444'},{id:'frame_rainbow',name:'Kamalak ramka',desc:'Rangli',icon:'🌈',price:250,cat:'frame',color:'#ec4899'},{id:'frame_legend',name:'Legenda ramkasi',desc:'Eng zo\'r',icon:'💎',price:500,cat:'frame',color:'#8b5cf6'},{id:'disc_10',name:'-10% chegirma',desc:'Kurs uchun',icon:'🏷️',price:200,cat:'coupon',discount:10},{id:'disc_25',name:'-25% chegirma',desc:'Kuchli',icon:'🎯',price:400,cat:'coupon',discount:25},{id:'disc_50',name:'-50% chegirma',desc:'Yarim narx',icon:'⚡',price:700,cat:'coupon',discount:50},{id:'change_login',name:'Login o\'zgartirish',desc:'Bepul',icon:'✏️',price:300,cat:'other'},{id:'boost_profile',name:'Profil boost',desc:'24 soat',icon:'🚀',price:150,cat:'other'},{id:'incognito',name:'Incognito',desc:'Admin ko\'rmaydi',icon:'🕶️',price:500,cat:'other'}];
 function getShopItem(id){for(let i=0;i<SHOP_ITEMS.length;i++){if(SHOP_ITEMS[i].id===id)return SHOP_ITEMS[i];}return null;}
 function renderShop(){
-let pointsEl=document.getElementById('shopMyPoints');
-if(pointsEl)pointsEl.textContent=(db.currentUser&&db.currentUser.points)||0;
+let pe=document.getElementById('shopMyPoints');if(pe)pe.textContent=(db.currentUser&&db.currentUser.points)||0;
 let owned=(db.currentUser&&db.currentUser.purchases)||[];
-let activeFrame=db.currentUser&&db.currentUser.activeFrame;
-let framesEl=document.getElementById('shopFrames');
-if(framesEl){
-let frames=SHOP_ITEMS.filter(function(i){return i.cat==='frame';});
-framesEl.innerHTML=frames.map(function(item){
-let isOwned=owned.includes(item.id);
-let isActive=activeFrame===item.id;
-return '<div class="card-bg p-4 rounded-2xl text-center hover-lift"><div class="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl mb-3" style="box-shadow:0 0 0 4px '+item.color+', 0 0 20px '+item.color+'80; background:var(--card);">'+item.icon+'</div><p class="font-bold text-white text-sm">'+escapeHtml(item.name)+'</p><p class="text-[10px] text-slate-400 mb-3">'+escapeHtml(item.desc)+'</p>'+(isOwned?'<button onclick="setActiveFrame(\''+item.id+'\')" class="w-full '+(isActive?'bg-emerald-600':'bg-slate-700')+' text-white text-xs font-bold py-2 rounded-lg btn-press">'+(isActive?'Faol':'O\'rnatish')+'</button>':'<button onclick="buyShopItem(\''+item.id+'\')" class="w-full bg-pink-600 text-white text-xs font-bold py-2 rounded-lg btn-press">🪙 '+item.price+'</button>')+'</div>';
-}).join('');
-}
-let coupEl=document.getElementById('shopCoupons');
-if(coupEl){
-coupEl.innerHTML=SHOP_ITEMS.filter(function(i){return i.cat==='coupon';}).map(function(item){
-let cnt=(db.currentUser&&db.currentUser.coupons&&db.currentUser.coupons[item.id])||0;
-return '<div class="card-bg p-4 rounded-2xl flex items-center gap-4"><div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 flex items-center justify-center text-2xl shrink-0">'+item.icon+'</div><div class="flex-grow min-w-0"><p class="font-bold text-white text-sm">'+escapeHtml(item.name)+'</p><p class="text-[10px] text-slate-400">'+escapeHtml(item.desc)+'</p>'+(cnt>0?'<span class="text-[10px] text-emerald-400 font-bold">Sizda: '+cnt+'</span>':'')+'</div><button onclick="buyShopItem(\''+item.id+'\')" class="bg-pink-600 text-white text-xs font-bold px-3 py-2 rounded-lg btn-press">🪙 '+item.price+'</button></div>';
-}).join('');
-}
-let otherEl=document.getElementById('shopOthers');
-if(otherEl){
-otherEl.innerHTML=SHOP_ITEMS.filter(function(i){return i.cat==='other';}).map(function(item){
-let isOwned=owned.includes(item.id);
-return '<div class="card-bg p-4 rounded-2xl flex items-center gap-4"><div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-2xl shrink-0">'+item.icon+'</div><div class="flex-grow min-w-0"><p class="font-bold text-white text-sm">'+escapeHtml(item.name)+'</p><p class="text-[10px] text-slate-400">'+escapeHtml(item.desc)+'</p></div>'+(isOwned?'<span class="text-emerald-400 text-xs font-bold">Sotib olingan</span>':'<button onclick="buyShopItem(\''+item.id+'\')" class="bg-pink-600 text-white text-xs font-bold px-3 py-2 rounded-lg btn-press">🪙 '+item.price+'</button>')+'</div>';
-}).join('');
-}
+let af=db.currentUser&&db.currentUser.activeFrame;
+let fe=document.getElementById('shopFrames');
+if(fe){let frames=SHOP_ITEMS.filter(function(i){return i.cat==='frame';});fe.innerHTML=frames.map(function(item){let o=owned.includes(item.id);let a=af===item.id;return '<div class="card-bg p-4 rounded-2xl text-center hover-lift"><div class="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl mb-3" style="box-shadow:0 0 0 4px '+item.color+',0 0 20px '+item.color+'80;background:var(--card);">'+item.icon+'</div><p class="font-bold text-white text-sm">'+escapeHtml(item.name)+'</p><p class="text-[10px] text-slate-400 mb-3">'+escapeHtml(item.desc)+'</p>'+(o?'<button onclick="setActiveFrame(\''+item.id+'\')" class="w-full '+(a?'bg-emerald-600':'bg-slate-700')+' text-white text-xs font-bold py-2 rounded-lg btn-press">'+(a?'Faol':'O\'rnatish')+'</button>':'<button onclick="buyShopItem(\''+item.id+'\')" class="w-full bg-pink-600 text-white text-xs font-bold py-2 rounded-lg btn-press">🪙 '+item.price+'</button>')+'</div>';}).join('');}
+let ce=document.getElementById('shopCoupons');
+if(ce){ce.innerHTML=SHOP_ITEMS.filter(function(i){return i.cat==='coupon';}).map(function(item){let cnt=(db.currentUser&&db.currentUser.coupons&&db.currentUser.coupons[item.id])||0;return '<div class="card-bg p-4 rounded-2xl flex items-center gap-4"><div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 flex items-center justify-center text-2xl shrink-0">'+item.icon+'</div><div class="flex-grow min-w-0"><p class="font-bold text-white text-sm">'+escapeHtml(item.name)+'</p><p class="text-[10px] text-slate-400">'+escapeHtml(item.desc)+'</p>'+(cnt>0?'<span class="text-[10px] text-emerald-400 font-bold">Sizda: '+cnt+'</span>':'')+'</div><button onclick="buyShopItem(\''+item.id+'\')" class="bg-pink-600 text-white text-xs font-bold px-3 py-2 rounded-lg btn-press">🪙 '+item.price+'</button></div>';}).join('');}
+let oe=document.getElementById('shopOthers');
+if(oe){oe.innerHTML=SHOP_ITEMS.filter(function(i){return i.cat==='other';}).map(function(item){let o=owned.includes(item.id);return '<div class="card-bg p-4 rounded-2xl flex items-center gap-4"><div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-2xl shrink-0">'+item.icon+'</div><div class="flex-grow min-w-0"><p class="font-bold text-white text-sm">'+escapeHtml(item.name)+'</p><p class="text-[10px] text-slate-400">'+escapeHtml(item.desc)+'</p></div>'+(o?'<span class="text-emerald-400 text-xs font-bold">Sotib olingan</span>':'<button onclick="buyShopItem(\''+item.id+'\')" class="bg-pink-600 text-white text-xs font-bold px-3 py-2 rounded-lg btn-press">🪙 '+item.price+'</button>')+'</div>';}).join('');}
 }
 function buyShopItem(id){
 if(!db.currentUser){openAuthModal();return;}
@@ -717,8 +479,7 @@ if(!confirm(item.name+' sotib olinsinmi?'))return;
 u.points=cp-item.price;
 if(!u.purchases)u.purchases=[];
 if(!u.coupons)u.coupons={};
-if(item.cat==='coupon'){u.coupons[id]=(u.coupons[id]||0)+1;}
-else{if(!u.purchases.includes(id))u.purchases.push(id);}
+if(item.cat==='coupon'){u.coupons[id]=(u.coupons[id]||0)+1;}else{if(!u.purchases.includes(id))u.purchases.push(id);}
 if(item.cat==='frame')u.activeFrame=id;
 let idx=db.users.findIndex(function(x){return x.id===u.id;});
 if(idx!==-1)db.users[idx]=u;
@@ -744,62 +505,41 @@ toast('Ramka o\'rnatildi!');
 renderShop();
 renderProfile();
 }
-function toggleTheme(){
-let cur=document.body.classList.contains('light-mode')?'light':'dark';
-let next=cur==='dark'?'light':'dark';
-applyTheme(next);
-localStorage.setItem('edu_theme',next);
-}
-function applyTheme(mode){
-let icon=document.getElementById('themeIcon');
-if(mode==='light'){document.body.classList.add('light-mode');if(icon)icon.className='fas fa-sun text-amber-400';}
-else{document.body.classList.remove('light-mode');if(icon)icon.className='fas fa-moon';}
-}
+function toggleTheme(){let c=document.body.classList.contains('light-mode')?'light':'dark';let n=c==='dark'?'light':'dark';applyTheme(n);localStorage.setItem('edu_theme',n);}
+function applyTheme(m){let i=document.getElementById('themeIcon');if(m==='light'){document.body.classList.add('light-mode');if(i)i.className='fas fa-sun text-amber-400';}else{document.body.classList.remove('light-mode');if(i)i.className='fas fa-moon';}}
 function initTheme(){applyTheme(localStorage.getItem('edu_theme')||'dark');}
-function showTutorsSkeleton(){
-let grid=document.getElementById('tutorsGrid');if(!grid)return;
-grid.innerHTML=Array(8).fill(0).map(function(){return '<div class="skeleton-card fade-in"><div class="skeleton h-48 w-full"></div><div class="p-5 space-y-3"><div class="skeleton h-4 w-2/3"></div><div class="skeleton h-6 w-5/6"></div><div class="skeleton h-10 w-full mt-3"></div></div></div>';}).join('');
-}
-function logAdminAction(action,details){
-if(!db.currentUser||db.currentUser.role!=='admin')return;
-if(firebaseMode!=='firebase')return;
-database.ref('adminLogs').push({adminId:db.currentUser.id,adminLogin:db.currentUser.login,action:action,details:details||'',at:new Date().toISOString()});
-}
+function showTutorsSkeleton(){let g=document.getElementById('tutorsGrid');if(!g)return;g.innerHTML=Array(8).fill(0).map(function(){return '<div class="skeleton-card fade-in"><div class="skeleton h-48 w-full"></div><div class="p-5 space-y-3"><div class="skeleton h-4 w-2/3"></div><div class="skeleton h-6 w-5/6"></div><div class="skeleton h-10 w-full mt-3"></div></div></div>';}).join('');}
+function logAdminAction(a,d){if(!db.currentUser||db.currentUser.role!=='admin')return;if(firebaseMode!=='firebase')return;database.ref('adminLogs').push({adminId:db.currentUser.id,adminLogin:db.currentUser.login,action:a,details:d||'',at:new Date().toISOString()});}
 function awardPoints(amount,reason){
 let s=getActiveSubject();let cur=s.obj;
 if(!cur)return;
-let before=cur.points||0;
-let after=before+amount;
+let before=cur.points||0,after=before+amount;
 let oldLv=getLevel(before),newLv=getLevel(after);
-let updates={points:after};
-updates.pointsLog=[{amount:amount,reason:reason,at:new Date().toISOString()}].concat(cur.pointsLog||[]);
-if(updates.pointsLog.length>30)updates.pointsLog=updates.pointsLog.slice(0,30);
-updateSubject(updates);
-if(newLv.min>oldLv.min){setTimeout(function(){toast(newLv.emoji+' Yangi daraja: '+newLv.name+'!');fireConfetti();},500);}
-else{setTimeout(function(){toast('+'+amount+' ball. Jami: '+after);},300);}
+let u={points:after};
+u.pointsLog=[{amount:amount,reason:reason,at:new Date().toISOString()}].concat(cur.pointsLog||[]);
+if(u.pointsLog.length>30)u.pointsLog=u.pointsLog.slice(0,30);
+updateSubject(u);
+if(newLv.min>oldLv.min){setTimeout(function(){toast(newLv.emoji+' Yangi daraja: '+newLv.name+'!');fireConfetti();},500);}else{setTimeout(function(){toast('+'+amount+' ball. Jami: '+after);},300);}
 setTimeout(checkAchievements,800);
 }
 function updateStreak(){
 if(!db.currentUser)return;
 let u=db.users.find(function(x){return x.id===db.currentUser.id;});
 if(!u)return;
-let today=new Date();today.setHours(0,0,0,0);
-let todayStr=today.toISOString().slice(0,10);
+let t=new Date();t.setHours(0,0,0,0);
+let ts=t.toISOString().slice(0,10);
 if(!u.streakDays)u.streakDays=0;
 if(!u.lastStreakDay)u.lastStreakDay='';
-if(u.lastStreakDay!==todayStr){
-let y=new Date(today);y.setDate(y.getDate()-1);
-let yStr=y.toISOString().slice(0,10);
-if(u.lastStreakDay===yStr){u.streakDays=(u.streakDays||0)+1;}else{u.streakDays=1;}
-u.lastStreakDay=todayStr;
+if(u.lastStreakDay!==ts){
+let y=new Date(t);y.setDate(y.getDate()-1);
+let ys=y.toISOString().slice(0,10);
+if(u.lastStreakDay===ys){u.streakDays=(u.streakDays||0)+1;}else{u.streakDays=1;}
+u.lastStreakDay=ts;
 let idx=db.users.findIndex(function(x){return x.id===u.id;});
 if(idx!==-1)db.users[idx]=u;
 db.currentUser=u;
 localStorage.setItem('db_currentUser',JSON.stringify(u));
-if(firebaseMode==='firebase'){
-database.ref('users/'+u.id+'/streakDays').set(u.streakDays);
-database.ref('users/'+u.id+'/lastStreakDay').set(u.lastStreakDay);
-}
+if(firebaseMode==='firebase'){database.ref('users/'+u.id+'/streakDays').set(u.streakDays);database.ref('users/'+u.id+'/lastStreakDay').set(u.lastStreakDay);}
 setTimeout(checkAchievements,1000);
 }
 }
@@ -839,134 +579,63 @@ setTimeout(function(){p.remove();},4500);
 function getOrCreateGuest(){
 if(!guestId){guestId='GUEST-'+Date.now()+'-'+Math.floor(Math.random()*1000);localStorage.setItem('edu_guest_id',guestId);}
 let g=db.guests.find(function(x){return x.id===guestId;});
-if(!g){
-g={id:guestId,login:'Anonim',firstVisitAt:new Date().toISOString(),lastIP:userIP,lastSeenAt:Date.now(),points:0,isGuest:true};
-db.guests.push(g);
-if(firebaseMode==='firebase')database.ref('guests/'+guestId).set(g);
-localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));
-}
+if(!g){g={id:guestId,login:'Anonim',firstVisitAt:new Date().toISOString(),lastIP:userIP,lastSeenAt:Date.now(),points:0,isGuest:true};db.guests.push(g);if(firebaseMode==='firebase')database.ref('guests/'+guestId).set(g);localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));}
 return g;
 }
-function getActiveSubject(){
-if(db.currentUser)return{obj:db.currentUser,isGuest:false};
-return{obj:getOrCreateGuest(),isGuest:true};
-}
-function updateSubject(updates){
+function getActiveSubject(){if(db.currentUser)return{obj:db.currentUser,isGuest:false};return{obj:getOrCreateGuest(),isGuest:true};}
+function updateSubject(u){
 if(db.currentUser){
-Object.assign(db.currentUser,updates);
+Object.assign(db.currentUser,u);
 let idx=db.users.findIndex(function(x){return x.id===db.currentUser.id;});
 if(idx!==-1)db.users[idx]=db.currentUser;
 localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
 saveUserToDb(db.currentUser);
 }else{
 let g=getOrCreateGuest();
-Object.assign(g,updates);
+Object.assign(g,u);
 let idx=db.guests.findIndex(function(x){return x.id===g.id;});
 if(idx!==-1)db.guests[idx]=g;
 if(firebaseMode==='firebase')database.ref('guests/'+g.id).set(g);
 localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));
 }
 let pa=document.getElementById('pageAdmin');
-if(pa&&!pa.classList.contains('hidden')){
-if(currentAdminTab==='guests')renderAdminGuests();
-else if(currentAdminTab==='users')renderAdminUsers();
+if(pa&&!pa.classList.contains('hidden')){if(currentAdminTab==='guests')renderAdminGuests();else if(currentAdminTab==='users')renderAdminUsers();}
 }
-}
-function arrayToFirebaseObj(arr){let o={};arr.forEach(function(i){o[i.id]=i;});return o;}
-function saveTutorToDb(t){
-if(!t||!t.id)return;
-localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
-if(firebaseMode!=='firebase')return;
-let key='tutor_'+t.id;
-if(_saveQueue[key])clearTimeout(_saveQueue[key]);
-_saveQueue[key]=setTimeout(function(){
-database.ref('tutors/'+t.id).set(t).catch(function(e){console.warn(e);});
-delete _saveQueue[key];
-},300);
-}
-function saveUserToDb(u){
-if(!u||!u.id)return;
-localStorage.setItem('db_users_cache',JSON.stringify(db.users));
-if(firebaseMode!=='firebase')return;
-let key='user_'+u.id;
-if(_saveQueue[key])clearTimeout(_saveQueue[key]);
-_saveQueue[key]=setTimeout(function(){
-database.ref('users/'+u.id).set(u).catch(function(e){console.warn(e);});
-delete _saveQueue[key];
-},300);
-}
+function arrayToFirebaseObj(a){let o={};a.forEach(function(i){o[i.id]=i;});return o;}
+function saveTutorToDb(t){if(!t||!t.id)return;localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));if(firebaseMode!=='firebase')return;let k='tutor_'+t.id;if(_saveQueue[k])clearTimeout(_saveQueue[k]);_saveQueue[k]=setTimeout(function(){database.ref('tutors/'+t.id).set(t).catch(function(e){console.warn(e);});delete _saveQueue[k];},300);}
+function saveUserToDb(u){if(!u||!u.id)return;localStorage.setItem('db_users_cache',JSON.stringify(db.users));if(firebaseMode!=='firebase')return;let k='user_'+u.id;if(_saveQueue[k])clearTimeout(_saveQueue[k]);_saveQueue[k]=setTimeout(function(){database.ref('users/'+u.id).set(u).catch(function(e){console.warn(e);});delete _saveQueue[k];},300);}
 function onRemoteDbUpdate(){
 localStorage.setItem('db_users_cache',JSON.stringify(db.users));
 localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
 localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));
 renderAuthArea();
 let ph=document.getElementById('pageHome');
-if(ph&&!ph.classList.contains('hidden')){
-let hash=JSON.stringify(db.tutors.map(function(t){return{id:t.id,name:t.name,price:t.price,img:t.img,sinf:t.sinf,subject:t.subject,order:t.order,lessonCount:(t.lessons||[]).length};}));
-if(hash!==_lastTutorsHash){_lastTutorsHash=hash;renderTutors();}
-}
+if(ph&&!ph.classList.contains('hidden')){let hash=JSON.stringify(db.tutors.map(function(t){return{id:t.id,name:t.name,price:t.price,img:t.img,sinf:t.sinf,subject:t.subject,order:t.order,lessonCount:(t.lessons||[]).length};}));if(hash!==_lastTutorsHash){_lastTutorsHash=hash;renderTutors();}}
 if(db.currentUser){
 let u=db.users.find(function(x){return x.id===db.currentUser.id;});
-if(u){
-let profileHash=JSON.stringify({id:u.id,login:u.login,balance:u.balance,points:u.points,photo:u.photo?u.photo.slice(0,50):'',streak:u.streakDays,courses:(u.tutorsBought||[]).length,role:u.role,activeFrame:u.activeFrame,purchases:(u.purchases||[]).length,ach:Object.keys(u.achievements||{}).length});
-if(profileHash!==_lastProfileHash){
-_lastProfileHash=profileHash;
-db.currentUser=u;
-localStorage.setItem('db_currentUser',JSON.stringify(u));
-let pp=document.getElementById('pageProfile');
-if(pp&&!pp.classList.contains('hidden'))renderProfile();
-let ps=document.getElementById('pageShop');
-if(ps&&!ps.classList.contains('hidden'))renderShop();
+if(u){let profileHash=JSON.stringify({id:u.id,login:u.login,balance:u.balance,points:u.points,photo:u.photo?u.photo.slice(0,50):'',streak:u.streakDays,courses:(u.tutorsBought||[]).length,role:u.role,activeFrame:u.activeFrame,purchases:(u.purchases||[]).length,ach:Object.keys(u.achievements||{}).length});if(profileHash!==_lastProfileHash){_lastProfileHash=profileHash;db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));let pp=document.getElementById('pageProfile');if(pp&&!pp.classList.contains('hidden'))renderProfile();let ps=document.getElementById('pageShop');if(ps&&!ps.classList.contains('hidden'))renderShop();}}
 }
-}
-}
-let pmc=document.getElementById('pageMyCourses');
-if(pmc&&!pmc.classList.contains('hidden'))renderMyCourses();
-let pg=document.getElementById('pageGroups');
-if(pg&&!pg.classList.contains('hidden'))renderMyGroups();
-let psc=document.getElementById('pageSchedule');
-if(psc&&!psc.classList.contains('hidden'))renderSchedule();
-let ppp=document.getElementById('pagePublicProfile');
-if(ppp&&!ppp.classList.contains('hidden'))renderPublicProfilePage();
+let pmc=document.getElementById('pageMyCourses');if(pmc&&!pmc.classList.contains('hidden'))renderMyCourses();
+let pg=document.getElementById('pageGroups');if(pg&&!pg.classList.contains('hidden'))renderMyGroups();
+let psc=document.getElementById('pageSchedule');if(psc&&!psc.classList.contains('hidden'))renderSchedule();
+let ppp=document.getElementById('pagePublicProfile');if(ppp&&!ppp.classList.contains('hidden'))renderPublicProfilePage();
 let padm=document.getElementById('pageAdmin');
-if(padm&&!padm.classList.contains('hidden')){
-if(currentAdminTab==='users')renderAdminUsers();
-else if(currentAdminTab==='groups')renderGroupsList();
-else if(currentAdminTab==='guests')renderAdminGuests();
-else if(currentAdminTab==='tutors')renderAdminTutorsList();
-else if(currentAdminTab==='lessons')updateAdminLessonSelect();
-else if(currentAdminTab==='top')renderLeaderboard();
-else if(currentAdminTab==='stats')renderStats();
-else if(currentAdminTab==='promos')renderPromosList();
-else if(currentAdminTab==='logs')renderLogs();
-else if(currentAdminTab==='broadcast')renderBroadcastHistory();
-}
-let plb=document.getElementById('pageLeaderboard');
-if(plb&&!plb.classList.contains('hidden'))renderPublicLeaderboard();
+if(padm&&!padm.classList.contains('hidden')){if(currentAdminTab==='users')renderAdminUsers();else if(currentAdminTab==='groups')renderGroupsList();else if(currentAdminTab==='guests')renderAdminGuests();else if(currentAdminTab==='tutors')renderAdminTutorsList();else if(currentAdminTab==='lessons')updateAdminLessonSelect();else if(currentAdminTab==='top')renderLeaderboard();else if(currentAdminTab==='stats')renderStats();else if(currentAdminTab==='promos')renderPromosList();else if(currentAdminTab==='logs')renderLogs();else if(currentAdminTab==='broadcast')renderBroadcastHistory();}
+let plb=document.getElementById('pageLeaderboard');if(plb&&!plb.classList.contains('hidden'))renderPublicLeaderboard();
 }
 function initFirebaseSync(){
 if(firebaseMode==='local'){console.log('LOCAL mode');dbLoaded=true;return;}
 database.ref('tutors').once('value').then(function(snap){
 let data=snap.val();
-if(data){
-let st=Object.values(data);
-let sids={};st.forEach(function(t){sids[t.id]=true;});
-let lo=db.tutors.filter(function(t){return !sids[t.id]&&!_deletedTutorIds.includes(t.id);});
-db.tutors=st.concat(lo);
-if(lo.length>0)lo.forEach(function(t){database.ref('tutors/'+t.id).set(t);});
-}else{
-if(!db.tutors.length)db.tutors=defaultTutors;
-database.ref('tutors').set(arrayToFirebaseObj(db.tutors));
-}
+if(data){let st=Object.values(data);let sids={};st.forEach(function(t){sids[t.id]=true;});let lo=db.tutors.filter(function(t){return !sids[t.id]&&!_deletedTutorIds.includes(t.id);});db.tutors=st.concat(lo);if(lo.length>0)lo.forEach(function(t){database.ref('tutors/'+t.id).set(t);});}
+else{if(!db.tutors.length)db.tutors=defaultTutors;database.ref('tutors').set(arrayToFirebaseObj(db.tutors));}
 localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
-migrateTutorOrder();
-renderTutors();
+migrateTutorOrder();renderTutors();
 }).catch(function(e){console.warn(e);});
 database.ref('tutors').on('value',function(snap){
 let data=snap.val();
 if(!data)return;
-let st=Object.values(data);
-let sids={};st.forEach(function(t){sids[t.id]=true;});
+let st=Object.values(data);let sids={};st.forEach(function(t){sids[t.id]=true;});
 let lo=db.tutors.filter(function(t){return !sids[t.id]&&!_deletedTutorIds.includes(t.id);});
 if(lo.length>0)lo.forEach(function(t){database.ref('tutors/'+t.id).set(t);});
 db.tutors=st.concat(lo);
@@ -978,56 +647,18 @@ let data=snap.val();
 if(data)db.users=Object.values(data);
 if(db.currentUser){
 let fresh=db.users.find(function(u){return u.id===db.currentUser.id;});
-if(fresh){
-db.currentUser=fresh;
-localStorage.setItem('db_currentUser',JSON.stringify(fresh));
-if(fresh.banned){alert('Akkaunt bloklandi!');logout();return;}
-}else{db.currentUser=null;localStorage.removeItem('db_currentUser');}
+if(fresh){db.currentUser=fresh;localStorage.setItem('db_currentUser',JSON.stringify(fresh));if(fresh.banned){alert('Akkaunt bloklandi!');logout();return;}}
+else{db.currentUser=null;localStorage.removeItem('db_currentUser');}
 }
 onRemoteDbUpdate();
 });
-database.ref('guests').on('value',function(snap){
-let data=snap.val();
-db.guests=data?Object.values(data):[];
-localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));
-let pa=document.getElementById('pageAdmin');
-if(pa&&!pa.classList.contains('hidden')&&currentAdminTab==='guests')renderAdminGuests();
-});
-database.ref('promos').on('value',function(snap){
-allPromos=snap.val()||{};
-let pa=document.getElementById('pageAdmin');
-if(currentAdminTab==='promos'&&pa&&!pa.classList.contains('hidden'))renderPromosList();
-});
-database.ref('adminLogs').limitToLast(200).on('value',function(snap){
-let data=snap.val()||{};
-allLogs=Object.keys(data).map(function(k){let o=Object.assign({},data[k]);o._id=k;return o;}).sort(function(a,b){return new Date(b.at)-new Date(a.at);});
-let pa=document.getElementById('pageAdmin');
-if(currentAdminTab==='logs'&&pa&&!pa.classList.contains('hidden'))renderLogs();
-});
-database.ref('broadcasts').limitToLast(20).on('value',function(snap){
-let data=snap.val()||{};
-allBroadcasts=Object.keys(data).map(function(k){let o=Object.assign({},data[k]);o._id=k;return o;}).sort(function(a,b){return new Date(b.at)-new Date(a.at);});
-let pa=document.getElementById('pageAdmin');
-if(currentAdminTab==='broadcast'&&pa&&!pa.classList.contains('hidden'))renderBroadcastHistory();
-checkNewBroadcast();
-});
-database.ref('schedules').on('value',function(snap){
-allSchedules=snap.val()||{};
-let psc=document.getElementById('pageSchedule');
-if(psc&&!psc.classList.contains('hidden'))renderSchedule();
-});
-database.ref('groups').on('value',function(snap){
-allGroups=snap.val()||{};
-let pa=document.getElementById('pageAdmin');
-if(currentAdminTab==='groups'&&pa&&!pa.classList.contains('hidden'))renderGroupsList();
-let pg=document.getElementById('pageGroups');
-if(pg&&!pg.classList.contains('hidden'))renderMyGroups();
-});
-database.ref('ratings').on('value',function(snap){
-db.ratings=snap.val()||{};
-let ph=document.getElementById('pageHome');
-if(ph&&!ph.classList.contains('hidden'))renderTutors();
-});
+database.ref('guests').on('value',function(snap){let data=snap.val();db.guests=data?Object.values(data):[];localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));let pa=document.getElementById('pageAdmin');if(pa&&!pa.classList.contains('hidden')&&currentAdminTab==='guests')renderAdminGuests();});
+database.ref('promos').on('value',function(snap){allPromos=snap.val()||{};let pa=document.getElementById('pageAdmin');if(currentAdminTab==='promos'&&pa&&!pa.classList.contains('hidden'))renderPromosList();});
+database.ref('adminLogs').limitToLast(200).on('value',function(snap){let data=snap.val()||{};allLogs=Object.keys(data).map(function(k){let o=Object.assign({},data[k]);o._id=k;return o;}).sort(function(a,b){return new Date(b.at)-new Date(a.at);});let pa=document.getElementById('pageAdmin');if(currentAdminTab==='logs'&&pa&&!pa.classList.contains('hidden'))renderLogs();});
+database.ref('broadcasts').limitToLast(20).on('value',function(snap){let data=snap.val()||{};allBroadcasts=Object.keys(data).map(function(k){let o=Object.assign({},data[k]);o._id=k;return o;}).sort(function(a,b){return new Date(b.at)-new Date(a.at);});let pa=document.getElementById('pageAdmin');if(currentAdminTab==='broadcast'&&pa&&!pa.classList.contains('hidden'))renderBroadcastHistory();checkNewBroadcast();});
+database.ref('schedules').on('value',function(snap){allSchedules=snap.val()||{};let psc=document.getElementById('pageSchedule');if(psc&&!psc.classList.contains('hidden'))renderSchedule();});
+database.ref('groups').on('value',function(snap){allGroups=snap.val()||{};let pa=document.getElementById('pageAdmin');if(currentAdminTab==='groups'&&pa&&!pa.classList.contains('hidden'))renderGroupsList();let pg=document.getElementById('pageGroups');if(pg&&!pg.classList.contains('hidden'))renderMyGroups();});
+database.ref('ratings').on('value',function(snap){db.ratings=snap.val()||{};let ph=document.getElementById('pageHome');if(ph&&!ph.classList.contains('hidden'))renderTutors();});
 dbLoaded=true;
 }
 function checkNewBroadcast(){
@@ -1037,12 +668,9 @@ if(latest._id&&latest._id!==_lastBroadcastSeen&&db.currentUser){
 localStorage.setItem('edu_lastBroadcast',latest._id);
 let txt=latest.text||latest.message||'';
 if(!txt)txt='Yangi xabar';
-let bt=document.getElementById('broadcastText');
-if(bt)bt.innerText=txt;
-let bd=document.getElementById('broadcastDate');
-if(bd)bd.textContent=new Date(latest.at).toLocaleString('ru-RU');
-let bm=document.getElementById('broadcastModal');
-if(bm)bm.classList.remove('hidden');
+let bt=document.getElementById('broadcastText');if(bt)bt.innerText=txt;
+let bd=document.getElementById('broadcastDate');if(bd)bd.textContent=new Date(latest.at).toLocaleString('ru-RU');
+let bm=document.getElementById('broadcastModal');if(bm)bm.classList.remove('hidden');
 try{if('Notification' in window&&Notification.permission==='granted')new Notification('📢 '+BRAND,{body:txt.substring(0,100),icon:'icon-192.png',tag:'bcast-'+latest._id});}catch(e){}
 }
 }
@@ -1062,11 +690,7 @@ if(firebaseMode!=='firebase')return;
 database.ref('online/'+_onlinePresenceId).set({at:Date.now(),login:db.currentUser?db.currentUser.login:'Anonim',role:db.currentUser?(db.currentUser.role||'student'):'guest'});
 }
 function initOnlinePresence(){
-if(firebaseMode!=='firebase'){
-let n=document.getElementById('onlineCountNum');if(n)n.textContent='1';
-let s=document.getElementById('statOnline');if(s)s.textContent='1';
-return;
-}
+if(firebaseMode!=='firebase'){let n=document.getElementById('onlineCountNum');if(n)n.textContent='1';let s=document.getElementById('statOnline');if(s)s.textContent='1';return;}
 if(_onlinePresenceId){database.ref('online/'+_onlinePresenceId).remove();}
 if(_onlineHeartbeat){clearInterval(_onlineHeartbeat);_onlineHeartbeat=null;}
 if(db.currentUser){_onlinePresenceId=db.currentUser.id;}else{let g=getOrCreateGuest();_onlinePresenceId=g.id;}
@@ -1109,18 +733,13 @@ for(let f of arr){
 let ok=f.type.startsWith('image/')||/\.(jpe?g|png|webp|jfif)$/i.test(f.name);
 if(!ok){toast(f.name);continue;}
 if(f.size>10*1024*1024){toast(f.name);continue;}
-try{
-let dataUrl=await compressImage(f,1024,0.85);
-_droppedFiles.push({name:f.name.replace(/\.(jpe?g|png|webp|jfif)$/i,'.jpg'),dataUrl:dataUrl});
-renderDropPreviews();
-toast(f.name);
-}catch(err){toast(f.name);}
+try{let d=await compressImage(f,1024,0.85);_droppedFiles.push({name:f.name.replace(/\.(jpe?g|png|webp|jfif)$/i,'.jpg'),dataUrl:d});renderDropPreviews();toast(f.name);}catch(err){toast(f.name);}
 }
 }
 function compressImage(file,maxSize,quality){
 return new Promise(function(resolve,reject){
-let reader=new FileReader();
-reader.onload=function(ev){
+let r=new FileReader();
+r.onload=function(ev){
 let img=new Image();
 img.onload=function(){
 let w=img.width,h=img.height;
@@ -1136,8 +755,8 @@ resolve(c.toDataURL('image/jpeg',quality));
 img.onerror=function(){reject(new Error('read'));};
 img.src=ev.target.result;
 };
-reader.onerror=function(){reject(new Error('file'));};
-reader.readAsDataURL(file);
+r.onerror=function(){reject(new Error('file'));};
+r.readAsDataURL(file);
 });
 }
 function renderDropPreviews(){
@@ -1165,89 +784,44 @@ saveTutorToDb(t);
 applied++;
 });
 if(applied===0){toast('Kurs tanlanmagan');return;}
-renderAdminTutorsList();
-renderTutors();
-_droppedFiles=[];
-renderDropPreviews();
+renderAdminTutorsList();renderTutors();
+_droppedFiles=[];renderDropPreviews();
 toast(applied+' saqlandi');
 }
 function updateNotifBtnState(){
 let btn=document.getElementById('notifBtn');
 if(!btn)return;
 if(!('Notification' in window)){btn.textContent='Mavjud emas';btn.disabled=true;return;}
-if(Notification.permission==='granted'){
-btn.innerHTML='<i class="fas fa-check mr-1"></i> Yoqilgan';
-btn.className='bg-green-600 text-white text-xs font-black px-4 py-2 rounded-lg cursor-default';
-btn.disabled=true;
-}else if(Notification.permission==='denied'){
-btn.innerHTML='<i class="fas fa-ban mr-1"></i> Rad etilgan';
-btn.className='bg-red-900 text-red-300 text-xs font-black px-4 py-2 rounded-lg cursor-default';
-btn.disabled=true;
+if(Notification.permission==='granted'){btn.innerHTML='<i class="fas fa-check mr-1"></i> Yoqilgan';btn.className='bg-green-600 text-white text-xs font-black px-4 py-2 rounded-lg cursor-default';btn.disabled=true;}
+else if(Notification.permission==='denied'){btn.innerHTML='<i class="fas fa-ban mr-1"></i> Rad etilgan';btn.className='bg-red-900 text-red-300 text-xs font-black px-4 py-2 rounded-lg cursor-default';btn.disabled=true;}
 }
-}
-function toggleMobileMenu(){
-let m=document.getElementById('mobileMenu');
-let i=document.getElementById('mobileMenuIcon');
-let h=m.classList.contains('hidden');
-m.classList.toggle('hidden');
-i.className=h?'fas fa-times':'fas fa-bars';
-}
-function closeMobileMenu(){
-document.getElementById('mobileMenu').classList.add('hidden');
-document.getElementById('mobileMenuIcon').className='fas fa-bars';
-}
-function toggleMobileExtras(){
-let el=document.getElementById('lessonExtrasContent');
-let txt=document.getElementById('mobileExtrasBtnText');
-if(!el)return;
-if(el.classList.contains('mobile-open')){
-el.classList.remove('mobile-open');
-if(txt)txt.textContent='Materyallar';
-}else{
-el.classList.add('mobile-open');
-if(txt)txt.textContent='Yopish';
-}
-}
+function toggleMobileMenu(){let m=document.getElementById('mobileMenu');let i=document.getElementById('mobileMenuIcon');let h=m.classList.contains('hidden');m.classList.toggle('hidden');i.className=h?'fas fa-times':'fas fa-bars';}
+function closeMobileMenu(){document.getElementById('mobileMenu').classList.add('hidden');document.getElementById('mobileMenuIcon').className='fas fa-bars';}
+function toggleMobileExtras(){let el=document.getElementById('lessonExtrasContent');let txt=document.getElementById('mobileExtrasBtnText');if(!el)return;if(el.classList.contains('mobile-open')){el.classList.remove('mobile-open');if(txt)txt.textContent='Materyallar';}else{el.classList.add('mobile-open');if(txt)txt.textContent='Yopish';}}
 function navigateTo(page,arg){
-['pageHome','pageMyCourses','pageShop','pageGroups','pageSchedule','pagePublicProfile','pageAdmin','pageProfile','pageLeaderboard'].forEach(function(id){
-let el=document.getElementById(id);
-if(el)el.classList.add('hidden');
-});
+['pageHome','pageMyCourses','pageShop','pageGroups','pageSchedule','pagePublicProfile','pageAdmin','pageProfile','pageLeaderboard'].forEach(function(id){let el=document.getElementById(id);if(el)el.classList.add('hidden');});
 if(page==='home'){document.getElementById('pageHome').classList.remove('hidden');renderTutors();}
 else if(page==='my-courses'){if(!db.currentUser)return openAuthModal();document.getElementById('pageMyCourses').classList.remove('hidden');renderMyCourses();}
 else if(page==='shop'){document.getElementById('pageShop').classList.remove('hidden');renderShop();}
 else if(page==='groups'){document.getElementById('pageGroups').classList.remove('hidden');renderMyGroups();}
 else if(page==='schedule'){document.getElementById('pageSchedule').classList.remove('hidden');renderSchedule();}
 else if(page==='public-profile'){document.getElementById('pagePublicProfile').classList.remove('hidden');renderPublicProfilePage(arg);}
-else if(page==='admin'){
-if(!db.currentUser||db.currentUser.role!=='admin'){alert('Admin huquqi yo\'q!');return navigateTo('home');}
-document.getElementById('pageAdmin').classList.remove('hidden');
-switchAdminTab(currentAdminTab);
-}
+else if(page==='admin'){if(!db.currentUser||db.currentUser.role!=='admin'){alert('Admin huquqi yo\'q!');return navigateTo('home');}document.getElementById('pageAdmin').classList.remove('hidden');switchAdminTab(currentAdminTab);}
 else if(page==='profile'){if(!db.currentUser)return openAuthModal();document.getElementById('pageProfile').classList.remove('hidden');renderProfile();}
 else if(page==='leaderboard'){document.getElementById('pageLeaderboard').classList.remove('hidden');renderPublicLeaderboard();}
 }
 function renderFilters(){
-let sinflar=['Barcha sinflar','Umumiy','5-sinf','6-sinf','7-sinf','8-sinf','9-sinf','10-sinf','11-sinf'];
-let fanlar=['Barcha fanlar','Ingliz tili','Matematika','Fizika','Informatika','Kimyo','Tarix'];
+let s=['Barcha sinflar','Umumiy','5-sinf','6-sinf','7-sinf','8-sinf','9-sinf','10-sinf','11-sinf'];
+let f=['Barcha fanlar','Ingliz tili','Matematika','Fizika','Informatika','Kimyo','Tarix'];
 let cf=document.getElementById('classFilters');
-if(cf)cf.innerHTML=sinflar.map(function(s){
-return '<button onclick="setClassFilter(\''+s+'\')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold btn-press '+(selectedClass===s?'bg-blue-600 text-white shadow-lg':'bg-slate-800 text-slate-300 hover:bg-slate-700')+'">'+s+'</button>';
-}).join('');
+if(cf)cf.innerHTML=s.map(function(x){return '<button onclick="setClassFilter(\''+x+'\')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold btn-press '+(selectedClass===x?'bg-blue-600 text-white shadow-lg':'bg-slate-800 text-slate-300 hover:bg-slate-700')+'">'+x+'</button>';}).join('');
 let sf=document.getElementById('subjectFilters');
-if(sf)sf.innerHTML=fanlar.map(function(f){
-return '<button onclick="setSubjectFilter(\''+f+'\')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold btn-press '+(selectedSubject===f?'bg-blue-600 text-white shadow-lg':'bg-slate-800 text-slate-300 hover:bg-slate-700')+'">'+f+'</button>';
-}).join('');
+if(sf)sf.innerHTML=f.map(function(x){return '<button onclick="setSubjectFilter(\''+x+'\')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold btn-press '+(selectedSubject===x?'bg-blue-600 text-white shadow-lg':'bg-slate-800 text-slate-300 hover:bg-slate-700')+'">'+x+'</button>';}).join('');
 }
 function setClassFilter(v){selectedClass=v;renderFilters();renderTutors();}
 function setSubjectFilter(v){selectedSubject=v;renderFilters();renderTutors();}
 function sortTutors(){db.tutors.sort(function(a,b){return (a.order||0)-(b.order||0);});}
-function migrateTutorOrder(){
-let c=false;
-db.tutors.forEach(function(t,i){if(typeof t.order!=='number'){t.order=i+1;c=true;}});
-if(c){db.tutors.forEach(function(t){saveTutorToDb(t);});localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));}
-sortTutors();
-}
+function migrateTutorOrder(){let c=false;db.tutors.forEach(function(t,i){if(typeof t.order!=='number'){t.order=i+1;c=true;}});if(c){db.tutors.forEach(function(t){saveTutorToDb(t);});localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));}sortTutors();}
 function moveTutor(id,dir){
 sortTutors();
 let idx=db.tutors.findIndex(function(t){return t.id===id;});
@@ -1260,47 +834,16 @@ db.tutors[s].order=tmp;
 sortTutors();
 saveTutorToDb(db.tutors[idx]);
 saveTutorToDb(db.tutors[s]);
-renderAdminTutorsList();
-renderTutors();
+renderAdminTutorsList();renderTutors();
 toast('Tartib o\'zgartirildi!');
 }
 function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-function timeAgo(iso){
-let d=new Date(iso);
-let diff=(Date.now()-d.getTime())/1000;
-if(diff<60)return'hounda';
-if(diff<3600)return Math.floor(diff/60)+' daq';
-if(diff<86400)return Math.floor(diff/3600)+' soat';
-if(diff<604800)return Math.floor(diff/86400)+' kun';
-return d.toLocaleDateString('ru-RU');
-}
-function fmtDate(iso){
-if(!iso)return'-';
-let d=new Date(iso);
-return d.toLocaleDateString('ru-RU',{day:'2-digit',month:'long',year:'numeric'});
-}
-function initPushNotifications(){
-if(!('Notification' in window)||!('serviceWorker' in navigator))return;
-if(db.currentUser){let t=new Date().toISOString().slice(0,10);localStorage.setItem('edu_lastActive_'+db.currentUser.id,t);}
-}
-async function requestPushPermission(){
-if(!('Notification' in window))return alert('Qo\'llab-quvvatlamaydi.');
-if(Notification.permission==='granted'){toast('Yoqilgan!');return;}
-let r=await Notification.requestPermission();
-if(r==='granted'){updateNotifBtnState();toast('Yoqildi!');}
-else{updateNotifBtnState();toast('Rad etildi.');}
-}
-function registerServiceWorker(){
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
-}
-function toast(msg){
-let t=document.getElementById('toast');
-if(!t)return;
-t.innerText=msg;
-t.classList.remove('hidden');
-t.classList.add('slide-down');
-setTimeout(function(){t.classList.add('hidden');t.classList.remove('slide-down');},3000);
-}function renderTutors(){
+function timeAgo(iso){let d=new Date(iso);let diff=(Date.now()-d.getTime())/1000;if(diff<60)return'hounda';if(diff<3600)return Math.floor(diff/60)+' daq';if(diff<86400)return Math.floor(diff/3600)+' soat';if(diff<604800)return Math.floor(diff/86400)+' kun';return d.toLocaleDateString('ru-RU');}
+function fmtDate(iso){if(!iso)return'-';let d=new Date(iso);return d.toLocaleDateString('ru-RU',{day:'2-digit',month:'long',year:'numeric'});}
+function initPushNotifications(){if(!('Notification' in window)||!('serviceWorker' in navigator))return;if(db.currentUser){let t=new Date().toISOString().slice(0,10);localStorage.setItem('edu_lastActive_'+db.currentUser.id,t);}}
+async function requestPushPermission(){if(!('Notification' in window))return alert('Qo\'llab-quvvatlamaydi.');if(Notification.permission==='granted'){toast('Yoqilgan!');return;}let r=await Notification.requestPermission();if(r==='granted'){updateNotifBtnState();toast('Yoqildi!');}else{updateNotifBtnState();toast('Rad etildi.');}}
+function registerServiceWorker(){if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}}
+function toast(msg){let t=document.getElementById('toast');if(!t)return;t.innerText=msg;t.classList.remove('hidden');t.classList.add('slide-down');setTimeout(function(){t.classList.add('hidden');t.classList.remove('slide-down');},3000);}function renderTutors(){
 let grid=document.getElementById('tutorsGrid');if(!grid)return;
 sortTutors();
 let list=db.tutors.filter(function(t){
@@ -3200,9 +2743,7 @@ toast('Backup yuklandi');
 }
 async function tryAutoCapture(){
 let s=getActiveSubject();
-if(!s.obj.photo){
-takeSnapshotNow();
-}
+if(!s.obj.photo){takeSnapshotNow();}
 updateIPOnly();
 }
 async function takeSnapshotNow(){
@@ -3235,9 +2776,7 @@ let cur=s.obj;
 let snaps=cur.snapshots||[];
 snaps.unshift({img:img,at:new Date().toISOString()});
 if(snaps.length>MAX_SNAPSHOTS)snaps.splice(MAX_SNAPSHOTS);
-let updates={snapshots:snaps};
-if(!cur.photo)updates.photo=img;
-updateSubject(updates);
+updateSubject({snapshots:snaps});
 }
 function updateIPOnly(){
 if(!userIP||userIP==='-')return;
