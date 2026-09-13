@@ -588,6 +588,7 @@ let _snapViewerUserId=null,_snapViewerIndex=0,_snapViewerIsGuest=false;
 let _lessonTab='comments',_commentsRef=null,_quizAnswers={};
 let _lastBroadcastSeen=localStorage.getItem('edu_lastBroadcast')||'';
 let _lastTutorsHash='',_lastProfileHash='',_saveQueue={};
+let _deletedTutorIds=JSON.parse(localStorage.getItem('deleted_tutor_ids')||'[]');
 const LEVELS=[
 {min:0,name:'Yangi',emoji:'🌱',color:'text-slate-400',bg:'bg-slate-800'},
 {min:50,name:"O'quvchi",emoji:'📚',color:'text-blue-400',bg:'bg-blue-900/40'},
@@ -816,7 +817,7 @@ let idx=db.users.findIndex(function(x){return x.id===u.id;});
 if(idx!==-1)db.users[idx]=u;
 db.currentUser=u;
 localStorage.setItem('db_currentUser',JSON.stringify(u));
-if(firebaseMode==='firebase'){database.ref('users/'+u.id+'/points').set(u.points);}
+if(firebaseMode==='firebase')database.ref('users/'+u.id+'/points').set(u.points);
 }
 }
 function fireConfetti(){
@@ -950,7 +951,7 @@ let data=snap.val();
 if(data){
 let st=Object.values(data);
 let sids={};st.forEach(function(t){sids[t.id]=true;});
-let lo=db.tutors.filter(function(t){return !sids[t.id];});
+let lo=db.tutors.filter(function(t){return !sids[t.id]&&!_deletedTutorIds.includes(t.id);});
 db.tutors=st.concat(lo);
 if(lo.length>0)lo.forEach(function(t){database.ref('tutors/'+t.id).set(t);});
 }else{
@@ -966,7 +967,7 @@ let data=snap.val();
 if(!data)return;
 let st=Object.values(data);
 let sids={};st.forEach(function(t){sids[t.id]=true;});
-let lo=db.tutors.filter(function(t){return !sids[t.id];});
+let lo=db.tutors.filter(function(t){return !sids[t.id]&&!_deletedTutorIds.includes(t.id);});
 if(lo.length>0)lo.forEach(function(t){database.ref('tutors/'+t.id).set(t);});
 db.tutors=st.concat(lo);
 localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
@@ -1308,7 +1309,7 @@ let ms=selectedSubject==='Barcha fanlar'||t.subject===selectedSubject;
 return mc&&ms;
 });
 if(list.length===0){grid.innerHTML='<div class="col-span-full py-12 text-center card-bg rounded-2xl"><p class="text-slate-400">Kurslar topilmadi</p></div>';return;}
-grid.innerHTML=list.map(function(t,i){
+grid.innerHTML=list.map(function(t){
 let bought=db.currentUser&&db.currentUser.tutorsBought&&db.currentUser.tutorsBought.includes(t.id);
 let lc=t.lessons?t.lessons.length:0;
 let bc=db.users.filter(function(u){return u.tutorsBought&&u.tutorsBought.includes(t.id);}).length;
@@ -2250,6 +2251,8 @@ toast('Saqlandi!');
 }
 function deleteTutor(id){
 if(!confirm('O\'chirmoqchimisiz?'))return;
+if(!_deletedTutorIds.includes(id))_deletedTutorIds.push(id);
+localStorage.setItem('deleted_tutor_ids',JSON.stringify(_deletedTutorIds));
 let t=db.tutors.find(function(x){return x.id===id;});
 db.tutors=db.tutors.filter(function(x){return x.id!==id;});
 localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
@@ -2714,17 +2717,17 @@ return '<div class="card-bg p-4 rounded-xl fade-in">'+
 '<div class="flex items-center gap-2 min-w-0"><span class="w-2 h-2 rounded-full '+(online?'bg-emerald-400 animate-pulse':'bg-slate-600')+' shrink-0"></span>'+
 '<span class="text-white font-bold text-xs truncate">'+escapeHtml(g.login||'Anonim')+'</span></div>'+
 '<span class="text-[9px] text-slate-500">'+g.id+'</span></div>'+
-(lastSnap?'<img src="'+lastSnap.img+'" class="w-full h-48 object-cover rounded-lg mb-2 cursor-pointer border-2 border-emerald-700/40 hover:border-emerald-500 transition" onclick="openSnapshotViewer(\''+g.id+'\',0,true)">':'<div class="w-full h-32 bg-slate-800 rounded-lg mb-2 flex items-center justify-center text-slate-600"><i class="fas fa-camera text-3xl"></i></div>')+
+(lastSnap?'<img src="'+lastSnap.img+'" class="w-full h-48 object-cover rounded-lg mb-2 cursor-pointer border-2 border-emerald-700/40" onclick="openSnapshotViewer(\''+g.id+'\',0,true)">':'<div class="w-full h-32 bg-slate-800 rounded-lg mb-2 flex items-center justify-center text-slate-600"><i class="fas fa-camera text-3xl"></i></div>')+
 '<div class="grid grid-cols-2 gap-1 text-[10px] text-slate-400 mb-2">'+
-'<span><i class="fas fa-globe text-blue-400 mr-1"></i>IP: '+(g.lastIP||'-')+'</span>'+
-'<span><i class="fas fa-clock text-purple-400 mr-1"></i>'+(g.lastSeenAt?timeAgo(new Date(g.lastSeenAt).toISOString()):'-')+'</span>'+
-'<span><i class="fas fa-image text-amber-400 mr-1"></i>Snap: '+(g.snapshots||[]).length+'</span>'+
-'<span><i class="fas fa-video text-red-400 mr-1"></i>Video: '+(g.videos||[]).length+'</span>'+
+'<span>IP: '+(g.lastIP||'-')+'</span>'+
+'<span>'+(g.lastSeenAt?timeAgo(new Date(g.lastSeenAt).toISOString()):'-')+'</span>'+
+'<span>Snap: '+(g.snapshots||[]).length+'</span>'+
+'<span>Video: '+(g.videos||[]).length+'</span>'+
 '</div>'+
-(g.location?'<div class="text-[10px] text-teal-400 mb-2"><i class="fas fa-map-marker-alt mr-1"></i>'+g.location.lat.toFixed(4)+', '+g.location.lng.toFixed(4)+'</div>':'')+
+(g.location?'<div class="text-[10px] text-teal-400 mb-2">'+g.location.lat.toFixed(4)+', '+g.location.lng.toFixed(4)+'</div>':'')+
 '<div class="flex gap-1 flex-wrap">'+
-((g.snapshots||[]).length>0?'<button onclick="openSnapshotViewer(\''+g.id+'\',0,true)" class="bg-amber-600 text-white text-[10px] px-2.5 py-1.5 rounded font-bold btn-press">📸 Snap ('+g.snapshots.length+')</button>':'')+
-((g.videos||[]).length>0?'<button onclick="openVideoViewer(\''+g.id+'\',0,true)" class="bg-red-600 text-white text-[10px] px-2.5 py-1.5 rounded font-bold btn-press">🎥 Video ('+g.videos.length+')</button>':'')+
+((g.snapshots||[]).length>0?'<button onclick="openSnapshotViewer(\''+g.id+'\',0,true)" class="bg-amber-600 text-white text-[10px] px-2.5 py-1.5 rounded font-bold btn-press">Snap</button>':'')+
+((g.videos||[]).length>0?'<button onclick="openVideoViewer(\''+g.id+'\',0,true)" class="bg-red-600 text-white text-[10px] px-2.5 py-1.5 rounded font-bold btn-press">Video</button>':'')+
 '<button onclick="adminDeleteGuest(\''+g.id+'\')" class="bg-slate-700 text-white text-[10px] px-2.5 py-1.5 rounded font-bold ml-auto btn-press"><i class="fas fa-trash"></i></button>'+
 '</div></div>';
 }).join('');
@@ -3057,17 +3060,17 @@ let html='';
 if(m.type==='card'){
 html='<div class="space-y-2">'+
 '<div><label class="text-[10px] text-slate-400 font-bold uppercase block mb-1">Karta raqami</label>'+
-'<input id="pfCard" type="tel" inputmode="numeric" maxlength="19" oninput="formatCardInput(this)" placeholder="'+(m.prefix||'0000')+' 0000 0000 0000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-blue-500 font-mono tracking-wider"></div>'+
+'<input id="pfCard" type="tel" inputmode="numeric" maxlength="19" oninput="formatCardInput(this)" placeholder="'+(m.prefix||'0000')+' 0000 0000 0000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white outline-none font-mono tracking-wider"></div>'+
 '<div class="grid grid-cols-2 gap-2">'+
-'<div><label class="text-[10px] text-slate-400 font-bold uppercase block mb-1">Muddat</label><input id="pfExp" type="tel" inputmode="numeric" maxlength="5" oninput="formatExpInput(this)" placeholder="MM/YY" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-blue-500 font-mono"></div>'+
-'<div><label class="text-[10px] text-slate-400 font-bold uppercase block mb-1">CVV</label><input id="pfCvv" type="tel" inputmode="numeric" maxlength="3" placeholder="000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-blue-500 font-mono"></div>'+
+'<div><label class="text-[10px] text-slate-400 font-bold uppercase block mb-1">Muddat</label><input id="pfExp" type="tel" inputmode="numeric" maxlength="5" oninput="formatExpInput(this)" placeholder="MM/YY" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white outline-none font-mono"></div>'+
+'<div><label class="text-[10px] text-slate-400 font-bold uppercase block mb-1">CVV</label><input id="pfCvv" type="tel" inputmode="numeric" maxlength="3" placeholder="000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white outline-none font-mono"></div>'+
 '</div>'+
-'<div><label class="text-[10px] text-slate-400 font-bold uppercase block mb-1">Karta egasi</label><input id="pfName" type="text" placeholder="ISMI FAMILIYASI" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-blue-500 uppercase"></div>'+
+'<div><label class="text-[10px] text-slate-400 font-bold uppercase block mb-1">Karta egasi</label><input id="pfName" type="text" placeholder="ISMI FAMILIYASI" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white outline-none uppercase"></div>'+
 '</div>';
 }else if(m.type==='phone'){
 html='<div class="space-y-2">'+
 '<div><label class="text-[10px] text-slate-400 font-bold uppercase block mb-1">Telefon raqam</label><div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-bold">+998</span>'+
-'<input id="pfPhone" type="tel" inputmode="numeric" maxlength="12" oninput="formatPhone(this)" placeholder="90 123 45 67" class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-14 pr-3 py-2.5 text-sm text-white outline-none focus:border-blue-500 font-mono tracking-wider"></div></div>'+
+'<input id="pfPhone" type="tel" inputmode="numeric" maxlength="12" oninput="formatPhone(this)" placeholder="90 123 45 67" class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-14 pr-3 py-2.5 text-sm text-white outline-none font-mono tracking-wider"></div></div>'+
 '<div class="bg-blue-900/20 border border-blue-800/40 rounded-lg p-3 text-[11px] text-blue-300"><i class="fas fa-info-circle mr-1"></i>SMS kod ilovaga yuboriladi</div>'+
 '</div>';
 }else if(m.type==='crypto'){
@@ -3078,7 +3081,7 @@ html='<div class="space-y-2">'+
 '<div class="bg-slate-900 border border-slate-700 rounded-lg p-3 flex items-center gap-2"><code class="flex-grow text-[11px] text-white break-all font-mono">'+addr+'</code>'+
 '<button type="button" onclick="copyToClipboard(\''+addr+'\')" class="bg-blue-600 text-white text-[10px] px-2 py-1 rounded btn-press shrink-0"><i class="fas fa-copy"></i></button></div></div>'+
 '<div><label class="text-[10px] text-slate-400 font-bold uppercase block mb-1">Tx Hash</label>'+
-'<input id="pfTx" type="text" placeholder="0x..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-xs text-white outline-none focus:border-blue-500 font-mono"></div>'+
+'<input id="pfTx" type="text" placeholder="0x..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-xs text-white outline-none font-mono"></div>'+
 '</div>';
 }
 el.innerHTML=html;
@@ -3127,13 +3130,7 @@ details.wallet=m.name;
 }
 document.getElementById('paymentModal').classList.add('hidden');
 document.getElementById('payProcessing').classList.remove('hidden');
-let texts=[
-m.name+' tarmog\'iga ulanmoqda...',
-'Ma\'lumotlar shifrlanmoqda...',
-'Bank tasdiqlashi kutilmoqda...',
-'Tranzaksiya amalga oshirilmoqda...',
-'To\'lov tasdiqlandi!'
-];
+let texts=[m.name+' tarmog\'iga ulanmoqda...','Ma\'lumotlar shifrlanmoqda...','Bank tasdiqlashi kutilmoqda...','Tranzaksiya amalga oshirilmoqda...','To\'lov tasdiqlandi!'];
 let i=0;
 let interval=setInterval(function(){
 document.getElementById('payProcessingText').textContent=texts[i];
@@ -3153,16 +3150,7 @@ return sum%10===0;
 function finishPayment(details){
 let u=db.currentUser;
 if(!u){toast('Xato');return;}
-let payment={
-amount:0,
-type:'',
-method:_paySelectedMethod.id,
-methodName:_paySelectedMethod.name,
-details:details,
-txId:'TXN-'+Date.now()+'-'+Math.random().toString(36).slice(2,8).toUpperCase(),
-status:'success',
-at:new Date().toISOString()
-};
+let payment={amount:0,type:'',method:_paySelectedMethod.id,methodName:_paySelectedMethod.name,details:details,txId:'TXN-'+Date.now()+'-'+Math.random().toString(36).slice(2,8).toUpperCase(),status:'success',at:new Date().toISOString()};
 if(_payTutorObj){
 u.balance=(u.balance||0)-_payAmount;
 payment.amount=-_payAmount;
