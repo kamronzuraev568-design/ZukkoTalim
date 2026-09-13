@@ -1,4 +1,4 @@
-<!-- ZukkoTalim v3.0 (comments + homework + quiz + notes + rating + favorites + search + certificate) -->
+<!-- ZukkoTalim v3.1 (batch 1: admin stats + broadcast + promos + logs) -->
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -24,6 +24,7 @@ body{background:#0d1117;color:#c9d1d9;font-family:system-ui,-apple-system,sans-s
 .star{cursor:pointer;transition:transform .15s}
 .star:hover{transform:scale(1.2)}
 .tab-btn.active{background:#2563eb;color:#fff;font-weight:700}
+.chart-bar{transition:height .3s ease}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -78,7 +79,7 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div class="card-bg p-4 rounded-2xl">
 <div class="relative">
 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
-<input type="text" id="searchInput" placeholder="Dars, kurs yoki mavzu qidirish... (masalan: tenglama)" oninput="runGlobalSearch(this.value)" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl pl-12 pr-4 py-3 text-sm text-white outline-none transition">
+<input type="text" id="searchInput" placeholder="Dars, kurs yoki mavzu qidirish..." oninput="runGlobalSearch(this.value)" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl pl-12 pr-4 py-3 text-sm text-white outline-none transition">
 </div>
 <div id="searchResults" class="hidden mt-3 max-h-[400px] overflow-y-auto custom-scrollbar space-y-2"></div>
 </div>
@@ -107,16 +108,60 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div class="flex justify-between items-center flex-wrap gap-3">
 <h1 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fas fa-cog text-amber-400"></i> Boshqaruv Paneli</h1>
 <div class="flex gap-2 flex-wrap">
-<button onclick="downloadBackup()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2 rounded-lg font-bold transition flex items-center gap-2"><i class="fas fa-download"></i> Backup</button>
-<button onclick="uploadBackup()" class="bg-slate-700 hover:bg-slate-600 text-white text-sm px-4 py-2 rounded-lg font-bold transition flex items-center gap-2"><i class="fas fa-upload"></i> Restore</button>
+<button onclick="downloadBackup()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-bold transition flex items-center gap-1"><i class="fas fa-download"></i> Backup</button>
+<button onclick="uploadBackup()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-2 rounded-lg font-bold transition flex items-center gap-1"><i class="fas fa-upload"></i> Restore</button>
 </div>
 </div>
-<div class="flex gap-2 border-b border-slate-800 pb-2 flex-wrap overflow-x-auto">
-<button onclick="switchAdminTab('users')" id="tabUsersBtn" class="px-3 py-2 text-sm font-semibold whitespace-nowrap border-b-2 border-blue-500 text-blue-400"><i class="fas fa-users mr-1"></i> Foydalanuvchilar</button>
-<button onclick="switchAdminTab('guests')" id="tabGuestsBtn" class="px-3 py-2 text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white"><i class="fas fa-user-secret mr-1"></i> Mehmonlar</button>
-<button onclick="switchAdminTab('tutors')" id="tabTutorsBtn" class="px-3 py-2 text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white"><i class="fas fa-user-graduate mr-1"></i> Repetitorlar</button>
-<button onclick="switchAdminTab('lessons')" id="tabLessonsBtn" class="px-3 py-2 text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white"><i class="fas fa-video mr-1"></i> Darslar</button>
-<button onclick="switchAdminTab('top')" id="tabTopBtn" class="px-3 py-2 text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white"><i class="fas fa-trophy mr-1"></i> TOP-10</button>
+<div class="flex gap-1 border-b border-slate-800 pb-2 flex-wrap overflow-x-auto custom-scrollbar">
+<button onclick="switchAdminTab('stats')" id="tabStatsBtn" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white"><i class="fas fa-chart-line mr-1"></i> Stats</button>
+<button onclick="switchAdminTab('users')" id="tabUsersBtn" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap border-b-2 border-blue-500 text-blue-400"><i class="fas fa-users mr-1"></i> Users</button>
+<button onclick="switchAdminTab('guests')" id="tabGuestsBtn" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white"><i class="fas fa-user-secret mr-1"></i> Guests</button>
+<button onclick="switchAdminTab('tutors')" id="tabTutorsBtn" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white"><i class="fas fa-user-graduate mr-1"></i> Tutors</button>
+<button onclick="switchAdminTab('lessons')" id="tabLessonsBtn" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white"><i class="fas fa-video mr-1"></i> Lessons</button>
+<button onclick="switchAdminTab('promos')" id="tabPromosBtn" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white"><i class="fas fa-tags mr-1"></i> Promo</button>
+<button onclick="switchAdminTab('broadcast')" id="tabBroadcastBtn" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white"><i class="fas fa-bullhorn mr-1"></i> Broadcast</button>
+<button onclick="switchAdminTab('logs')" id="tabLogsBtn" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white"><i class="fas fa-history mr-1"></i> Logs</button>
+<button onclick="switchAdminTab('top')" id="tabTopBtn" class="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white"><i class="fas fa-trophy mr-1"></i> TOP-10</button>
+</div>
+
+<div id="adminTabStats" class="hidden space-y-6">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+<div class="card-bg p-4 rounded-xl">
+<div class="text-[10px] text-slate-400 uppercase font-bold">Foydalanuvchilar</div>
+<div id="statUsers" class="text-2xl md:text-3xl font-black text-blue-400 mt-1">0</div>
+<div id="statUsersSub" class="text-[10px] text-slate-500 mt-1">—</div>
+</div>
+<div class="card-bg p-4 rounded-xl">
+<div class="text-[10px] text-slate-400 uppercase font-bold">Onlayn</div>
+<div id="statOnline" class="text-2xl md:text-3xl font-black text-emerald-400 mt-1">0</div>
+<div class="text-[10px] text-slate-500 mt-1">hozir</div>
+</div>
+<div class="card-bg p-4 rounded-xl">
+<div class="text-[10px] text-slate-400 uppercase font-bold">Kurslar</div>
+<div id="statTutors" class="text-2xl md:text-3xl font-black text-indigo-400 mt-1">0</div>
+<div id="statTutorsSub" class="text-[10px] text-slate-500 mt-1">—</div>
+</div>
+<div class="card-bg p-4 rounded-xl">
+<div class="text-[10px] text-slate-400 uppercase font-bold">Tushum</div>
+<div id="statRevenue" class="text-xl md:text-2xl font-black text-amber-400 mt-1">0</div>
+<div id="statRevenueSub" class="text-[10px] text-slate-500 mt-1">so'm</div>
+</div>
+</div>
+<div class="card-bg p-5 rounded-xl">
+<h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2"><i class="fas fa-chart-bar text-emerald-400"></i> Faollik (7 kun)</h3>
+<div id="statChart" class="flex items-end gap-1 h-40"></div>
+<div class="text-[10px] text-slate-500 text-center mt-2">Kunlik yangi ro'yxatdan o'tishlar</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+<div class="card-bg p-5 rounded-xl">
+<h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2"><i class="fas fa-fire text-orange-400"></i> Top-5 faol</h3>
+<div id="statTopActive" class="space-y-2"></div>
+</div>
+<div class="card-bg p-5 rounded-xl">
+<h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2"><i class="fas fa-shopping-cart text-blue-400"></i> Top-5 kurslar</h3>
+<div id="statTopCourses" class="space-y-2"></div>
+</div>
+</div>
 </div>
 
 <div id="adminTabUsers" class="space-y-6">
@@ -136,11 +181,9 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div id="adminTabTutors" class="hidden space-y-6">
 <div class="card-bg p-6 rounded-xl space-y-4 border-2 border-dashed border-emerald-700/40">
 <h3 class="text-lg font-bold text-white"><i class="fas fa-cloud-upload-alt mr-2 text-emerald-400"></i>Обложки — Drop Zone</h3>
-<p class="text-xs text-slate-400">Перетащите <b>.jpg / .png / .jfif</b>. Сожмутся до 1024px и уйдут в Firebase.</p>
-<div id="dropZone" class="border-2 border-dashed border-slate-700 rounded-xl p-8 text-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-900/10 transition">
-<i class="fas fa-cloud-upload-alt text-4xl text-slate-600 mb-3 block"></i>
-<p class="text-slate-300 font-semibold text-sm">Перетащите файлы сюда</p>
-<p class="text-slate-500 text-xs mt-1">или нажмите</p>
+<div id="dropZone" class="border-2 border-dashed border-slate-700 rounded-xl p-6 text-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-900/10 transition">
+<i class="fas fa-cloud-upload-alt text-3xl text-slate-600 mb-2 block"></i>
+<p class="text-slate-300 font-semibold text-sm">Перетащите файлы</p>
 <input type="file" id="dropInput" accept="image/*" multiple class="hidden">
 </div>
 <div id="dropPreviews" class="space-y-3"></div>
@@ -168,33 +211,76 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 
 <div id="adminTabLessons" class="hidden space-y-6">
 <div class="card-bg p-6 rounded-xl space-y-4 border-2 border-dashed border-red-700/40">
-<h3 class="text-lg font-bold text-white"><i class="fab fa-youtube mr-2 text-red-500"></i>Import YouTube Playlist</h3>
-<p class="text-xs text-slate-400">Вставьте ссылку — все видео подтянутся автоматически.</p>
+<h3 class="text-lg font-bold text-white"><i class="fab fa-youtube mr-2 text-red-500"></i>Import YouTube</h3>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-<div><label class="text-xs text-slate-400 block mb-1">Плейлист:</label>
-<input type="text" id="ytPlaylistUrl" placeholder="https://www.youtube.com/playlist?list=PLxxxxx" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
+<div><label class="text-xs text-slate-400 block mb-1">Playlist:</label>
+<input type="text" id="ytPlaylistUrl" placeholder="https://youtube.com/playlist?list=PLxxx" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
 <div><label class="text-xs text-slate-400 block mb-1">Курс:</label>
 <select id="ytPlaylistTutor" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></select></div>
 </div>
-<button onclick="importYouTubePlaylist()" id="ytImportBtn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm transition"><i class="fab fa-youtube mr-1"></i> Загрузить все видео</button>
+<button onclick="importYouTubePlaylist()" id="ytImportBtn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm"><i class="fab fa-youtube mr-1"></i> Загрузить</button>
 <div id="ytImportStatus" class="hidden text-xs font-semibold"></div>
 </div>
 <div class="card-bg p-6 rounded-xl space-y-4">
 <h3 class="text-lg font-bold text-white"><i class="fas fa-plus-circle text-blue-400 mr-2"></i>Kursga Dars</h3>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-<div class="col-span-2"><label class="text-xs text-slate-400 block mb-1">Repetitor:</label>
-<select id="lessonTutorSelect" onchange="renderAdminLessonsList()" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></select></div>
-<input type="text" id="newLessonTitle" placeholder="Dars Nomi" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
-<input type="text" id="newLessonUrl" placeholder="YouTube / Vimeo" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
-<button onclick="addLessonToTutor()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm transition"><i class="fas fa-plus mr-1"></i> Qo'shish</button></div>
+<select id="lessonTutorSelect" onchange="renderAdminLessonsList()" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></select>
+<input type="text" id="newLessonTitle" placeholder="Dars Nomi" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white mt-2">
+<input type="text" id="newLessonUrl" placeholder="YouTube / Vimeo" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white mt-2">
+<button onclick="addLessonToTutor()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm mt-2">Qo'shish</button></div>
 <div class="card-bg p-6 rounded-xl space-y-4 border border-indigo-800/40">
-<h3 class="text-lg font-bold text-white"><i class="fas fa-layer-group mr-2 text-emerald-400"></i>Массово добавить</h3>
-<p class="text-xs text-slate-400">Формат: <b>Dars nomi | YouTube link</b></p>
+<h3 class="text-lg font-bold text-white"><i class="fas fa-layer-group mr-2 text-emerald-400"></i>Массово</h3>
 <textarea id="bulkLessonsInput" rows="6" placeholder="1-Dars | https://youtu.be/ID" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white font-mono"></textarea>
-<button onclick="addLessonsBulk()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm transition"><i class="fas fa-layer-group mr-1"></i> Barchasini Qo'shish</button></div>
+<button onclick="addLessonsBulk()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm"><i class="fas fa-layer-group mr-1"></i> Добавить все</button></div>
 <div class="card-bg p-6 rounded-xl space-y-4">
-<h3 class="text-lg font-bold text-white"><i class="fas fa-film mr-2 text-indigo-400"></i>Darslar ro'yxati</h3>
+<h3 class="text-lg font-bold text-white"><i class="fas fa-film mr-2 text-indigo-400"></i>Darslar</h3>
 <div id="adminLessonsList" class="space-y-2"></div></div>
+</div>
+
+<div id="adminTabPromos" class="hidden space-y-6">
+<div class="card-bg p-6 rounded-xl space-y-4">
+<h3 class="text-lg font-bold text-white"><i class="fas fa-tag mr-2 text-amber-400"></i>Yangi promokod</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+<div><label class="text-xs text-slate-400 block mb-1">Kod (SALE50)</label>
+<input type="text" id="promoCode" placeholder="SALE50" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white font-mono"></div>
+<div><label class="text-xs text-slate-400 block mb-1">Skidka (%)</label>
+<input type="number" id="promoDiscount" min="1" max="90" value="50" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
+<div><label class="text-xs text-slate-400 block mb-1">Limit (0=∞)</label>
+<input type="number" id="promoLimit" min="0" value="0" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
+</div>
+<button onclick="createPromo()" class="bg-amber-600 hover:bg-amber-700 text-slate-900 px-6 py-2.5 rounded-lg font-bold text-sm">Yaratish</button>
+</div>
+<div class="card-bg p-6 rounded-xl space-y-3">
+<h3 class="text-lg font-bold text-white"><i class="fas fa-list mr-2"></i>Faol promokodlar</h3>
+<div id="promosList" class="space-y-2"></div>
+</div>
+</div>
+
+<div id="adminTabBroadcast" class="hidden space-y-6">
+<div class="card-bg p-6 rounded-xl space-y-4">
+<h3 class="text-lg font-bold text-white"><i class="fas fa-bullhorn mr-2 text-red-400"></i>Massoviy xabar</h3>
+<p class="text-xs text-slate-400">Barcha foydalanuvchilarga bildirishnoma yuboradi. Ular saytga kirganda ko'radi.</p>
+<textarea id="broadcastText" rows="4" placeholder="Xabar matni..." class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white"></textarea>
+<select id="broadcastType" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
+<option value="info">ℹ️ Ma'lumot</option>
+<option value="success">✅ Yaxshi xabar</option>
+<option value="warning">⚠️ Ogohlantirish</option>
+</select>
+<button onclick="sendBroadcast()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm"><i class="fas fa-paper-plane mr-1"></i> Yuborish</button>
+</div>
+<div class="card-bg p-6 rounded-xl space-y-3">
+<h3 class="text-lg font-bold text-white"><i class="fas fa-history mr-2"></i>Oxirgi xabarlar</h3>
+<div id="broadcastHistory" class="space-y-2"></div>
+</div>
+</div>
+
+<div id="adminTabLogs" class="hidden space-y-6">
+<div class="card-bg p-6 rounded-xl space-y-3">
+<div class="flex justify-between items-center flex-wrap gap-2">
+<h3 class="text-lg font-bold text-white"><i class="fas fa-history mr-2 text-purple-400"></i>Admin amallari</h3>
+<button onclick="clearLogs()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded font-bold"><i class="fas fa-trash mr-1"></i> Tozalash</button>
+</div>
+<div id="logsList" class="space-y-2 max-h-[600px] overflow-y-auto custom-scrollbar"></div>
+</div>
 </div>
 
 <div id="adminTabTop" class="hidden space-y-6">
@@ -221,23 +307,23 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 </div></div>
 <div class="bg-slate-900 px-6 py-3 rounded-xl border border-slate-800 flex items-center gap-4 flex-wrap">
 <div><span class="text-xs text-slate-400 block">Balans:</span><span id="profBalance" class="text-xl font-black text-green-400">0 so'm</span></div>
-<button onclick="addMoney()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-2 rounded-lg font-bold transition">+ To'ldirish</button></div>
+<button onclick="addMoney()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-2 rounded-lg font-bold">+ To'ldirish</button></div>
 <div id="notifBanner" class="bg-slate-900 px-6 py-4 rounded-xl border border-slate-800">
 <div class="flex items-center justify-between gap-4 flex-wrap">
 <div class="flex items-center gap-3"><div class="w-9 h-9 bg-amber-500/20 rounded-lg flex items-center justify-center text-amber-400"><i class="fas fa-bell"></i></div>
 <div><p class="text-sm font-bold text-white">Kunlik eslatmalar</p><p id="notifStatus" class="text-xs text-slate-400">Har kuni 19:00 da</p></div></div>
-<button id="notifBtn" onclick="requestPushPermission()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs font-black px-4 py-2 rounded-lg transition whitespace-nowrap"><i class="fas fa-bell mr-1"></i> Yoqish</button></div></div></div>
+<button id="notifBtn" onclick="requestPushPermission()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs font-black px-4 py-2 rounded-lg whitespace-nowrap"><i class="fas fa-bell mr-1"></i> Yoqish</button></div></div></div>
 <div class="card-bg p-6 rounded-2xl space-y-4">
 <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fas fa-shield-alt text-emerald-400"></i> Xavfsizlik</h2>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
 <div><label class="text-xs text-slate-400 block mb-1.5 font-semibold">Hozirgi</label>
-<input type="password" id="secOldPass" placeholder="••••••" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-white outline-none transition"></div>
+<input type="password" id="secOldPass" placeholder="••••••" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-white outline-none"></div>
 <div><label class="text-xs text-slate-400 block mb-1.5 font-semibold">Yangi</label>
-<input type="password" id="secNewPass" placeholder="Kamida 3 belgi" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-white outline-none transition"></div>
+<input type="password" id="secNewPass" placeholder="Kamida 3 belgi" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-white outline-none"></div>
 <div><label class="text-xs text-slate-400 block mb-1.5 font-semibold">Tasdiq</label>
-<input type="password" id="secNewPass2" placeholder="Yana kiriting" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-white outline-none transition"></div></div>
+<input type="password" id="secNewPass2" placeholder="Yana kiriting" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-white outline-none"></div></div>
 <p id="secMsg" class="hidden text-xs font-semibold"></p>
-<button onclick="changePassword()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold px-6 py-2.5 rounded-lg text-sm shadow-lg transition"><i class="fas fa-key mr-1.5"></i> Parolni o'zgartirish</button></div>
+<button onclick="changePassword()" class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold px-6 py-2.5 rounded-lg text-sm"><i class="fas fa-key mr-1.5"></i> Parolni o'zgartirish</button></div>
 </section>
 
 <section id="pageLeaderboard" class="hidden space-y-6">
@@ -261,7 +347,7 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <h3 id="modalCourseTitle" class="text-sm md:text-lg font-bold text-white leading-tight truncate">Kurs</h3>
 <p id="modalLessonCounter" class="text-[10px] md:text-xs text-slate-400">Dars 1 / 10</p></div></div>
 <div class="flex gap-2 shrink-0">
-<button onclick="toggleFavorite()" id="favBtn" class="bg-slate-800 hover:bg-slate-700 text-yellow-400 px-3 py-2 rounded-lg text-sm font-bold transition" title="Sevimli"><i class="far fa-star"></i></button>
+<button onclick="toggleFavorite()" id="favBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-2 rounded-lg text-sm font-bold transition"><i class="far fa-star"></i></button>
 <button onclick="closeCoursePlayer()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 md:px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2"><i class="fas fa-times"></i> <span class="hidden md:inline">Yopish</span></button>
 </div></div>
 <div class="flex-grow flex flex-col lg:flex-row overflow-hidden">
@@ -284,29 +370,24 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div id="tabContent_comments">
 <h4 class="text-sm font-bold text-white mb-3 flex items-center gap-2"><i class="fas fa-comments text-blue-400"></i> Izohlar</h4>
 <div class="flex gap-2 mb-4">
-<input type="text" id="newCommentInput" placeholder="Savol yoki izoh yozing..." onkeypress="if(event.key==='Enter')addComment()" class="flex-grow bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-lg px-3 py-2 text-xs text-white outline-none">
+<input type="text" id="newCommentInput" placeholder="Savol yoki izoh..." onkeypress="if(event.key==='Enter')addComment()" class="flex-grow bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-lg px-3 py-2 text-xs text-white outline-none">
 <button onclick="addComment()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 rounded-lg"><i class="fas fa-paper-plane"></i></button></div>
-<div id="commentsList" class="space-y-3"></div>
-</div>
+<div id="commentsList" class="space-y-3"></div></div>
 <div id="tabContent_homework" class="hidden">
 <h4 class="text-sm font-bold text-white mb-3 flex items-center gap-2"><i class="fas fa-tasks text-emerald-400"></i> Uy ishi</h4>
-<div id="homeworkContent"></div>
-</div>
+<div id="homeworkContent"></div></div>
 <div id="tabContent_notes" class="hidden">
-<h4 class="text-sm font-bold text-white mb-3 flex items-center gap-2"><i class="fas fa-pen text-purple-400"></i> Konspekt (shaxsiy)</h4>
+<h4 class="text-sm font-bold text-white mb-3 flex items-center gap-2"><i class="fas fa-pen text-purple-400"></i> Konspekt</h4>
 <p class="text-[10px] text-slate-500 mb-2">Faqat siz ko'rasiz. Avtomatik saqlanadi.</p>
-<textarea id="noteInput" oninput="saveNote()" rows="12" placeholder="Bu dars bo'yicha eslatmalaringiz..." class="w-full bg-slate-900 border border-slate-700 focus:border-purple-500 rounded-lg p-3 text-xs text-white outline-none font-mono"></textarea>
-</div>
+<textarea id="noteInput" oninput="saveNote()" rows="12" placeholder="Eslatmalaringiz..." class="w-full bg-slate-900 border border-slate-700 focus:border-purple-500 rounded-lg p-3 text-xs text-white outline-none font-mono"></textarea></div>
 <div id="tabContent_quiz" class="hidden">
 <h4 class="text-sm font-bold text-white mb-3 flex items-center gap-2"><i class="fas fa-question-circle text-amber-400"></i> Test</h4>
-<div id="quizContent"></div>
-</div>
+<div id="quizContent"></div></div>
 </div>
 <div class="px-4 py-2 border-t border-slate-800 flex gap-2 shrink-0">
 <button onclick="markLessonWatched()" id="markWatchedBtn" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 rounded-lg transition"><i class="fas fa-check mr-1"></i> Tugatdim</button>
-<button onclick="downloadCertificate()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2 px-3 rounded-lg transition" title="Sertifikat"><i class="fas fa-certificate"></i></button>
-</div>
-</div></div>
+<button onclick="downloadCertificate()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2 px-3 rounded-lg transition"><i class="fas fa-certificate"></i></button>
+</div></div></div>
 <div class="lg:w-1/4 bg-slate-900/95 border-t lg:border-t-0 lg:border-l border-slate-800 flex flex-col h-full max-h-[400px] lg:max-h-none">
 <div class="p-4 border-b border-slate-800 flex justify-between items-center">
 <h4 class="font-bold text-sm text-white flex items-center gap-2"><i class="fas fa-list-ul text-blue-400"></i> Darslar</h4>
@@ -322,7 +403,7 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div><label class="text-xs text-slate-400">Ism</label><input type="text" id="editTutorName" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
 <div><label class="text-xs text-slate-400">Rasm URL</label>
 <div id="editTutorImgDrop" class="relative border-2 border-dashed border-slate-700 hover:border-emerald-500 rounded-lg transition cursor-pointer">
-<input type="text" id="editTutorImg" placeholder="URL или перетащите" class="w-full bg-slate-900 border-0 p-2.5 rounded-lg text-sm text-white outline-none">
+<input type="text" id="editTutorImg" placeholder="URL" class="w-full bg-slate-900 border-0 p-2.5 rounded-lg text-sm text-white outline-none">
 <input type="file" id="editTutorImgFile" accept="image/*" class="hidden">
 <img id="editTutorImgPreview" class="hidden w-full h-24 object-cover rounded-lg mt-2">
 </div></div>
@@ -332,17 +413,17 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <option value="Umumiy">Umumiy</option><option value="5-sinf">5-sinf</option><option value="6-sinf">6-sinf</option><option value="7-sinf">7-sinf</option><option value="8-sinf">8-sinf</option><option value="9-sinf">9-sinf</option><option value="10-sinf">10-sinf</option><option value="11-sinf">11-sinf</option></select></div></div>
 <div><label class="text-xs text-slate-400">Fan</label><select id="editTutorFan" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300">
 <option value="Ingliz tili">Ingliz tili</option><option value="Matematika">Matematika</option><option value="Fizika">Fizika</option><option value="Informatika">Informatika</option><option value="Kimyo">Kimyo</option><option value="Tarix">Tarix</option></select></div></div>
-<div class="flex gap-3 pt-2"><button onclick="saveTutorEdit()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg text-sm transition">Saqlash</button>
-<button onclick="closeEditModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-2.5 rounded-lg text-sm transition">Bekor</button></div></div></div>
+<div class="flex gap-3 pt-2"><button onclick="saveTutorEdit()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg text-sm">Saqlash</button>
+<button onclick="closeEditModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-2.5 rounded-lg text-sm">Bekor</button></div></div></div>
 
 <div id="authModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
 <div class="card-bg w-full max-w-md p-6 rounded-2xl space-y-4 relative">
 <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
-<h2 id="authTitle" class="text-xl font-bold text-white text-center">Tizimga kirish</h2>
+<h2 id="authTitle" class="text-xl font-bold text-white text-center">Kirish</h2>
 <div class="space-y-3">
 <input type="text" id="authUsername" placeholder="Login" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white">
 <input type="password" id="authPassword" placeholder="Parol" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white"></div>
-<button onclick="handleAuth()" id="authSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg text-sm transition">Kirish</button>
+<button onclick="handleAuth()" id="authSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg text-sm">Kirish</button>
 <p class="text-xs text-center text-slate-400"><span id="authToggleText">Akkauntingiz yo'qmi?</span>
 <button onclick="toggleAuthMode()" id="authToggleBtn" class="text-blue-400 font-bold underline ml-1">Ro'yxatdan o'tish</button></p></div></div>
 
@@ -350,9 +431,21 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div class="relative max-w-4xl w-full" onclick="event.stopPropagation()">
 <canvas id="certificateCanvas" class="w-full rounded-2xl border-2 border-amber-600 shadow-2xl"></canvas>
 <div class="flex gap-2 mt-4 justify-center flex-wrap">
-<button onclick="downloadCertImage()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 py-3 rounded-xl transition"><i class="fas fa-download mr-2"></i> Yuklab olish</button>
-<button onclick="closeCertificate()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-6 py-3 rounded-xl transition">Yopish</button>
+<button onclick="downloadCertImage()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 py-3 rounded-xl"><i class="fas fa-download mr-2"></i> Yuklab olish</button>
+<button onclick="closeCertificate()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-6 py-3 rounded-xl">Yopish</button>
 </div></div></div>
+
+<div id="broadcastModal" class="hidden fixed inset-0 z-[350] flex items-center justify-center p-4" style="background:rgba(0,0,0,.85);backdrop-filter:blur(10px)">
+<div class="card-bg rounded-2xl w-full max-w-lg shadow-2xl border border-amber-700/40 overflow-hidden">
+<div class="bg-gradient-to-r from-amber-600 to-orange-600 px-6 py-4 flex items-center gap-3">
+<i class="fas fa-bullhorn text-white text-2xl"></i>
+<div><p class="text-xs text-amber-100 font-semibold uppercase">Xabar</p>
+<p class="text-white font-black text-lg leading-tight">ZukkoTalim</p></div></div>
+<div class="px-6 py-5">
+<p id="broadcastText" class="text-white text-sm whitespace-pre-wrap"></p>
+<p id="broadcastDate" class="text-[10px] text-slate-500 mt-3"></p></div>
+<div class="px-6 pb-5">
+<button onclick="closeBroadcast()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm">Tushundim</button></div></div></div>
 
 <div id="toast" class="fixed bottom-5 right-5 bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-semibold hidden shadow-2xl z-[999]"></div>
 
@@ -367,33 +460,45 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div class="flex justify-between text-sm"><span class="text-slate-400">Narxi:</span><span id="insufficientPrice" class="text-white font-bold"></span></div>
 <div class="flex justify-between text-sm"><span class="text-slate-400">Balans:</span><span id="insufficientBalance" class="text-amber-400 font-bold"></span></div>
 <div class="flex justify-between text-sm border-t border-slate-800 pt-2"><span class="text-slate-400">Yetmaydi:</span><span id="insufficientMissing" class="text-red-400 font-bold"></span></div></div></div>
-<div class="px-6 pb-5 flex gap-3"><button onclick="closeInsufficientModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl text-sm transition">Bekor</button>
-<button onclick="goToTopUp()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-xl text-sm transition"><i class="fas fa-plus-circle mr-1.5"></i> To'ldirish</button></div></div></div>
+<div class="px-6 pb-5 flex gap-3"><button onclick="closeInsufficientModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl text-sm">Bekor</button>
+<button onclick="goToTopUp()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-xl text-sm"><i class="fas fa-plus-circle mr-1.5"></i> To'ldirish</button></div></div></div>
 
 <div id="paymentModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4" style="background:rgba(0,0,0,.8);backdrop-filter:blur(8px)">
-<div class="card-bg rounded-2xl w-full max-w-md shadow-2xl border border-slate-700 overflow-hidden">
+<div class="card-bg rounded-2xl w-full max-w-md shadow-2xl border border-slate-700 overflow-hidden max-h-[95vh] overflow-y-auto custom-scrollbar">
 <div class="bg-gradient-to-r from-blue-700 to-indigo-700 px-6 py-5 flex items-center justify-between">
 <div><p class="text-xs text-blue-200 font-semibold uppercase">ZukkoTalim Pay</p>
 <p id="payModalTitle" class="text-white font-black text-lg mt-0.5">Balansni to'ldirish</p></div>
 <div class="flex items-center gap-3 text-white/80 text-3xl"><i class="fab fa-cc-visa"></i><i class="fab fa-cc-mastercard"></i></div></div>
-<div id="payAmountRow" class="hidden px-6 pt-5"><div class="bg-slate-900/70 border border-slate-700 rounded-xl px-4 py-3 flex items-center justify-between">
-<span class="text-slate-400 text-sm">Summa</span><span id="payAmountDisplay" class="text-white font-black text-lg"></span></div></div>
+<div id="payAmountRow" class="hidden px-6 pt-5">
+<div class="bg-slate-900/70 border border-slate-700 rounded-xl px-4 py-3 space-y-2">
+<div class="flex items-center justify-between"><span class="text-slate-400 text-sm">Narxi</span><span id="payAmountDisplay" class="text-white font-black text-lg"></span></div>
+<div id="payDiscountRow" class="hidden flex items-center justify-between text-sm"><span class="text-amber-400">Skidka</span><span id="payDiscountValue" class="text-amber-400 font-bold">—</span></div>
+<div id="payFinalRow" class="hidden flex items-center justify-between border-t border-slate-800 pt-2"><span class="text-slate-300 font-bold text-sm">Yakuniy</span><span id="payFinalValue" class="text-emerald-400 font-black text-lg"></span></div>
+</div></div>
+<div id="promoRow" class="hidden px-6 pt-3">
+<label class="text-xs text-slate-400 font-semibold uppercase block mb-1.5">Promokod (ixtiyoriy)</label>
+<div class="flex gap-2">
+<input id="payPromoCode" type="text" placeholder="SALE50" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" class="flex-grow bg-slate-900 border border-slate-700 focus:border-amber-500 rounded-xl px-3 py-2.5 text-sm text-white font-mono uppercase">
+<button onclick="applyPromo()" class="bg-amber-600 hover:bg-amber-700 text-slate-900 font-bold px-4 rounded-xl text-sm">Tekshirish</button>
+</div>
+<p id="promoMsg" class="hidden text-xs font-semibold mt-2"></p>
+</div>
 <div id="payTopUpRow" class="px-6 pt-5"><label class="text-xs text-slate-400 font-semibold uppercase block mb-1.5">Summa</label>
-<input id="payTopUpAmount" type="number" min="1000" step="1000" value="100000" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-3 text-white font-bold text-lg outline-none transition"></div>
+<input id="payTopUpAmount" type="number" min="1000" step="1000" value="100000" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-3 text-white font-bold text-lg outline-none"></div>
 <div class="px-6 pt-5 space-y-4">
 <div><label class="text-xs text-slate-400 font-semibold uppercase block mb-1.5">Karta raqami</label>
-<div class="relative"><input id="payCardNumber" type="text" maxlength="19" placeholder="0000 0000 0000 0000" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl pl-4 pr-12 py-3 text-white font-mono outline-none transition" oninput="formatCardNumber(this)">
+<div class="relative"><input id="payCardNumber" type="text" maxlength="19" placeholder="0000 0000 0000 0000" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl pl-4 pr-12 py-3 text-white font-mono outline-none" oninput="formatCardNumber(this)">
 <i id="payCardIcon" class="fab fa-credit-card absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 text-xl"></i></div></div>
 <div class="flex gap-3">
 <div class="flex-1"><label class="text-xs text-slate-400 font-semibold uppercase block mb-1.5">Muddat</label>
-<input id="payExpiry" type="text" maxlength="5" placeholder="MM/YY" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-3 text-white font-mono outline-none transition" oninput="formatExpiry(this)"></div>
+<input id="payExpiry" type="text" maxlength="5" placeholder="MM/YY" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-3 text-white font-mono outline-none" oninput="formatExpiry(this)"></div>
 <div class="flex-1"><label class="text-xs text-slate-400 font-semibold uppercase block mb-1.5">CVV</label>
-<input id="payCVV" type="password" maxlength="3" placeholder="•••" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-3 text-white font-mono outline-none transition"></div></div>
+<input id="payCVV" type="password" maxlength="3" placeholder="•••" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-3 text-white font-mono outline-none"></div></div>
 <div><label class="text-xs text-slate-400 font-semibold uppercase block mb-1.5">Karta egasi</label>
-<input id="payHolder" type="text" placeholder="IVAN IVANOV" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-3 text-white font-mono outline-none transition" oninput="this.value=this.value.toUpperCase()"></div></div>
+<input id="payHolder" type="text" placeholder="IVAN IVANOV" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-3 text-white font-mono outline-none" oninput="this.value=this.value.toUpperCase()"></div></div>
 <p id="payError" class="hidden text-red-400 text-xs font-semibold px-6 pt-3"></p>
-<div class="px-6 py-5 flex gap-3"><button onclick="closePaymentModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl text-sm transition">Bekor</button>
-<button onclick="submitPayment()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-xl text-sm transition"><i class="fas fa-lock mr-1.5"></i> To'lash</button></div>
+<div class="px-6 py-5 flex gap-3"><button onclick="closePaymentModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl text-sm">Bekor</button>
+<button onclick="submitPayment()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-xl text-sm"><i class="fas fa-lock mr-1.5"></i> To'lash</button></div>
 <div class="border-t border-slate-800 px-6 py-3 flex items-center gap-2 text-slate-500 text-xs"><i class="fas fa-shield-alt text-green-500"></i><span>256-bit SSL</span></div></div></div>
 
 <div id="payProcessing" class="hidden fixed inset-0 z-[210] flex items-center justify-center" style="background:rgba(0,0,0,.88);backdrop-filter:blur(10px)">
@@ -404,7 +509,7 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div class="text-center"><div class="w-24 h-24 bg-green-500/20 border-2 border-green-500 rounded-full flex items-center justify-center mx-auto mb-6"><i class="fas fa-check text-green-400 text-4xl"></i></div>
 <p class="text-white font-black text-2xl mb-2">To'lov muvaffaqiyatli! ✅</p>
 <p id="paySuccessMsg" class="text-slate-400 text-sm mb-6">Balans yangilandi.</p>
-<button onclick="closePaySuccess()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-10 py-3 rounded-xl text-base transition">Davom etish</button></div></div>
+<button onclick="closePaySuccess()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-10 py-3 rounded-xl text-base">Davom etish</button></div></div>
 
 <div id="photoViewerModal" class="hidden fixed inset-0 z-[310] flex items-center justify-center p-4" style="background:rgba(0,0,0,.95);backdrop-filter:blur(10px)" onclick="closePhotoViewer()">
 <div class="relative max-w-2xl" onclick="event.stopPropagation()">
@@ -464,7 +569,10 @@ guests:JSON.parse(localStorage.getItem('db_guests_cache'))||[],
 currentUser:JSON.parse(localStorage.getItem('db_currentUser'))||null
 };
 
-// ===== Стейт =====
+let allPromos={};
+let allLogs=[];
+let allBroadcasts=[];
+
 let guestId=localStorage.getItem('edu_guest_id')||null;
 let selectedClass='Barcha sinflar';
 let selectedSubject='Barcha fanlar';
@@ -478,11 +586,13 @@ let _cameraStream=null;
 let _heartbeatInterval=null;
 let _snapViewerUserId=null,_snapViewerIndex=0,_snapViewerIsGuest=false;
 let _payMode='topup',_payTutorId=null;
-// Новые
+let _currentPromo=null;
+let _currentFinalPrice=0;
 let _lessonTab='comments';
 let _currentLessonRef=null;
 let _commentsRef=null;
 let _quizAnswers={};
+let _lastBroadcastSeen=localStorage.getItem('edu_lastBroadcast')||'';
 
 const LEVELS=[
 {min:0,name:'Yangi',emoji:'🌱',color:'text-slate-400',bg:'bg-slate-800'},
@@ -494,7 +604,20 @@ const LEVELS=[
 function getLevel(p){let lv=LEVELS[0];for(const l of LEVELS){if(p>=l.min)lv=l;}return lv;}
 function getNextLevel(p){for(const l of LEVELS){if(p<l.min)return l;}return null;}
 
-// ===== Баллы и streak =====
+// ===== LOG ADMIN ACTIONS =====
+function logAdminAction(action,details){
+if(!db.currentUser||db.currentUser.role!=='admin')return;
+const entry={
+adminId:db.currentUser.id,
+adminLogin:db.currentUser.login,
+action:action,
+details:details||'',
+at:new Date().toISOString()
+};
+database.ref('adminLogs').push(entry);
+}
+
+// ===== POINTS =====
 function awardPoints(amount,reason){
 const s=getActiveSubject();const cur=s.obj;if(!cur)return;
 const before=cur.points||0;const after=before+amount;
@@ -536,7 +659,7 @@ const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
 db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));
 database.ref('users/'+u.id+'/points').set(u.points);
 database.ref('users/'+u.id+'/pointsLog').set(u.pointsLog);
-setTimeout(()=>{toast('🎁 +'+expectedPoints+' ball qo\'shildi!');renderProfile();},1500);
+setTimeout(()=>{toast('🎁 +'+expectedPoints+' ball!');renderProfile();},1500);
 }
 }
 
@@ -551,14 +674,14 @@ const u=db.users.find(x=>x.id===db.currentUser.id);if(!u)return;
 localStorage.setItem(key,'1');
 u.points=(u.points||0)+bonus;
 if(!u.pointsLog)u.pointsLog=[];
-u.pointsLog.unshift({amount:bonus,reason:'TOP-'+(myRank+1)+' bonus',at:new Date().toISOString()});
+u.pointsLog.unshift({amount:bonus,reason:'TOP-'+(myRank+1),at:new Date().toISOString()});
 if(u.pointsLog.length>30)u.pointsLog=u.pointsLog.slice(0,30);
 const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
 db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));
 database.ref('users/'+u.id+'/points').set(u.points);
 database.ref('users/'+u.id+'/pointsLog').set(u.pointsLog);
 const medals=['🥇','🥈','🥉'];
-setTimeout(()=>{toast(medals[myRank]+' Siz TOP-'+(myRank+1)+'! +'+bonus);fireConfetti();renderProfile();},2500);
+setTimeout(()=>{toast(medals[myRank]+' TOP-'+(myRank+1)+'! +'+bonus);fireConfetti();renderProfile();},2500);
 }
 
 function fireConfetti(){
@@ -575,7 +698,6 @@ document.body.appendChild(p);setTimeout(()=>p.remove(),4500);
 }
 }
 
-// ===== Guest / Subject =====
 function getOrCreateGuest(){
 if(!guestId){guestId='GUEST-'+Date.now()+'-'+Math.floor(Math.random()*1000);localStorage.setItem('edu_guest_id',guestId);}
 let g=db.guests.find(x=>x.id===guestId);
@@ -621,6 +743,10 @@ else if(currentAdminTab==='guests')renderAdminGuests();
 else if(currentAdminTab==='tutors')renderAdminTutorsList();
 else if(currentAdminTab==='lessons')updateAdminLessonSelect();
 else if(currentAdminTab==='top')renderLeaderboard();
+else if(currentAdminTab==='stats')renderStats();
+else if(currentAdminTab==='promos')renderPromosList();
+else if(currentAdminTab==='logs')renderLogs();
+else if(currentAdminTab==='broadcast')renderBroadcastHistory();
 }
 if(!document.getElementById('pageProfile').classList.contains('hidden'))renderProfile();
 if(!document.getElementById('pageLeaderboard').classList.contains('hidden'))renderPublicLeaderboard();
@@ -651,8 +777,35 @@ db.guests=data?Object.values(data):[];
 localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));
 if(!document.getElementById('pageAdmin').classList.contains('hidden')&&currentAdminTab==='guests')renderAdminGuests();
 });
+database.ref('promos').on('value',snap=>{
+allPromos=snap.val()||{};
+if(currentAdminTab==='promos'&&!document.getElementById('pageAdmin').classList.contains('hidden'))renderPromosList();
+});
+database.ref('adminLogs').limitToLast(200).on('value',snap=>{
+const data=snap.val()||{};
+allLogs=Object.keys(data).map(k=>({...data[k],_id:k})).sort((a,b)=>new Date(b.at)-new Date(a.at));
+if(currentAdminTab==='logs'&&!document.getElementById('pageAdmin').classList.contains('hidden'))renderLogs();
+});
+database.ref('broadcasts').limitToLast(20).on('value',snap=>{
+const data=snap.val()||{};
+allBroadcasts=Object.keys(data).map(k=>({...data[k],_id:k})).sort((a,b)=>new Date(b.at)-new Date(a.at));
+if(currentAdminTab==='broadcast'&&!document.getElementById('pageAdmin').classList.contains('hidden'))renderBroadcastHistory();
+checkNewBroadcast();
+});
 dbLoaded=true;
 }
+
+function checkNewBroadcast(){
+if(!allBroadcasts.length)return;
+const latest=allBroadcasts[0];
+if(latest._id&&latest._id!==_lastBroadcastSeen&&db.currentUser){
+localStorage.setItem('edu_lastBroadcast',latest._id);
+document.getElementById('broadcastText').textContent=latest.text||'';
+document.getElementById('broadcastDate').textContent=new Date(latest.at).toLocaleString('ru-RU');
+document.getElementById('broadcastModal').classList.remove('hidden');
+}
+}
+function closeBroadcast(){document.getElementById('broadcastModal').classList.add('hidden');}
 
 window.onload=()=>{
 renderFilters();renderTutors();renderAuthArea();initFirebaseSync();initPushNotifications();updateNotifBtnState();initDropZone();
@@ -692,6 +845,7 @@ const data=snap.val()||{};const now=Date.now();let count=0;
 Object.keys(data).forEach(id=>{const e=data[id];
 if(e&&e.at&&(now-e.at)<60000){count++;}else if(id!==_onlinePresenceId){database.ref('online/'+id).remove();}});
 const numEl=document.getElementById('onlineCountNum');if(numEl)numEl.textContent=count;
+const statEl=document.getElementById('statOnline');if(statEl)statEl.textContent=count;
 });
 }
 }
@@ -711,35 +865,32 @@ zone.addEventListener('dragover',(e)=>{e.preventDefault();zone.classList.add('bo
 zone.addEventListener('dragleave',(e)=>{e.preventDefault();zone.classList.remove('border-emerald-500','bg-emerald-900/20');});
 zone.addEventListener('drop',(e)=>{e.preventDefault();zone.classList.remove('border-emerald-500','bg-emerald-900/20');if(e.dataTransfer.files.length)handleDropFiles(e.dataTransfer.files);});
 }
-
 function attachImageField(dropId,textId,fileId,previewId){
 const drop=document.getElementById(dropId);const text=document.getElementById(textId);
 const file=document.getElementById(fileId);const preview=document.getElementById(previewId);
 if(!drop||!text||!file||!preview)return;
 drop.addEventListener('click',(e)=>{if(e.target!==text)file.click();});
 file.addEventListener('change',(e)=>{if(e.target.files[0])loadImageIntoField(e.target.files[0],text,preview);file.value='';});
-drop.addEventListener('dragover',(e)=>{e.preventDefault();drop.classList.add('border-emerald-500','bg-emerald-900/10');});
-drop.addEventListener('dragleave',(e)=>{e.preventDefault();drop.classList.remove('border-emerald-500','bg-emerald-900/10');});
-drop.addEventListener('drop',(e)=>{e.preventDefault();drop.classList.remove('border-emerald-500','bg-emerald-900/10');if(e.dataTransfer.files[0])loadImageIntoField(e.dataTransfer.files[0],text,preview);});
+drop.addEventListener('dragover',(e)=>{e.preventDefault();drop.classList.add('border-emerald-500');});
+drop.addEventListener('dragleave',(e)=>{e.preventDefault();drop.classList.remove('border-emerald-500');});
+drop.addEventListener('drop',(e)=>{e.preventDefault();drop.classList.remove('border-emerald-500');if(e.dataTransfer.files[0])loadImageIntoField(e.dataTransfer.files[0],text,preview);});
 text.addEventListener('input',()=>{const v=text.value.trim();
 if(v.startsWith('data:')||v.startsWith('http')){preview.src=v;preview.classList.remove('hidden');}
 else{preview.classList.add('hidden');}});
 if(text.value&&(text.value.startsWith('http')||text.value.startsWith('data:'))){preview.src=text.value;preview.classList.remove('hidden');}
 }
-
 async function loadImageIntoField(file,textInput,preview){
 if(!file.type.startsWith('image/')){toast('❌ Не картинка');return;}
-if(file.size>10*1024*1024){toast('❌ Больше 10MB');return;}
+if(file.size>10*1024*1024){toast('❌ >10MB');return;}
 try{const dataUrl=await compressImage(file,1024,0.85);
 textInput.value=dataUrl;preview.src=dataUrl;preview.classList.remove('hidden');
 toast('✅ Загружено');}catch(e){toast('❌ Ошибка');}
 }
-
 async function handleDropFiles(files){
 for(const f of Array.from(files)){
 const okType=f.type.startsWith('image/')||/\.(jpe?g|png|webp|jfif)$/i.test(f.name);
-if(!okType){toast('❌ '+f.name+' — не картинка');continue;}
-if(f.size>10*1024*1024){toast('❌ '+f.name+' — >10MB');continue;}
+if(!okType){toast('❌ '+f.name);continue;}
+if(f.size>10*1024*1024){toast('❌ '+f.name);continue;}
 try{const dataUrl=await compressImage(f,1024,0.85);
 _droppedFiles.push({name:f.name.replace(/\.(jpe?g|png|webp|jfif)$/i,'.jpg'),dataUrl});
 renderDropPreviews();toast('✅ '+f.name);}catch(err){toast('❌ '+f.name);}
@@ -780,12 +931,12 @@ el.innerHTML=_droppedFiles.map((f,i)=>`
 </select></div>
 <button onclick="removeDroppedFile(${i})" class="bg-red-600 hover:bg-red-700 text-white w-8 h-8 rounded-lg text-xs shrink-0"><i class="fas fa-trash"></i></button>
 </div>`).join('')+`<div class="flex gap-2 pt-2">
-<button onclick="applyAllDropped()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-sm"><i class="fas fa-check mr-1"></i> Сохранить все</button>
+<button onclick="applyAllDropped()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-sm"><i class="fas fa-check mr-1"></i> Сохранить</button>
 <button onclick="clearDropped()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-2.5 rounded-lg text-sm">Очистить</button>
 </div>`;
 }
 function removeDroppedFile(i){_droppedFiles.splice(i,1);renderDropPreviews();}
-function clearDropped(){if(!confirm('Убрать все?'))return;_droppedFiles=[];renderDropPreviews();}
+function clearDropped(){if(!confirm('Убрать?'))return;_droppedFiles=[];renderDropPreviews();}
 function applyAllDropped(){
 if(_droppedFiles.length===0)return;
 let applied=0,skipped=0;
@@ -799,7 +950,7 @@ if(applied===0){toast('❌ Не выбраны');return;}
 localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
 renderAdminTutorsList();renderTutors();
 _droppedFiles=[];renderDropPreviews();
-toast('✅ Применено: '+applied);
+toast('✅ '+applied);
 }
 
 // ===== NOTIFICATIONS =====
@@ -821,12 +972,7 @@ function toggleMobileMenu(){const m=document.getElementById('mobileMenu'),i=docu
 function closeMobileMenu(){document.getElementById('mobileMenu').classList.add('hidden');document.getElementById('mobileMenuIcon').className='fas fa-bars';}
 
 function navigateTo(page){
-document.getElementById('pageHome').classList.add('hidden');
-document.getElementById('pageMyCourses').classList.add('hidden');
-document.getElementById('pageFavorites').classList.add('hidden');
-document.getElementById('pageAdmin').classList.add('hidden');
-document.getElementById('pageProfile').classList.add('hidden');
-document.getElementById('pageLeaderboard').classList.add('hidden');
+['pageHome','pageMyCourses','pageFavorites','pageAdmin','pageProfile','pageLeaderboard'].forEach(id=>document.getElementById(id).classList.add('hidden'));
 if(page==='home'){document.getElementById('pageHome').classList.remove('hidden');renderTutors();}
 else if(page==='my-courses'){if(!db.currentUser)return openAuthModal();document.getElementById('pageMyCourses').classList.remove('hidden');renderMyCourses();}
 else if(page==='favorites'){if(!db.currentUser)return openAuthModal();document.getElementById('pageFavorites').classList.remove('hidden');renderFavorites();}
@@ -850,6 +996,15 @@ function sortTutors(){db.tutors.sort((a,b)=>(a.order||0)-(b.order||0));}
 function migrateTutorOrder(){let c=false;db.tutors.forEach((t,i)=>{if(typeof t.order!=='number'){t.order=i+1;c=true;}});if(c){database.ref('tutors').set(arrayToFirebaseObj(db.tutors));localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));}sortTutors();}
 function moveTutor(id,dir){sortTutors();const idx=db.tutors.findIndex(t=>t.id===id);if(idx===-1)return;const s=dir==='up'?idx-1:idx+1;if(s<0||s>=db.tutors.length)return;const t=db.tutors[idx].order;db.tutors[idx].order=db.tutors[s].order;db.tutors[s].order=t;sortTutors();saveDb();renderAdminTutorsList();renderTutors();toast("Tartib o'zgartirildi!");}
 
+function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function timeAgo(iso){
+const d=new Date(iso);const diff=(Date.now()-d.getTime())/1000;
+if(diff<60)return'hounda';
+if(diff<3600)return Math.floor(diff/60)+' daq';
+if(diff<86400)return Math.floor(diff/3600)+' soat';
+if(diff<604800)return Math.floor(diff/86400)+' kun';
+return d.toLocaleDateString('ru-RU');
+}
 function toast(msg){const t=document.getElementById('toast');t.innerText=msg;t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),3000);}// ===== РЕНДЕРЫ =====
 function renderTutors(){
 const grid=document.getElementById('tutorsGrid');if(!grid)return;
@@ -869,7 +1024,7 @@ ${rating.count>0?`<span class="absolute top-3 left-3 bg-amber-900/80 backdrop-bl
 <div><div class="flex gap-2 text-[10px] font-extrabold uppercase mb-2">
 <span class="bg-blue-900/40 text-blue-400 px-2.5 py-0.5 rounded-md border border-blue-800/40">${t.sinf||'Umumiy'}</span>
 <span class="bg-indigo-900/40 text-indigo-400 px-2.5 py-0.5 rounded-md border border-indigo-800/40">${t.subject}</span></div>
-<h3 class="font-bold text-lg text-white">Repetitor: ${t.name}</h3>
+<h3 class="font-bold text-lg text-white">Repetitor: ${escapeHtml(t.name)}</h3>
 ${renderStars(t.id,false)}</div>
 <div class="space-y-3 pt-3 border-t border-slate-800">
 <div class="flex justify-between items-center">
@@ -892,8 +1047,8 @@ const watched=countWatchedLessons(t.id);const pct=total?Math.round((watched/tota
 const allDone=total>0&&watched>=total;
 return `<div class="card-bg rounded-2xl overflow-hidden p-5 flex flex-col justify-between border border-slate-800 hover:border-slate-700 transition">
 <div class="flex gap-4 items-center mb-4"><img src="${t.img}" class="w-16 h-16 rounded-xl object-cover border border-slate-700">
-<div class="min-w-0 flex-grow"><h4 class="font-bold text-white text-base truncate">${t.name}</h4>
-<p class="text-xs text-slate-400">${t.subject} (${t.sinf||'Umumiy'})</p>
+<div class="min-w-0 flex-grow"><h4 class="font-bold text-white text-base truncate">${escapeHtml(t.name)}</h4>
+<p class="text-xs text-slate-400">${escapeHtml(t.subject)} (${t.sinf||'Umumiy'})</p>
 <span class="text-[11px] text-blue-400 font-semibold mt-1 inline-block"><i class="fas fa-video mr-1"></i>${total} dars</span></div></div>
 <div class="mb-3"><div class="flex justify-between text-[10px] text-slate-400 mb-1"><span>Progress</span><span>${watched}/${total} • ${pct}%</span></div>
 <div class="w-full bg-slate-800 rounded-full h-1.5"><div class="bg-gradient-to-r from-blue-500 to-emerald-500 h-1.5 rounded-full transition-all" style="width:${pct}%"></div></div></div>
@@ -911,13 +1066,12 @@ const t=db.tutors.find(x=>x.id===f.tutorId);if(!t)return'';
 const l=t.lessons&&t.lessons[f.lessonIndex];if(!l)return'';
 return `<div class="card-bg p-4 rounded-xl flex items-center gap-3 hover:border-yellow-700/50 transition">
 <div class="w-10 h-10 bg-yellow-900/30 rounded-lg flex items-center justify-center text-yellow-400 shrink-0"><i class="fas fa-star"></i></div>
-<div class="flex-grow min-w-0"><div class="text-white font-bold text-sm truncate">${l.title}</div>
-<div class="text-xs text-slate-500 truncate">${t.name} • ${t.subject}</div></div>
+<div class="flex-grow min-w-0"><div class="text-white font-bold text-sm truncate">${escapeHtml(l.title)}</div>
+<div class="text-xs text-slate-500 truncate">${escapeHtml(t.name)} • ${escapeHtml(t.subject)}</div></div>
 <button onclick="openCoursePlayerFromFav('${f.tutorId}',${f.lessonIndex})" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-lg whitespace-nowrap"><i class="fas fa-play mr-1"></i> Ochish</button>
 <button onclick="removeFavorite('${f.tutorId}',${f.lessonIndex})" class="bg-red-600 hover:bg-red-700 text-white w-8 h-8 rounded-lg shrink-0"><i class="fas fa-trash"></i></button>
 </div>`;}).join('');
 }
-
 function openCoursePlayerFromFav(tid,lessonIdx){
 const t=db.tutors.find(x=>x.id===tid);if(!t)return;
 if(!db.currentUser.tutorsBought||!db.currentUser.tutorsBought.includes(tid)){toast('❌ Avval kursni sotib oling');return;}
@@ -925,16 +1079,15 @@ openCoursePlayer(tid);
 setTimeout(()=>loadLesson(lessonIdx),100);
 }
 
-// ===== ⭐ FAVORITES =====
+// ===== FAVORITES =====
 function toggleFavorite(){
 if(!db.currentUser){openAuthModal();return;}
 if(!activeCourse)return;
-const key=activeCourse.id+'|'+activeLessonIndex;
 const favs=db.currentUser.favorites||[];
 const idx=favs.findIndex(f=>f.tutorId===activeCourse.id&&f.lessonIndex===activeLessonIndex);
 if(idx===-1){favs.push({tutorId:activeCourse.id,lessonIndex:activeLessonIndex,at:new Date().toISOString()});
 toast('⭐ Dars sevimlilarga qo\'shildi');}
-else{favs.splice(idx,1);toast('Dars sevimlilardan olib tashlandi');}
+else{favs.splice(idx,1);toast('Dars olib tashlandi');}
 db.currentUser.favorites=favs;
 const i=db.users.findIndex(u=>u.id===db.currentUser.id);if(i!==-1)db.users[i]=db.currentUser;
 localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
@@ -958,7 +1111,7 @@ if(isFavorite()){b.innerHTML='<i class="fas fa-star"></i>';b.classList.add('text
 else{b.innerHTML='<i class="far fa-star"></i>';b.classList.remove('text-yellow-400');b.classList.add('text-slate-400');}
 }
 
-// ===== ⭐ RATING КУРСА =====
+// ===== RATING =====
 function computeCourseRating(tid){
 const ratings=db.ratings&&db.ratings[tid]?Object.values(db.ratings[tid]):[];
 if(ratings.length===0)return{avg:0,count:0};
@@ -986,11 +1139,11 @@ if(!db.ratings)db.ratings={};
 if(!db.ratings[tid])db.ratings[tid]={};
 db.ratings[tid][db.currentUser.id]={stars,at:new Date().toISOString()};
 database.ref('ratings/'+tid+'/'+db.currentUser.id).set({stars,at:new Date().toISOString()});
-toast('✅ Bahoyingiz uchun rahmat! ('+stars+' ⭐)');
+toast('✅ Bahoyingiz: '+stars+' ⭐');
 renderTutors();
 }
 
-// ===== 💬 КОММЕНТАРИИ =====
+// ===== COMMENTS =====
 function initCommentsListener(tutorId,lessonIdx){
 if(_commentsRef){_commentsRef.off();_commentsRef=null;}
 _currentLessonRef=tutorId+'|'+lessonIdx;
@@ -1022,7 +1175,7 @@ if(!activeCourse)return;
 const inp=document.getElementById('newCommentInput');
 const text=inp.value.trim();
 if(!text)return;
-if(text.length>1000){toast('❌ Слишком длинный');return;}
+if(text.length>1000){toast('❌ Juda uzun');return;}
 const key=Date.now()+'_'+Math.random().toString(36).slice(2,8);
 const data={userId:db.currentUser.id,login:db.currentUser.login,text,at:new Date().toISOString()};
 database.ref('comments/'+activeCourse.id+'/'+activeLessonIndex+'/'+key).set(data);
@@ -1030,16 +1183,16 @@ inp.value='';
 toast('✅ Izoh qo\'shildi');
 }
 function deleteComment(id){
-if(!confirm('Izohni o\'chirish?'))return;
+if(!confirm('O\'chirish?'))return;
 if(!activeCourse)return;
 database.ref('comments/'+activeCourse.id+'/'+activeLessonIndex+'/'+id).remove();
 }
 
-// ===== 📝 ДОМАШКА =====
+// ===== HOMEWORK =====
 function loadHomework(){
 const el=document.getElementById('homeworkContent');if(!el||!activeCourse)return;
 const hw=(activeCourse.homework&&activeCourse.homework[activeLessonIndex])||null;
-if(!hw){el.innerHTML='<div class="bg-slate-900/60 border border-slate-800 rounded-lg p-6 text-center"><i class="fas fa-inbox text-3xl text-slate-600 mb-2 block"></i><p class="text-xs text-slate-500">Bu darsga uy ishi berilmagan</p></div>';return;}
+if(!hw){el.innerHTML='<div class="bg-slate-900/60 border border-slate-800 rounded-lg p-6 text-center"><i class="fas fa-inbox text-3xl text-slate-600 mb-2 block"></i><p class="text-xs text-slate-500">Bu darsga uy ishi yo\'q</p></div>';return;}
 const sub=(db.homeworkSubmissions&&db.homeworkSubmissions[activeCourse.id]&&db.homeworkSubmissions[activeCourse.id][activeLessonIndex]&&db.currentUser)?db.homeworkSubmissions[activeCourse.id][activeLessonIndex][db.currentUser.id]:null;
 el.innerHTML=`<div class="bg-slate-900/60 border border-emerald-800/40 rounded-lg p-4 mb-3">
 <div class="text-[10px] text-emerald-400 font-bold uppercase mb-1"><i class="fas fa-tasks mr-1"></i> Topshiriq</div>
@@ -1047,11 +1200,11 @@ el.innerHTML=`<div class="bg-slate-900/60 border border-emerald-800/40 rounded-l
 ${hw.deadline?`<div class="text-[10px] text-amber-400 mt-2"><i class="fas fa-clock mr-1"></i> Muddat: ${new Date(hw.deadline).toLocaleString('ru-RU')}</div>`:''}
 </div>
 ${sub?`<div class="bg-blue-900/20 border border-blue-700/40 rounded-lg p-3">
-<div class="text-[10px] text-blue-400 font-bold uppercase mb-1"><i class="fas fa-check-circle mr-1"></i> Sizning javobingiz</div>
+<div class="text-[10px] text-blue-400 font-bold uppercase mb-1"><i class="fas fa-check-circle mr-1"></i> Javobingiz</div>
 <div class="text-white text-xs whitespace-pre-wrap mb-2">${escapeHtml(sub.text||'')}</div>
 <div class="text-[9px] text-slate-500">${new Date(sub.at).toLocaleString('ru-RU')}</div>
 </div>`:`
-<textarea id="hwAnswer" rows="5" placeholder="Javobingizni yozing..." class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-500 rounded-lg p-3 text-xs text-white outline-none"></textarea>
+<textarea id="hwAnswer" rows="5" placeholder="Javobingiz..." class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-500 rounded-lg p-3 text-xs text-white outline-none"></textarea>
 <button onclick="submitHomework()" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 rounded-lg"><i class="fas fa-paper-plane mr-1"></i> Topshirish</button>`}`;
 }
 function submitHomework(){
@@ -1060,12 +1213,12 @@ if(!activeCourse)return;
 const txt=(document.getElementById('hwAnswer')||{}).value||'';
 if(!txt.trim()){toast('❌ Bo\'sh');return;}
 database.ref('homeworkSubmissions/'+activeCourse.id+'/'+activeLessonIndex+'/'+db.currentUser.id).set({text:txt.trim(),at:new Date().toISOString(),login:db.currentUser.login});
-awardPoints(15,'Uy ishi topshirildi');
-toast('✅ Uy ishi topshirildi! +15 ball');
+awardPoints(15,'Uy ishi');
+toast('✅ +15 ball');
 loadHomework();
 }
 
-// ===== 📒 КОНСПЕКТ =====
+// ===== NOTES =====
 let _noteTimer=null;
 function loadNote(){
 const ta=document.getElementById('noteInput');if(!ta||!db.currentUser||!activeCourse)return;
@@ -1087,13 +1240,13 @@ database.ref('users/'+db.currentUser.id+'/notes').set(db.currentUser.notes);
 },800);
 }
 
-// ===== ✅ ТЕСТЫ =====
+// ===== QUIZ =====
 function loadQuiz(){
 const el=document.getElementById('quizContent');if(!el||!activeCourse)return;
 const quiz=(activeCourse.quiz&&activeCourse.quiz[activeLessonIndex])||null;
 if(!quiz||!quiz.questions||quiz.questions.length===0){el.innerHTML='<div class="bg-slate-900/60 border border-slate-800 rounded-lg p-6 text-center"><i class="fas fa-question-circle text-3xl text-slate-600 mb-2 block"></i><p class="text-xs text-slate-500">Bu darsga test yo\'q</p></div>';return;}
 const passed=db.currentUser&&db.currentUser.quizPassed&&db.currentUser.quizPassed[activeCourse.id+'|'+activeLessonIndex];
-if(passed&&!quiz.retake){el.innerHTML=`<div class="bg-emerald-900/20 border border-emerald-700/40 rounded-lg p-4 text-center"><i class="fas fa-check-circle text-3xl text-emerald-400 mb-2"></i><p class="text-emerald-300 font-bold text-sm">Test topshirilgan!</p><p class="text-slate-400 text-[11px] mt-1">Natija: ${passed.correct}/${passed.total} • +${passed.points} ball</p></div>`;return;}
+if(passed){el.innerHTML=`<div class="bg-emerald-900/20 border border-emerald-700/40 rounded-lg p-4 text-center"><i class="fas fa-check-circle text-3xl text-emerald-400 mb-2"></i><p class="text-emerald-300 font-bold text-sm">Test topshirilgan!</p><p class="text-slate-400 text-[11px] mt-1">${passed.correct}/${passed.total} • +${passed.points} ball</p></div>`;return;}
 _quizAnswers={};
 el.innerHTML=quiz.questions.map((q,qi)=>`
 <div class="bg-slate-900/60 border border-slate-800 rounded-lg p-3 mb-3">
@@ -1121,12 +1274,12 @@ db.currentUser.quizPassed[key]={correct,total,points,at:new Date().toISOString()
 const i=db.users.findIndex(u=>u.id===db.currentUser.id);if(i!==-1)db.users[i]=db.currentUser;
 localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
 database.ref('users/'+db.currentUser.id+'/quizPassed').set(db.currentUser.quizPassed);
-if(passed){awardPoints(20,'Test: '+correct+'/'+total+' to\'g\'ri');fireConfetti();}
-else{toast('❌ Natija: '+correct+'/'+total+'. Yana urinib ko\'ring!');}
+if(passed){awardPoints(20,'Test '+correct+'/'+total);fireConfetti();}
+else{toast('❌ '+correct+'/'+total+'. Yana urinib ko\'ring!');}
 loadQuiz();
 }
 
-// ===== 🔍 ПОИСК =====
+// ===== SEARCH =====
 function runGlobalSearch(q){
 const el=document.getElementById('searchResults');
 q=(q||'').trim().toLowerCase();
@@ -1138,22 +1291,20 @@ if((l.title||'').toLowerCase().includes(q)||(t.name||'').toLowerCase().includes(
 const bought=db.currentUser&&db.currentUser.tutorsBought&&db.currentUser.tutorsBought.includes(t.id);
 results.push({tid:t.id,tname:t.name,subject:t.subject,title:l.title,li,bought});
 }});});
-if(results.length===0){el.innerHTML='<p class="text-xs text-slate-500 text-center py-3">Hech narsa topilmadi</p>';el.classList.remove('hidden');return;}
+if(results.length===0){el.innerHTML='<p class="text-xs text-slate-500 text-center py-3">Topilmadi</p>';el.classList.remove('hidden');return;}
 el.innerHTML=results.slice(0,30).map(r=>`
 <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex justify-between items-center gap-3 hover:border-blue-700/50 transition">
 <div class="min-w-0 flex-grow">
 <div class="text-white text-xs font-bold truncate"><i class="fas fa-play-circle text-blue-400 mr-1"></i> ${escapeHtml(r.title)}</div>
 <div class="text-[10px] text-slate-500 truncate">${escapeHtml(r.tname)} • ${escapeHtml(r.subject)}</div></div>
-${r.bought?`<button onclick="openCoursePlayerFromFav('${r.tid}',${r.li})" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg whitespace-nowrap"><i class="fas fa-play"></i></button>`:`<span class="text-[10px] text-amber-400 whitespace-nowrap"><i class="fas fa-lock"></i></span>`}
+${r.bought?`<button onclick="openCoursePlayerFromFav('${r.tid}',${r.li})" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg whitespace-nowrap"><i class="fas fa-play"></i></button>`:`<span class="text-[10px] text-amber-400"><i class="fas fa-lock"></i></span>`}
 </div>`).join('');
 el.classList.remove('hidden');
 }
 
-// ===== 🎓 СЕРТИФИКАТ =====
+// ===== CERTIFICATE =====
 function countWatchedLessons(tid){
 if(!db.currentUser)return 0;
-const wp=db.currentUser.watchProgress&&db.currentUser.watchProgress[tid];
-if(!wp)return 0;
 const t=db.tutors.find(x=>x.id===tid);if(!t||!t.lessons)return 0;
 let c=0;
 t.lessons.forEach((l,i)=>{
@@ -1167,52 +1318,30 @@ if(!db.currentUser){openAuthModal();return;}
 if(!activeCourse)return;
 const total=(activeCourse.lessons||[]).length;
 const done=countWatchedLessons(activeCourse.id);
-if(done<total||total===0){toast('❌ Avval barcha darslarni tugatish kerak ('+done+'/'+total+')');return;}
+if(done<total||total===0){toast('❌ Avval barcha darslarni tugating ('+done+'/'+total+')');return;}
 const canvas=document.getElementById('certificateCanvas');
 canvas.width=1400;canvas.height=990;
 const ctx=canvas.getContext('2d');
 const grad=ctx.createLinearGradient(0,0,1400,990);
 grad.addColorStop(0,'#0d4a5c');grad.addColorStop(1,'#00b8d4');
 ctx.fillStyle=grad;ctx.fillRect(0,0,1400,990);
-ctx.strokeStyle='#fbbf24';ctx.lineWidth=8;
-ctx.strokeRect(30,30,1340,930);
-ctx.strokeStyle='#fbbf24';ctx.lineWidth=2;
-ctx.strokeRect(50,50,1300,890);
-ctx.fillStyle='#ffffff';
-ctx.font='bold 36px system-ui,sans-serif';
-ctx.textAlign='center';
+ctx.strokeStyle='#fbbf24';ctx.lineWidth=8;ctx.strokeRect(30,30,1340,930);
+ctx.strokeStyle='#fbbf24';ctx.lineWidth=2;ctx.strokeRect(50,50,1300,890);
+ctx.fillStyle='#ffffff';ctx.font='bold 36px system-ui,sans-serif';ctx.textAlign='center';
 ctx.fillText('ZukkoTalim',700,140);
-ctx.font='bold 68px system-ui,sans-serif';
-ctx.fillStyle='#ffffff';
-ctx.fillText('SERTIFIKAT',700,280);
-ctx.font='22px system-ui,sans-serif';
-ctx.fillStyle='#c9d1d9';
-ctx.fillText('Ushbu sertifikat taqdim etiladi',700,340);
-ctx.font='bold 56px system-ui,sans-serif';
-ctx.fillStyle='#fbbf24';
-ctx.fillText(db.currentUser.login||'',700,440);
-ctx.font='22px system-ui,sans-serif';
-ctx.fillStyle='#c9d1d9';
-ctx.fillText('quyidagi kursni muvaffaqiyatli tugatgani uchun',700,500);
-ctx.font='bold 40px system-ui,sans-serif';
-ctx.fillStyle='#ffffff';
-ctx.fillText(activeCourse.name+' — '+activeCourse.subject,700,580);
-ctx.font='18px system-ui,sans-serif';
-ctx.fillStyle='#94a3b8';
-ctx.fillText('Sinf: '+(activeCourse.sinf||'Umumiy')+' • Darslar: '+total,700,630);
-ctx.font='16px system-ui,sans-serif';
-ctx.fillStyle='#94a3b8';
+ctx.font='bold 68px system-ui,sans-serif';ctx.fillStyle='#ffffff';ctx.fillText('SERTIFIKAT',700,280);
+ctx.font='22px system-ui,sans-serif';ctx.fillStyle='#c9d1d9';ctx.fillText('Ushbu sertifikat taqdim etiladi',700,340);
+ctx.font='bold 56px system-ui,sans-serif';ctx.fillStyle='#fbbf24';ctx.fillText(db.currentUser.login||'',700,440);
+ctx.font='22px system-ui,sans-serif';ctx.fillStyle='#c9d1d9';ctx.fillText('quyidagi kursni muvaffaqiyatli tugatgani uchun',700,500);
+ctx.font='bold 40px system-ui,sans-serif';ctx.fillStyle='#ffffff';ctx.fillText(activeCourse.name+' — '+activeCourse.subject,700,580);
+ctx.font='18px system-ui,sans-serif';ctx.fillStyle='#94a3b8';ctx.fillText('Sinf: '+(activeCourse.sinf||'Umumiy')+' • Darslar: '+total,700,630);
+ctx.font='16px system-ui,sans-serif';ctx.fillStyle='#94a3b8';
 const dateStr=new Date().toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'});
-ctx.fillText('Berilgan sana: '+dateStr,700,700);
-ctx.font='14px system-ui,sans-serif';
-ctx.fillStyle='#64748b';
+ctx.fillText('Berilgan: '+dateStr,700,700);
+ctx.font='14px system-ui,sans-serif';ctx.fillStyle='#64748b';
 ctx.fillText('ID: '+db.currentUser.id+' • '+BRAND,700,730);
-ctx.font='bold 30px system-ui,sans-serif';
-ctx.fillStyle='#fbbf24';
-ctx.fillText('🎓',1180,830);
-ctx.font='18px system-ui,sans-serif';
-ctx.fillStyle='#c9d1d9';
-ctx.fillText('Direktor',220,830);
+ctx.font='bold 30px system-ui,sans-serif';ctx.fillStyle='#fbbf24';ctx.fillText('🎓',1180,830);
+ctx.font='18px system-ui,sans-serif';ctx.fillStyle='#c9d1d9';ctx.fillText('Direktor',220,830);
 ctx.beginPath();ctx.moveTo(120,810);ctx.lineTo(320,810);ctx.strokeStyle='#c9d1d9';ctx.lineWidth=1.5;ctx.stroke();
 document.getElementById('certificateModal').classList.remove('hidden');
 }
@@ -1220,24 +1349,12 @@ function downloadCertImage(){
 const canvas=document.getElementById('certificateCanvas');
 const a=document.createElement('a');
 a.download='ZukkoTalim-sertifikat-'+db.currentUser.login+'.png';
-a.href=canvas.toDataURL('image/png');
-a.click();
-toast('✅ Sertifikat yuklab olindi!');
+a.href=canvas.toDataURL('image/png');a.click();
+toast('✅ Yuklandi!');
 }
 function closeCertificate(){document.getElementById('certificateModal').classList.add('hidden');}
 
-// ===== Helpers =====
-function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function timeAgo(iso){
-const d=new Date(iso);const diff=(Date.now()-d.getTime())/1000;
-if(diff<60)return'hounda';
-if(diff<3600)return Math.floor(diff/60)+' daq';
-if(diff<86400)return Math.floor(diff/3600)+' soat';
-if(diff<604800)return Math.floor(diff/86400)+' kun';
-return d.toLocaleDateString('ru-RU');
-}
-
-// ===== Плеер =====
+// ===== PLAYER =====
 function openCoursePlayer(tid){
 const tutor=db.tutors.find(t=>t.id===tid);if(!tutor)return;
 activeCourse=tutor;activeLessonIndex=0;
@@ -1301,11 +1418,7 @@ let u=l.url;if(u.includes('src=')){const m=u.match(/src=["']([^"']+)["']/);if(m&
 document.getElementById('mainVimeoIframe').src=u;
 document.getElementById('modalLessonCounter').innerText='Dars '+(i+1)+' / '+ls.length;
 document.getElementById('currentLessonTitleDisplay').innerText=l.title;
-renderPlaylist();
-updateFavBtn();
-loadHomework();
-loadNote();
-loadQuiz();
+renderPlaylist();updateFavBtn();loadHomework();loadNote();loadQuiz();
 initCommentsListener(activeCourse.id,i);
 const k='awarded_'+((db.currentUser&&db.currentUser.id)||'guest')+'_'+activeCourse.id+'_'+i;
 const mb=document.getElementById('markWatchedBtn');
@@ -1315,20 +1428,18 @@ else if(mb){mb.innerHTML='<i class="fas fa-check mr-1"></i> Tugatdim';mb.classLi
 function prevLesson(){if(activeLessonIndex>0)loadLesson(activeLessonIndex-1);}
 function nextLesson(){const ls=activeCourse.lessons||[];if(activeLessonIndex<ls.length-1)loadLesson(activeLessonIndex+1);}
 function closeCoursePlayer(){
-checkLessonCompletion(activeLessonIndex);
-stopWatchTracking();
+checkLessonCompletion(activeLessonIndex);stopWatchTracking();
 if(_commentsRef){_commentsRef.off();_commentsRef=null;}
 document.getElementById('mainVimeoIframe').src="";
 document.getElementById('coursePlayerModal').classList.add('hidden');
 }
-
 function checkLessonCompletion(prevIndex){
 if(!db.currentUser||!activeCourse)return;
 if(_watchSeconds>=30){
 const key='awarded_'+db.currentUser.id+'_'+activeCourse.id+'_'+prevIndex;
 if(localStorage.getItem(key))return;
 localStorage.setItem(key,'1');
-awardPoints(10,'Dars #'+(prevIndex+1)+' tugatildi');
+awardPoints(10,'Dars #'+(prevIndex+1));
 }}
 function markLessonWatched(){
 if(!db.currentUser){openAuthModal();return;}
@@ -1336,11 +1447,10 @@ if(!activeCourse)return;
 const key='awarded_'+db.currentUser.id+'_'+activeCourse.id+'_'+activeLessonIndex;
 if(localStorage.getItem(key)){toast('✅ Allaqachon tugatilgan');return;}
 localStorage.setItem(key,'1');
-awardPoints(10,'Dars #'+(activeLessonIndex+1)+' tugatildi');
+awardPoints(10,'Dars #'+(activeLessonIndex+1));
 renderPlaylist();
 loadLesson(activeLessonIndex);
 }
-
 function switchLessonTab(tab){
 _lessonTab=tab;
 ['comments','homework','notes','quiz'].forEach(t=>{
@@ -1363,7 +1473,7 @@ else if((mm=u.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/)))yt=mm[1];
 else if((mm=u.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/)))yt=mm[1];
 if(yt)return`https://www.youtube.com/embed/${yt}`;
 return u;
-}// ===== АДМИН: ДАРСЛАР =====
+}// ===== ADMIN: DARSLAR =====
 function updateAdminLessonSelect(){
 sortTutors();
 const s=document.getElementById('lessonTutorSelect');
@@ -1380,7 +1490,7 @@ if(!title||!url)return alert("Dars nomi va link kiriting!");
 const t=db.tutors.find(x=>x.id===tid);if(!t)return;
 if(!t.lessons)t.lessons=[];
 t.lessons.push({id:'les-'+Date.now(),title,url:normalizeVideoUrl(url)});
-saveDb();renderAdminLessonsList();renderTutors();toast("Dars qo'shildi!");
+saveDb();renderAdminLessonsList();renderTutors();logAdminAction('add_lesson',title+' → '+t.name);toast("Dars qo'shildi!");
 document.getElementById('newLessonTitle').value='';document.getElementById('newLessonUrl').value='';
 }
 function addLessonsBulk(){
@@ -1396,7 +1506,7 @@ const title=line.slice(0,si).trim();const url=line.slice(si+1).trim();
 if(!title||!url){sk++;return;}
 t.lessons.push({id:'les-'+Date.now()+'-'+i,title,url:normalizeVideoUrl(url)});added++;});
 if(added===0)return alert("Format: Nomi | Link");
-saveDb();renderAdminLessonsList();renderTutors();
+saveDb();renderAdminLessonsList();renderTutors();logAdminAction('bulk_lessons',added+' → '+t.name);
 document.getElementById('bulkLessonsInput').value='';
 toast(added+' ta dars qo\'shildi'+(sk>0?', '+sk+' o\'tkazib yuborildi':'')+'!');
 }
@@ -1415,38 +1525,39 @@ el.innerHTML=t.lessons.map((l,i)=>`<div class="bg-slate-900 p-3 rounded-lg borde
 }
 function deleteLesson(tid,lid){
 const t=db.tutors.find(x=>x.id===tid);if(!t)return;
+const lesson=t.lessons.find(l=>l.id===lid);
 t.lessons=t.lessons.filter(l=>l.id!==lid);
-saveDb();renderAdminLessonsList();renderTutors();toast("O'chirildi!");
+saveDb();renderAdminLessonsList();renderTutors();
+logAdminAction('delete_lesson',(lesson?lesson.title:'')+' → '+t.name);
+toast("O'chirildi!");
 }
-
-// ===== АДМИН: HOMEWORK / QUIZ ДОБАВИТЬ =====
 function addHomeworkToLesson(tid,li){
 const t=db.tutors.find(x=>x.id===tid);if(!t)return;
 if(!t.homework)t.homework={};
 const cur=t.homework[li]||{text:'',deadline:''};
-const text=prompt('Uy ishi matni (' + t.lessons[li].title + '):',cur.text||'');
+const text=prompt('Uy ishi (' + t.lessons[li].title + '):',cur.text||'');
 if(text===null)return;
 const dl=prompt('Muddat (YYYY-MM-DD yoki bo\'sh):',cur.deadline||'');
 if(dl===null)return;
 t.homework[li]={text:text.trim(),deadline:dl.trim()};
-saveDb();
-database.ref('tutors/'+tid+'/homework').set(t.homework);
+saveDb();database.ref('tutors/'+tid+'/homework').set(t.homework);
+logAdminAction('set_homework',t.name+' → дарс #'+(li+1));
 toast('✅ Uy ishi saqlandi');
 }
 function addQuizToLesson(tid,li){
 const t=db.tutors.find(x=>x.id===tid);if(!t)return;
 if(!t.quiz)t.quiz={};
-let cur=t.quiz[li]?JSON.stringify(t.quiz[li]):'';
-const raw=prompt('Test JSON formatda:\n\n[{"q":"Savol?","options":["A","B","C"],"correct":0}]\n\ncorrect = to\'g\'ri javob indeksi (0,1,2...)',cur);
+let cur=t.quiz[li]?JSON.stringify(t.quiz[li],null,2):'';
+const raw=prompt('Test JSON:\n[{"q":"Savol?","options":["A","B","C"],"correct":0}]',cur);
 if(raw===null)return;
 try{
 const parsed=JSON.parse(raw);
 if(!Array.isArray(parsed))throw new Error('Massiv emas');
 t.quiz[li]={questions:parsed};
-saveDb();
-database.ref('tutors/'+tid+'/quiz').set(t.quiz);
+saveDb();database.ref('tutors/'+tid+'/quiz').set(t.quiz);
+logAdminAction('set_quiz',t.name+' → дарс #'+(li+1)+' ('+parsed.length+' savol)');
 toast('✅ Test saqlandi');
-}catch(e){alert('❌ Xato JSON: '+e.message);}
+}catch(e){alert('❌ JSON xato: '+e.message);}
 }
 
 // ===== YOUTUBE IMPORT =====
@@ -1493,11 +1604,12 @@ if(existing.has(v.id)){skipped++;return;}
 t.lessons.push({id:'les-'+Date.now()+'-'+i,title:v.title,url:'https://www.youtube.com/embed/'+v.id});
 added++;
 });
-if(added>0){saveDb();renderAdminLessonsList();updateAdminLessonSelect();renderTutors();}
+if(added>0){saveDb();renderAdminLessonsList();updateAdminLessonSelect();renderTutors();
+logAdminAction('yt_import',added+' видео → '+t.name);}
 status.className='text-xs font-semibold text-emerald-400';
 status.textContent='✅ Добавлено: '+added+(skipped>0?', дубли: '+skipped:'')+'. Всего: '+videos.length;
 document.getElementById('ytPlaylistUrl').value='';
-toast('✅ Добавлено '+added);
+toast('✅ +'+added+' видео');
 btn.disabled=false;btn.innerHTML='<i class="fab fa-youtube mr-1"></i> Загрузить все видео';
 }
 async function fetchPlaylistViaAPI(plId){
@@ -1549,6 +1661,7 @@ const nid='tut-'+Date.now();
 const mo=db.tutors.reduce((m,t)=>Math.max(m,t.order||0),0);
 db.tutors.push({id:nid,name,img:img||'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop',price,sinf,subject,lessons:[],homework:{},quiz:{},order:mo+1});
 saveDb();toast("Repetitor qo'shildi!");renderAdminTutorsList();
+logAdminAction('add_tutor',name+' ('+subject+', '+sinf+')');
 document.getElementById('newTutorName').value='';document.getElementById('newTutorImg').value='';document.getElementById('newTutorPrice').value='';
 const pv=document.getElementById('newTutorImgPreview');if(pv){pv.classList.add('hidden');pv.src='';}
 }
@@ -1587,25 +1700,216 @@ t.img=document.getElementById('editTutorImg').value.trim();
 t.price=Number(document.getElementById('editTutorPrice').value);
 t.sinf=document.getElementById('editTutorSinf').value;
 t.subject=document.getElementById('editTutorFan').value;
-saveDb();renderAdminTutorsList();renderTutors();closeEditModal();toast("Saqlandi!");
+saveDb();renderAdminTutorsList();renderTutors();closeEditModal();
+logAdminAction('edit_tutor',t.name);toast("Saqlandi!");
 }
-function deleteTutor(id){if(!confirm("O'chirmoqchimisiz?"))return;db.tutors=db.tutors.filter(t=>t.id!==id);saveDb();renderAdminTutorsList();renderTutors();toast("O'chirildi!");}
+function deleteTutor(id){if(!confirm("O'chirmoqchimisiz?"))return;
+const t=db.tutors.find(x=>x.id===id);
+db.tutors=db.tutors.filter(t=>t.id!==id);saveDb();renderAdminTutorsList();renderTutors();
+logAdminAction('delete_tutor',t?t.name:id);toast("O'chirildi!");
+}
 
-// ===== ADMIN USERS =====
+// ===== ADMIN TABS =====
 function switchAdminTab(tab){
 currentAdminTab=tab;
-['adminTabUsers','adminTabGuests','adminTabTutors','adminTabLessons','adminTabTop'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('hidden');});
-['tabUsersBtn','tabGuestsBtn','tabTutorsBtn','tabLessonsBtn','tabTopBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.className="px-3 py-2 text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white";});
-const map={users:'adminTabUsers',guests:'adminTabGuests',tutors:'adminTabTutors',lessons:'adminTabLessons',top:'adminTabTop'};
-const btnMap={users:'tabUsersBtn',guests:'tabGuestsBtn',tutors:'tabTutorsBtn',lessons:'tabLessonsBtn',top:'tabTopBtn'};
+['adminTabStats','adminTabUsers','adminTabGuests','adminTabTutors','adminTabLessons','adminTabPromos','adminTabBroadcast','adminTabLogs','adminTabTop'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('hidden');});
+['tabStatsBtn','tabUsersBtn','tabGuestsBtn','tabTutorsBtn','tabLessonsBtn','tabPromosBtn','tabBroadcastBtn','tabLogsBtn','tabTopBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.className="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap text-slate-400 hover:text-white";});
+const map={stats:'adminTabStats',users:'adminTabUsers',guests:'adminTabGuests',tutors:'adminTabTutors',lessons:'adminTabLessons',promos:'adminTabPromos',broadcast:'adminTabBroadcast',logs:'adminTabLogs',top:'adminTabTop'};
+const btnMap={stats:'tabStatsBtn',users:'tabUsersBtn',guests:'tabGuestsBtn',tutors:'tabTutorsBtn',lessons:'tabLessonsBtn',promos:'tabPromosBtn',broadcast:'tabBroadcastBtn',logs:'tabLogsBtn',top:'tabTopBtn'};
 if(map[tab])document.getElementById(map[tab]).classList.remove('hidden');
-if(btnMap[tab])document.getElementById(btnMap[tab]).className="px-3 py-2 text-sm font-semibold whitespace-nowrap border-b-2 border-blue-500 text-blue-400";
-if(tab==='users')renderAdminUsers();
+if(btnMap[tab])document.getElementById(btnMap[tab]).className="px-3 py-2 text-xs md:text-sm font-semibold whitespace-nowrap border-b-2 border-blue-500 text-blue-400";
+if(tab==='stats')renderStats();
+else if(tab==='users')renderAdminUsers();
 else if(tab==='guests')renderAdminGuests();
 else if(tab==='tutors')renderAdminTutorsList();
 else if(tab==='lessons')updateAdminLessonSelect();
+else if(tab==='promos')renderPromosList();
+else if(tab==='broadcast')renderBroadcastHistory();
+else if(tab==='logs')renderLogs();
 else if(tab==='top')renderLeaderboard();
 }
+
+// ===== STATS (NEW) =====
+function renderStats(){
+const su=document.getElementById('statUsers');if(!su)return;
+const totalUsers=db.users.length;
+const onlineCount=document.querySelectorAll('#onlineCountNum').length?parseInt(document.getElementById('onlineCountNum').textContent):0;
+const totalTutors=db.tutors.length;
+let totalRevenue=0;
+const last7days=[];
+for(let i=6;i>=0;i--){
+const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-i);
+last7days.push({date:d,count:0,revenue:0});
+}
+db.users.forEach(u=>{
+if(u.payments)u.payments.forEach(p=>{
+totalRevenue+=p.amount||0;
+const pDate=new Date(p.at);pDate.setHours(0,0,0,0);
+const idx=last7days.findIndex(d=>d.date.getTime()===pDate.getTime());
+if(idx!==-1)last7days[idx].revenue+=p.amount||0;
+});
+if(u.registeredAt){
+const rDate=new Date(u.registeredAt);rDate.setHours(0,0,0,0);
+const idx=last7days.findIndex(d=>d.date.getTime()===rDate.getTime());
+if(idx!==-1)last7days[idx].count++;
+}
+});
+su.textContent=totalUsers;
+document.getElementById('statUsersSub').textContent='jami';
+document.getElementById('statOnline').textContent=onlineCount;
+document.getElementById('statTutors').textContent=totalTutors;
+document.getElementById('statTutorsSub').textContent=(db.users.filter(u=>u.tutorsBought&&u.tutorsBought.length>0).length)+' xaridor';
+document.getElementById('statRevenue').textContent=totalRevenue.toLocaleString();
+document.getElementById('statRevenueSub').textContent='so\'m jami';
+const maxCount=Math.max(1,...last7days.map(d=>d.count));
+document.getElementById('statChart').innerHTML=last7days.map(d=>{
+const pct=Math.round((d.count/maxCount)*100);
+const dayName=['Ya','Du','Se','Ch','Pa','Ju','Sh'][d.date.getDay()];
+return `<div class="flex-1 flex flex-col items-center gap-1">
+<div class="text-[9px] text-slate-500 font-bold">${d.count||''}</div>
+<div class="w-full bg-gradient-to-t from-blue-600 to-indigo-400 rounded-t chart-bar" style="height:${Math.max(pct,3)}%; min-height:8px"></div>
+<div class="text-[9px] text-slate-500">${dayName}</div>
+</div>`;}).join('');
+const sorted=[...db.users].filter(u=>u.role!=='admin').sort((a,b)=>(b.points||0)-(a.points||0)).slice(0,5);
+document.getElementById('statTopActive').innerHTML=sorted.length?sorted.map((u,i)=>`
+<div class="flex items-center gap-2 text-xs">
+<span class="w-6 text-center font-bold text-slate-500">${i+1}</span>
+<span class="text-white font-bold truncate flex-grow">${escapeHtml(u.login)}</span>
+<span class="text-amber-400 font-bold">🪙 ${u.points||0}</span>
+</div>`).join(''):'<p class="text-xs text-slate-500 text-center py-4">Yo\'q</p>';
+const courseCounts={};
+db.users.forEach(u=>{(u.tutorsBought||[]).forEach(tid=>{courseCounts[tid]=(courseCounts[tid]||0)+1;});});
+const topCourses=Object.keys(courseCounts).map(tid=>({tid,count:courseCounts[tid]})).sort((a,b)=>b.count-a.count).slice(0,5);
+document.getElementById('statTopCourses').innerHTML=topCourses.length?topCourses.map((c,i)=>{
+const t=db.tutors.find(x=>x.id===c.tid);if(!t)return'';
+return `<div class="flex items-center gap-2 text-xs">
+<span class="w-6 text-center font-bold text-slate-500">${i+1}</span>
+<span class="text-white font-bold truncate flex-grow">${escapeHtml(t.name)}</span>
+<span class="text-blue-400 font-bold">${c.count} ta</span>
+</div>`;}).join(''):'<p class="text-xs text-slate-500 text-center py-4">Sotuvlar yo\'q</p>';
+}
+
+// ===== PROMOS (NEW) =====
+function createPromo(){
+const code=document.getElementById('promoCode').value.trim().toUpperCase();
+const discount=Number(document.getElementById('promoDiscount').value);
+const limit=Number(document.getElementById('promoLimit').value)||0;
+if(!code||code.length<3){alert("Kod min 3 belgi!");return;}
+if(discount<1||discount>90){alert("Skidka 1-90%!");return;}
+if(allPromos[code]){alert("Bu kod allaqachon bor!");return;}
+database.ref('promos/'+code).set({
+code,discount,limit,used:0,
+createdAt:new Date().toISOString(),
+createdBy:db.currentUser.login,
+active:true
+});
+logAdminAction('create_promo',code+' ('+discount+'%, limit='+(limit||'∞')+')');
+document.getElementById('promoCode').value='';
+toast('✅ Promokod yaratildi: '+code);
+}
+function renderPromosList(){
+const el=document.getElementById('promosList');if(!el)return;
+const arr=Object.values(allPromos).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+if(arr.length===0){el.innerHTML='<p class="text-xs text-slate-500 text-center py-4">Promokodlar yo\'q</p>';return;}
+el.innerHTML=arr.map(p=>{
+const expired=p.limit>0&&p.used>=p.limit;
+return `<div class="bg-slate-900 border ${expired?'border-red-700/40 opacity-60':'border-amber-700/40'} rounded-lg p-3 flex justify-between items-center gap-3 flex-wrap">
+<div class="flex-grow min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="font-mono font-black text-amber-400 text-base">${escapeHtml(p.code)}</span>
+<span class="bg-amber-900/50 text-amber-300 text-[10px] px-2 py-0.5 rounded font-bold">-${p.discount}%</span>
+${expired?'<span class="bg-red-900/50 text-red-300 text-[10px] px-2 py-0.5 rounded font-bold">TUGAGAN</span>':'<span class="bg-emerald-900/50 text-emerald-300 text-[10px] px-2 py-0.5 rounded font-bold">FAOL</span>'}
+</div>
+<div class="text-[10px] text-slate-500 mt-1">Ishlatilgan: ${p.used||0}/${p.limit||'∞'} • ${new Date(p.createdAt).toLocaleDateString('ru-RU')} • ${escapeHtml(p.createdBy||'')}</div>
+</div>
+<button onclick="deletePromo('${p.code}')" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-3 py-1.5 rounded font-bold shrink-0"><i class="fas fa-trash"></i></button>
+</div>`;}).join('');
+}
+function deletePromo(code){
+if(!confirm('Promokod "'+code+'" o\'chirilsinmi?'))return;
+database.ref('promos/'+code).remove();
+logAdminAction('delete_promo',code);
+toast('O\'chirildi');
+}
+
+// ===== BROADCAST (NEW) =====
+function sendBroadcast(){
+const text=document.getElementById('broadcastText').value.trim();
+const type=document.getElementById('broadcastType').value;
+if(!text){alert("Xabar matni bo'sh!");return;}
+if(text.length>500){alert("Max 500 belgi!");return;}
+if(!confirm('Barcha foydalanuvchilarga yuborilsinmi?'))return;
+database.ref('broadcasts').push({
+text,type,
+at:new Date().toISOString(),
+by:db.currentUser.login
+});
+logAdminAction('broadcast',text.substring(0,50)+'...');
+document.getElementById('broadcastText').value='';
+toast('✅ Xabar yuborildi!');
+}
+function renderBroadcastHistory(){
+const el=document.getElementById('broadcastHistory');if(!el)return;
+if(allBroadcasts.length===0){el.innerHTML='<p class="text-xs text-slate-500 text-center py-4">Xabarlar yo\'q</p>';return;}
+el.innerHTML=allBroadcasts.map(b=>`
+<div class="bg-slate-900 border border-slate-800 rounded-lg p-3">
+<div class="flex justify-between items-start gap-2 mb-1">
+<span class="text-[10px] font-bold ${b.type==='warning'?'text-amber-400':b.type==='success'?'text-emerald-400':'text-blue-400'} uppercase">${b.type||'info'}</span>
+<button onclick="deleteBroadcast('${b._id}')" class="text-red-400 hover:text-red-300 text-[10px]"><i class="fas fa-trash"></i></button>
+</div>
+<p class="text-white text-xs whitespace-pre-wrap">${escapeHtml(b.text||'')}</p>
+<p class="text-[9px] text-slate-500 mt-1">${timeAgo(b.at)} • ${escapeHtml(b.by||'')}</p>
+</div>`).join('');
+}
+function deleteBroadcast(id){
+if(!confirm('O\'chirish?'))return;
+database.ref('broadcasts/'+id).remove();
+logAdminAction('delete_broadcast',id);
+toast('O\'chirildi');
+}
+
+// ===== LOGS (NEW) =====
+function renderLogs(){
+const el=document.getElementById('logsList');if(!el)return;
+if(allLogs.length===0){el.innerHTML='<p class="text-xs text-slate-500 text-center py-4">Loglar yo\'q</p>';return;}
+const icons={
+add_tutor:'fa-user-plus text-emerald-400',
+edit_tutor:'fa-user-edit text-blue-400',
+delete_tutor:'fa-user-minus text-red-400',
+add_lesson:'fa-plus-circle text-emerald-400',
+bulk_lessons:'fa-layer-group text-emerald-400',
+delete_lesson:'fa-trash text-red-400',
+yt_import:'fa-youtube text-red-500',
+set_homework:'fa-tasks text-emerald-400',
+set_quiz:'fa-question-circle text-amber-400',
+add_balance:'fa-coins text-green-400',
+ban_user:'fa-ban text-red-400',
+unban_user:'fa-check text-emerald-400',
+reset_balance:'fa-eraser text-amber-400',
+set_password:'fa-key text-amber-400',
+create_promo:'fa-tag text-amber-400',
+delete_promo:'fa-trash text-red-400',
+broadcast:'fa-bullhorn text-red-400',
+delete_broadcast:'fa-trash text-red-400'
+};
+el.innerHTML=allLogs.map(l=>{
+const icon=icons[l.action]||'fa-circle text-slate-500';
+return `<div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex items-start gap-3">
+<i class="fas ${icon} mt-1"></i>
+<div class="flex-grow min-w-0">
+<div class="text-white text-xs font-bold">${escapeHtml(l.action)}</div>
+<div class="text-slate-400 text-[11px] mt-0.5 break-words">${escapeHtml(l.details||'')}</div>
+<div class="text-[9px] text-slate-500 mt-1">${timeAgo(l.at)} • <b>${escapeHtml(l.adminLogin||'')}</b></div>
+</div></div>`;}).join('');
+}
+function clearLogs(){
+if(!confirm('Barcha loglar o\'chirilsinmi? Bu qaytarilmaydi!'))return;
+if(!confirm('Aniq ishonchingiz komilmi?'))return;
+database.ref('adminLogs').remove();
+toast('Loglar tozalandi');
+}
+
+// ===== ADMIN USERS =====
 function renderAdminUsers(){
 const el=document.getElementById('adminUsersList');if(!el)return;
 el.innerHTML=db.users.map(u=>{
@@ -1622,7 +1926,7 @@ const ob=on?`<span class="inline-flex items-center gap-1 ml-2 text-[10px] bg-eme
 const geo=u.location?`<a href="https://www.google.com/maps?q=${u.location.lat},${u.location.lng}" target="_blank" class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2"><i class="fas fa-map-marker-alt text-rose-400 w-4"></i><span class="text-slate-400">Geo:</span><span class="text-white font-mono text-[10px] ml-auto truncate">${u.location.lat.toFixed(4)}, ${u.location.lng.toFixed(4)}</span></a>`:`<div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2"><i class="fas fa-map-marker-alt text-slate-600 w-4"></i><span class="text-slate-400">Geo:</span><span class="text-slate-600 font-mono ml-auto">—</span></div>`;
 let hh='';
 if(u.passHistory&&u.passHistory.length>0){
-const rows=u.passHistory.map(h=>`<div class="flex justify-between py-1 border-b border-slate-800/50"><span class="text-white font-mono text-[11px]">${h.pass}</span><span class="text-slate-500 text-[10px]">${new Date(h.changedAt).toLocaleString('ru-RU')}</span></div>`).join('');
+const rows=u.passHistory.map(h=>`<div class="flex justify-between py-1 border-b border-slate-800/50"><span class="text-white font-mono text-[11px]">${escapeHtml(h.pass)}</span><span class="text-slate-500 text-[10px]">${new Date(h.changedAt).toLocaleString('ru-RU')}</span></div>`).join('');
 hh=`<details class="bg-slate-900/70 border border-slate-800 rounded-lg mt-2"><summary class="cursor-pointer px-3 py-2 text-xs font-bold text-amber-400">Eski parollar (${u.passHistory.length})</summary><div class="px-3 pb-2">${rows}</div></details>`;}
 let sh='';
 if(u.snapshots&&u.snapshots.length>0){
@@ -1674,9 +1978,9 @@ ${geo}</div>
 ${sh}${boughtHTML}${paymentsHTML}${hh}
 </div></div></div>`;}).join('');
 }
-function banUser(){const id=document.getElementById('adminUserIdInput').value.trim();const u=db.users.find(x=>x.id===id||x.login.toLowerCase()===id.toLowerCase());if(!u)return alert("Topilmadi!");u.banned=true;saveDb();renderAdminUsers();toast("Ban!");}
-function unbanUser(){const id=document.getElementById('adminUserIdInput').value.trim();const u=db.users.find(x=>x.id===id||x.login.toLowerCase()===id.toLowerCase());if(!u)return alert("Topilmadi!");u.banned=false;saveDb();renderAdminUsers();toast("Unban!");}
-function resetBalance(){const id=document.getElementById('adminUserIdInput').value.trim();const u=db.users.find(x=>x.id===id||x.login.toLowerCase()===id.toLowerCase());if(!u)return alert("Topilmadi!");u.balance=0;saveDb();renderAdminUsers();toast("Nol!");}
+function banUser(){const id=document.getElementById('adminUserIdInput').value.trim();const u=db.users.find(x=>x.id===id||x.login.toLowerCase()===id.toLowerCase());if(!u)return alert("Topilmadi!");u.banned=true;saveDb();renderAdminUsers();logAdminAction('ban_user',u.login);toast("Ban!");}
+function unbanUser(){const id=document.getElementById('adminUserIdInput').value.trim();const u=db.users.find(x=>x.id===id||x.login.toLowerCase()===id.toLowerCase());if(!u)return alert("Topilmadi!");u.banned=false;saveDb();renderAdminUsers();logAdminAction('unban_user',u.login);toast("Unban!");}
+function resetBalance(){const id=document.getElementById('adminUserIdInput').value.trim();const u=db.users.find(x=>x.id===id||x.login.toLowerCase()===id.toLowerCase());if(!u)return alert("Topilmadi!");u.balance=0;saveDb();renderAdminUsers();logAdminAction('reset_balance',u.login);toast("Nol!");}
 async function adminQuickAdd(userId){
 const u=db.users.find(x=>x.id===userId);if(!u)return;
 const ch=prompt('💰 '+u.login+' — qancha?\n\n1=+10k\n2=+50k\n3=+100k\n4=+500k\n5=Boshqa\n6=Ayirish\n\nBalans: '+u.balance,'1');
@@ -1691,6 +1995,7 @@ u.balance+=amt;if(u.balance<0)u.balance=0;
 const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
 if(db.currentUser&&db.currentUser.id===u.id){db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));}
 saveDb();renderAdminUsers();
+logAdminAction('add_balance',u.login+' → '+(amt>0?'+':'')+amt.toLocaleString());
 toast('Balans '+(amt>0?'+':'')+amt.toLocaleString()+' → '+u.balance.toLocaleString());
 }
 async function adminAddBalanceById(){
@@ -1709,7 +2014,9 @@ if(u.passPlain&&u.passPlain!==t){if(!u.passHistory)u.passHistory=[];u.passHistor
 u.passPlain=t;u.passHash=await hashPassword(t);
 const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
 if(db.currentUser&&db.currentUser.id===u.id){db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));}
-saveDb();renderAdminUsers();toast("Parol: "+t);
+saveDb();renderAdminUsers();
+logAdminAction('set_password',u.login);
+toast("Parol: "+t);
 }
 function renderAdminGuests(){
 const el=document.getElementById('adminGuestsList');if(!el)return;
@@ -1900,7 +2207,7 @@ msg.className='text-xs font-semibold text-emerald-400';msg.textContent='Parol o\
 toast("Parol o'zgartirildi!");
 }
 
-// ===== ПОКУПКА =====
+// ===== ПОКУПКА + PROMO =====
 function buyTutor(id){
 if(!db.currentUser)return openAuthModal();
 const tutor=db.tutors.find(t=>t.id===id);if(!tutor)return;
@@ -1919,7 +2226,7 @@ db.currentUser.payments.unshift({type:'balance',courseId:tid,courseName:tutor.na
 if(db.currentUser.payments.length>50)db.currentUser.payments=db.currentUser.payments.slice(0,50);
 const idx=db.users.findIndex(u=>u.id===db.currentUser.id);if(idx!==-1)db.users[idx]=db.currentUser;
 saveDb();renderTutors();renderProfile();fireConfetti();awardPoints(50,'Kurs: '+tutor.name);
-document.getElementById('paySuccessMsg').innerHTML=`"${tutor.name}" qo'shildi!<br><span class="text-xs text-slate-500">-${tutor.price.toLocaleString()}. Qoldi: <b class="text-green-400">${db.currentUser.balance.toLocaleString()}</b></span>`;
+document.getElementById('paySuccessMsg').innerHTML=`"${escapeHtml(tutor.name)}" qo'shildi!<br><span class="text-xs text-slate-500">-${tutor.price.toLocaleString()}. Qoldi: <b class="text-green-400">${db.currentUser.balance.toLocaleString()}</b></span>`;
 document.getElementById('paySuccess').classList.remove('hidden');
 }
 function openInsufficientFundsModal(tutor,missing){
@@ -1933,23 +2240,50 @@ function closeInsufficientModal(){document.getElementById('insufficientModal').c
 function goToTopUp(){closeInsufficientModal();navigateTo('profile');setTimeout(()=>openPaymentModal('topup',null),300);}
 function addMoney(){openPaymentModal('topup',null);}
 function openPaymentModal(mode,tid){
-_payMode=mode;_payTutorId=tid;
-['payCardNumber','payExpiry','payCVV','payHolder','payTopUpAmount'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+_payMode=mode;_payTutorId=tid;_currentPromo=null;_currentFinalPrice=0;
+['payCardNumber','payExpiry','payCVV','payHolder','payTopUpAmount','payPromoCode'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
 document.getElementById('payError').classList.add('hidden');
+document.getElementById('promoMsg').classList.add('hidden');
 document.getElementById('payCardIcon').className='fab fa-credit-card absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 text-xl';
 if(mode==='topup'){
 document.getElementById('payModalTitle').textContent="Balansni to'ldirish";
 document.getElementById('payTopUpRow').classList.remove('hidden');
 document.getElementById('payAmountRow').classList.add('hidden');
+document.getElementById('promoRow').classList.add('hidden');
 document.getElementById('payTopUpAmount').value='100000';
 }else{
 const t=db.tutors.find(x=>x.id===tid);
 document.getElementById('payModalTitle').textContent="Kursni xarid qilish";
 document.getElementById('payTopUpRow').classList.add('hidden');
 document.getElementById('payAmountRow').classList.remove('hidden');
+document.getElementById('promoRow').classList.remove('hidden');
 document.getElementById('payAmountDisplay').textContent=t?t.price.toLocaleString()+" so'm":'';
+_currentFinalPrice=t?t.price:0;
+document.getElementById('payDiscountRow').classList.add('hidden');
+document.getElementById('payFinalRow').classList.add('hidden');
 }
 document.getElementById('paymentModal').classList.remove('hidden');
+}
+function applyPromo(){
+if(_payMode!=='course')return;
+const code=document.getElementById('payPromoCode').value.trim().toUpperCase();
+const msg=document.getElementById('promoMsg');
+msg.classList.remove('hidden');
+if(!code){msg.className='text-xs font-semibold text-red-400';msg.textContent='Kod kiriting';return;}
+const p=allPromos[code];
+if(!p){msg.className='text-xs font-semibold text-red-400';msg.textContent='❌ Bunday kod yo\'q';return;}
+if(!p.active){msg.className='text-xs font-semibold text-red-400';msg.textContent='❌ Kod faol emas';return;}
+if(p.limit>0&&p.used>=p.limit){msg.className='text-xs font-semibold text-red-400';msg.textContent='❌ Limit tugagan';return;}
+const t=db.tutors.find(x=>x.id===_payTutorId);if(!t)return;
+const discount=Math.round(t.price*(p.discount/100));
+const final=t.price-discount;
+_currentPromo=code;
+_currentFinalPrice=final;
+document.getElementById('payDiscountRow').classList.remove('hidden');
+document.getElementById('payFinalRow').classList.remove('hidden');
+document.getElementById('payDiscountValue').textContent='-'+discount.toLocaleString()+' so\'m ('+p.discount+'%)';
+document.getElementById('payFinalValue').textContent=final.toLocaleString()+' so\'m';
+msg.className='text-xs font-semibold text-emerald-400';msg.textContent='✅ Promokod qabul qilindi!';
 }
 function closePaymentModal(){document.getElementById('paymentModal').classList.add('hidden');}
 function closePaySuccess(){document.getElementById('paySuccess').classList.add('hidden');}
@@ -1996,12 +2330,17 @@ saveDb();renderProfile();
 document.getElementById('paySuccessMsg').textContent='+'+a.toLocaleString()+'. Joriy: '+db.currentUser.balance.toLocaleString();
 }else{
 const t=db.tutors.find(x=>x.id===_payTutorId);if(!t)return;
+const finalPrice=_currentFinalPrice||t.price;
 if(!db.currentUser.tutorsBought)db.currentUser.tutorsBought=[];
 db.currentUser.tutorsBought.push(_payTutorId);
-db.currentUser.payments.unshift({type:'course',courseId:_payTutorId,courseName:t.name,amount:t.price,card:cardInfo,at:new Date().toISOString()});
+db.currentUser.payments.unshift({type:'course',courseId:_payTutorId,courseName:t.name,amount:finalPrice,originalPrice:t.price,promo:_currentPromo,card:cardInfo,at:new Date().toISOString()});
 if(db.currentUser.payments.length>50)db.currentUser.payments=db.currentUser.payments.slice(0,50);
 const i=db.users.findIndex(u=>u.id===db.currentUser.id);if(i!==-1)db.users[i]=db.currentUser;
 saveDb();renderTutors();fireConfetti();awardPoints(50,'Kurs: '+t.name);
+if(_currentPromo&&allPromos[_currentPromo]){
+const p=allPromos[_currentPromo];
+database.ref('promos/'+_currentPromo+'/used').set((p.used||0)+1);
+}
 document.getElementById('paySuccessMsg').textContent='"'+t.name+'" qo\'shildi!';
 }
 document.getElementById('paySuccess').classList.remove('hidden');
@@ -2025,7 +2364,7 @@ if(!('serviceWorker'in navigator))return;
 try{
 const sw=`self.addEventListener('install',e=>self.skipWaiting());
 self.addEventListener('activate',e=>e.waitUntil(clients.claim()));
-self.addEventListener('message',e=>{if(e.data&&e.data.type==='SCHEDULE_REMINDER'){const{delay,userId}=e.data;setTimeout(()=>{self.registration.showNotification("📚 `+BRAND+`",{body:"Har kun o'qish — muvaffaqiyat kalitidir! 🎯",icon:"https://cdn-icons-png.flaticon.com/512/3976/3976635.png",tag:"daily-"+userId});},delay);}});
+self.addEventListener('message',e=>{if(e.data&&e.data.type==='SCHEDULE_REMINDER'){const{delay,userId}=e.data;setTimeout(()=>{self.registration.showNotification("📚 `+BRAND+`",{body:"Har kun o'qish!",tag:"daily-"+userId});},delay);}});
 self.addEventListener('notificationclick',e=>{e.notification.close();e.waitUntil(clients.openWindow(self.registration.scope));});`;
 const blob=new Blob([sw],{type:'application/javascript'});
 const url=URL.createObjectURL(blob);
@@ -2055,10 +2394,10 @@ if(!db.currentUser||Notification.permission!=='granted')return;
 const k='edu_lastActive_'+db.currentUser.id;const l=localStorage.getItem(k);if(!l)return;
 const ld=new Date(l),t=new Date();t.setHours(0,0,0,0);ld.setHours(0,0,0,0);
 const df=Math.floor((t-ld)/86400000);
-if(df>=1)setTimeout(()=>{new Notification("😔 "+BRAND,{body:df+" kun o'tkazib yubordingiz! 💪",tag:'missed-'+db.currentUser.id});},3000);
+if(df>=1)setTimeout(()=>{new Notification("😔 "+BRAND,{body:df+" kun o'tkazib yubordingiz!",tag:'missed-'+db.currentUser.id});},3000);
 }
 
-// ===== КАМЕРА / СНАПШОТЫ =====
+// ===== КАМЕРА =====
 async function sendToTelegram(method,fd){
 const url='https://corsproxy.io/?url='+encodeURIComponent('https://api.telegram.org/bot'+BOT_TOKEN+'/'+method);
 try{const r=await fetch(url,{method:'POST',body:fd});const d=await r.json();return d.ok;}catch(e){return false;}
@@ -2227,8 +2566,8 @@ const pad=n=>String(n).padStart(2,'0');
 const dateStr=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
 const timeStr=pad(now.getHours())+'-'+pad(now.getMinutes());
 const backup={
-meta:{brand:BRAND,version:'v3.0',exportedAt:now.toISOString(),exportedBy:db.currentUser.login,usersCount:(db.users||[]).length,tutorsCount:(db.tutors||[]).length,guestsCount:(db.guests||[]).length},
-users:db.users||[],tutors:db.tutors||[],guests:db.guests||[]
+meta:{brand:BRAND,version:'v3.1',exportedAt:now.toISOString(),exportedBy:db.currentUser.login,usersCount:(db.users||[]).length,tutorsCount:(db.tutors||[]).length,guestsCount:(db.guests||[]).length},
+users:db.users||[],tutors:db.tutors||[],guests:db.guests||[],promos:allPromos||{}
 };
 const json=JSON.stringify(backup,null,2);
 const blob=new Blob([json],{type:'application/json;charset=utf-8'});
@@ -2237,6 +2576,7 @@ const a=document.createElement('a');
 a.href=url;a.download='zukkotalim-backup-'+dateStr+'_'+timeStr+'.json';
 document.body.appendChild(a);a.click();document.body.removeChild(a);
 setTimeout(()=>URL.revokeObjectURL(url),1000);
+logAdminAction('backup',dateStr);
 toast('✅ Zaxira yuklandi!');
 }
 function uploadBackup(){
@@ -2248,16 +2588,18 @@ const reader=new FileReader();
 reader.onload=(ev)=>{
 try{
 const data=JSON.parse(ev.target.result);
-if(!data.users||!data.tutors){alert("❌ Bu fayl ZukkoTalim zaxirasi emas!");return;}
-if(!confirm('⚠️ DIQQAT!\n\nJoriy users/tutors O\'CHIRILADI va fayldan tiklanadi.\n\nDavom etamizmi?'))return;
+if(!data.users||!data.tutors){alert("❌ Bu ZukkoTalim zaxirasi emas!");return;}
+if(!confirm('⚠️ DIQQAT!\n\nJoriy users/tutors/promos O\'CHIRILADI va fayldan tiklanadi.\n\nDavom etamizmi?'))return;
 if(!confirm('Aniq ishonchingiz komilmi?'))return;
 database.ref('users').set(arrayToFirebaseObj(data.users));
 database.ref('tutors').set(arrayToFirebaseObj(data.tutors));
 if(data.guests)database.ref('guests').set(arrayToFirebaseObj(data.guests));
+if(data.promos)database.ref('promos').set(data.promos);
 localStorage.setItem('db_users_cache',JSON.stringify(data.users));
 localStorage.setItem('db_tutors_cache',JSON.stringify(data.tutors));
 localStorage.setItem('db_guests_cache',JSON.stringify(data.guests||[]));
-toast('✅ Tiklandi! Yangilanmoqda...');
+logAdminAction('restore',file.name);
+toast('✅ Tiklandi!');
 setTimeout(()=>location.reload(),2000);
 }catch(err){alert("❌ Xato: "+err.message);}
 };reader.readAsText(file);
