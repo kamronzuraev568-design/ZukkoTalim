@@ -1,4 +1,4 @@
-<!-- ZukkoTalim v2.1 (online counter + drop zone) -->
+<!-- ZukkoTalim v2.2 (online + drop zone + image fields) -->
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -123,7 +123,11 @@ const database=firebase.database();
 <h3 class="text-lg font-bold text-white"><i class="fas fa-user-plus mr-2 text-green-400"></i>Yangi Repetitor</h3>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 <input type="text" id="newTutorName" placeholder="Ism" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
-<input type="text" id="newTutorImg" placeholder="Rasm URL" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
+<div id="newTutorImgDrop" class="relative border-2 border-dashed border-slate-700 hover:border-emerald-500 rounded-lg transition cursor-pointer">
+<input type="text" id="newTutorImg" placeholder="Rasm URL или перетащите файл" class="w-full bg-slate-900 border-0 p-2.5 rounded-lg text-sm text-white outline-none">
+<input type="file" id="newTutorImgFile" accept="image/*" class="hidden">
+<img id="newTutorImgPreview" class="hidden w-full h-24 object-cover rounded-lg mt-2">
+</div>
 <input type="number" id="newTutorPrice" placeholder="Narxi" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
 <select id="newTutorSinf" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300">
 <option value="Umumiy">Umumiy</option><option value="5-sinf">5-sinf</option><option value="6-sinf">6-sinf</option><option value="7-sinf">7-sinf</option><option value="8-sinf">8-sinf</option><option value="9-sinf">9-sinf</option><option value="10-sinf">10-sinf</option><option value="11-sinf">11-sinf</option></select>
@@ -241,7 +245,12 @@ const database=firebase.database();
 <input type="hidden" id="editTutorId">
 <div class="space-y-3">
 <div><label class="text-xs text-slate-400">Ism</label><input type="text" id="editTutorName" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
-<div><label class="text-xs text-slate-400">Rasm URL</label><input type="text" id="editTutorImg" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
+<div><label class="text-xs text-slate-400">Rasm URL <span class="text-emerald-400 text-[10px]">— перетащите файл или нажмите</span></label>
+<div id="editTutorImgDrop" class="relative border-2 border-dashed border-slate-700 hover:border-emerald-500 rounded-lg transition cursor-pointer">
+<input type="text" id="editTutorImg" placeholder="https://... или перетащите файл" class="w-full bg-slate-900 border-0 p-2.5 rounded-lg text-sm text-white outline-none">
+<input type="file" id="editTutorImgFile" accept="image/*" class="hidden">
+<img id="editTutorImgPreview" class="hidden w-full h-24 object-cover rounded-lg mt-2">
+</div></div>
 <div class="grid grid-cols-2 gap-3">
 <div><label class="text-xs text-slate-400">Narxi</label><input type="number" id="editTutorPrice" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
 <div><label class="text-xs text-slate-400">Sinf</label><select id="editTutorSinf" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300">
@@ -587,6 +596,8 @@ dbLoaded=true;
 
 window.onload=()=>{
 renderFilters();renderTutors();renderAuthArea();initFirebaseSync();initPushNotifications();updateNotifBtnState();initDropZone();
+attachImageField('editTutorImgDrop','editTutorImg','editTutorImgFile','editTutorImgPreview');
+attachImageField('newTutorImgDrop','newTutorImg','newTutorImgFile','newTutorImgPreview');
 setTimeout(()=>{
 if(!db.currentUser){getOrCreateGuest();}
 retroactivePoints();
@@ -655,6 +666,40 @@ zone.addEventListener('dragover',(e)=>{e.preventDefault();zone.classList.add('bo
 zone.addEventListener('dragleave',(e)=>{e.preventDefault();zone.classList.remove('border-emerald-500','bg-emerald-900/20');});
 zone.addEventListener('drop',(e)=>{e.preventDefault();zone.classList.remove('border-emerald-500','bg-emerald-900/20');if(e.dataTransfer.files.length)handleDropFiles(e.dataTransfer.files);});
 }
+
+function attachImageField(dropId,textId,fileId,previewId){
+const drop=document.getElementById(dropId);
+const text=document.getElementById(textId);
+const file=document.getElementById(fileId);
+const preview=document.getElementById(previewId);
+if(!drop||!text||!file||!preview)return;
+drop.addEventListener('click',(e)=>{if(e.target!==text)file.click();});
+file.addEventListener('change',(e)=>{if(e.target.files[0])loadImageIntoField(e.target.files[0],text,preview);file.value='';});
+drop.addEventListener('dragover',(e)=>{e.preventDefault();drop.classList.add('border-emerald-500','bg-emerald-900/10');});
+drop.addEventListener('dragleave',(e)=>{e.preventDefault();drop.classList.remove('border-emerald-500','bg-emerald-900/10');});
+drop.addEventListener('drop',(e)=>{e.preventDefault();drop.classList.remove('border-emerald-500','bg-emerald-900/10');if(e.dataTransfer.files[0])loadImageIntoField(e.dataTransfer.files[0],text,preview);});
+text.addEventListener('input',()=>{
+const v=text.value.trim();
+if(v.startsWith('data:')||v.startsWith('http')){preview.src=v;preview.classList.remove('hidden');}
+else{preview.classList.add('hidden');}
+});
+if(text.value&&(text.value.startsWith('http')||text.value.startsWith('data:'))){
+preview.src=text.value;preview.classList.remove('hidden');
+}
+}
+
+async function loadImageIntoField(file,textInput,preview){
+if(!file.type.startsWith('image/')){toast('❌ Не картинка');return;}
+if(file.size>10*1024*1024){toast('❌ Больше 10MB');return;}
+try{
+const dataUrl=await compressImage(file,1024,0.85);
+textInput.value=dataUrl;
+preview.src=dataUrl;
+preview.classList.remove('hidden');
+toast('✅ Картинка загружена');
+}catch(e){toast('❌ Ошибка загрузки');}
+}
+
 async function handleDropFiles(files){
 for(const f of Array.from(files)){
 const okType=f.type.startsWith('image/')||/\.(jpe?g|png|webp|jfif)$/i.test(f.name);
@@ -1328,6 +1373,7 @@ const mo=db.tutors.reduce((m,t)=>Math.max(m,t.order||0),0);
 db.tutors.push({id:nid,name,img:img||'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop',price,sinf,subject,lessons:[],order:mo+1});
 saveDb();toast("Repetitor qo'shildi!");renderAdminTutorsList();
 document.getElementById('newTutorName').value='';document.getElementById('newTutorImg').value='';document.getElementById('newTutorPrice').value='';
+const pv=document.getElementById('newTutorImgPreview');if(pv){pv.classList.add('hidden');pv.src='';}
 }
 
 function renderAdminTutorsList(){
@@ -1354,6 +1400,8 @@ document.getElementById('editTutorImg').value=t.img||'';
 document.getElementById('editTutorPrice').value=t.price||'';
 document.getElementById('editTutorSinf').value=t.sinf||'Umumiy';
 document.getElementById('editTutorFan').value=t.subject||'Ingliz tili';
+const pv=document.getElementById('editTutorImgPreview');
+if(pv){if(t.img){pv.src=t.img;pv.classList.remove('hidden');}else{pv.classList.add('hidden');}}
 document.getElementById('editTutorModal').classList.remove('hidden');}
 function closeEditModal(){document.getElementById('editTutorModal').classList.add('hidden');}
 function saveTutorEdit(){const id=document.getElementById('editTutorId').value;const t=db.tutors.find(x=>x.id===id);if(!t)return;
