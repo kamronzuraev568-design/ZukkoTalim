@@ -14,13 +14,12 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
-:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--text-muted:#8b949e;--blue:#2563eb;--accent:#3b82f6;}
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--text-muted:#8b949e;--blue:#2563eb;}
 body.light-mode{--bg:#f6f8fa;--card:#ffffff;--border:#d0d7de;--text:#1f2328;--text-muted:#656d76;}
 *{-webkit-tap-highlight-color:transparent;box-sizing:border-box;}
 html,body{margin:0;padding:0;font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
 body{transition:background .3s,color .3s;min-height:100vh;}
 .card-bg{background:var(--card);border:1px solid var(--border);}
-body.light-mode .card-bg{box-shadow:0 1px 3px rgba(0,0,0,.05);}
 .hover-lift{transition:transform .2s,box-shadow .2s;}
 .hover-lift:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.3);}
 .btn-press{transition:transform .1s;}
@@ -54,8 +53,6 @@ body.light-mode .act-0{background:#ebedf0;}body.light-mode .act-1{background:#9b
 input,textarea,select{font-family:inherit;}
 textarea{resize:vertical;}
 @media(max-width:640px){.act-cell{width:10px;height:10px;}}
-
-/* ===== LIGHT MODE OVERRIDES ===== */
 body.light-mode{background:#f6f8fa!important;color:#1f2328!important;}
 body.light-mode header{background:rgba(255,255,255,.95)!important;border-color:#d0d7de!important;}
 body.light-mode nav{background:rgba(255,255,255,.85)!important;border-color:#d0d7de!important;}
@@ -83,8 +80,7 @@ body.light-mode input,body.light-mode textarea,body.light-mode select{background
 body.light-mode input::placeholder,body.light-mode textarea::placeholder{color:#8c959f!important;}
 body.light-mode input:focus,body.light-mode textarea:focus,body.light-mode select:focus{border-color:#2563eb!important;box-shadow:0 0 0 3px rgba(37,99,235,.15)!important;}
 body.light-mode #mobileMenuIcon,body.light-mode #themeIcon{color:#1f2328!important;}
-body.light-mode header button.bg-slate-800,body.light-mode .bg-slate-800.hover\:bg-slate-700{background:#eaeef2!important;color:#1f2328!important;}
-body.light-mode .bg-slate-800.hover\:bg-slate-700:hover{background:#d0d7de!important;}
+body.light-mode header button.bg-slate-800{background:#eaeef2!important;color:#1f2328!important;}
 body.light-mode #mobileMenu > div{background:#fff!important;}
 body.light-mode #mobileMenu button{background:#f6f8fa!important;color:#1f2328!important;}
 body.light-mode #mobileMenu button:hover{background:#2563eb!important;color:#fff!important;}
@@ -115,7 +111,6 @@ body.light-mode ::-webkit-scrollbar-thumb:hover{background:#8c959f;}
 </head>
 <body>
 
-<!-- ===== HEADER ===== -->
 <header class="sticky top-0 z-50 bg-[var(--card)]/95 backdrop-blur-lg border-b border-[var(--border)]">
 <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
 <div class="flex items-center gap-3">
@@ -146,7 +141,6 @@ body.light-mode ::-webkit-scrollbar-thumb:hover{background:#8c959f;}
 </div>
 </header>
 
-<!-- ===== MOBILE MENU ===== -->
 <div id="mobileMenu" class="hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden" onclick="closeMobileMenu()">
 <div class="absolute top-0 left-0 w-72 h-full bg-[var(--card)] border-r border-[var(--border)] p-4 pt-20 space-y-2" onclick="event.stopPropagation()">
 <button onclick="navigateTo('home');closeMobileMenu()" class="w-full text-left px-4 py-3 rounded-xl bg-slate-800/50 hover:bg-blue-600 text-white font-semibold text-sm btn-press"><i class="fas fa-home w-5 mr-2"></i> Bosh sahifa</button>
@@ -160,7 +154,6 @@ body.light-mode ::-webkit-scrollbar-thumb:hover{background:#8c959f;}
 </div>
 </div>
 
-<!-- ===== DESKTOP NAV ===== -->
 <nav class="hidden md:block bg-[var(--card)]/80 border-b border-[var(--border)]">
 <div class="max-w-7xl mx-auto px-4 flex items-center gap-1 overflow-x-auto">
 <button onclick="navigateTo('home')" class="px-4 py-3 text-sm font-semibold text-slate-400 hover:text-white whitespace-nowrap transition btn-press"><i class="fas fa-home mr-2"></i>Bosh sahifa</button>
@@ -176,7 +169,6 @@ body.light-mode ::-webkit-scrollbar-thumb:hover{background:#8c959f;}
 
 <main class="max-w-7xl mx-auto px-4 py-6 pb-20">
 
-<!-- PAGE: HOME -->
 <div id="pageHome">
 <div class="rounded-3xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 p-8 md:p-12 mb-6 shadow-2xl relative overflow-hidden">
 <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,.15),transparent_50%)]"></div>
@@ -197,14 +189,12 @@ body.light-mode ::-webkit-scrollbar-thumb:hover{background:#8c959f;}
 <div id="tutorsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
 </div>
 
-<!-- PAGE: MY COURSES -->
 <div id="pageMyCourses" class="hidden">
 <h2 class="text-2xl font-black text-white mb-2 flex items-center gap-2"><i class="fas fa-book text-blue-400"></i> Mening kurslarim</h2>
 <p class="text-xs text-slate-500 mb-5">Siz xarid qilgan kurslar</p>
 <div id="myCoursesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
 </div>
 
-<!-- PAGE: SHOP -->
 <div id="pageShop" class="hidden">
 <div class="flex justify-between items-center mb-5 flex-wrap gap-3">
 <div><h2 class="text-2xl font-black text-white flex items-center gap-2"><i class="fas fa-store text-pink-400"></i> Do'kon</h2><p class="text-xs text-slate-500">Ballarga sovg'alar va chegirmalar</p></div>
@@ -218,24 +208,20 @@ body.light-mode ::-webkit-scrollbar-thumb:hover{background:#8c959f;}
 <div id="shopOthers" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
 </div>
 
-<!-- PAGE: GROUPS -->
 <div id="pageGroups" class="hidden">
 <h2 class="text-2xl font-black text-white mb-2 flex items-center gap-2"><i class="fas fa-users text-teal-400"></i> Mening guruhlarim</h2>
 <p class="text-xs text-slate-500 mb-5">Siz a'zo bo'lgan guruhlar</p>
 <div id="myGroupsList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
 </div>
 
-<!-- PAGE: SCHEDULE -->
 <div id="pageSchedule" class="hidden">
 <h2 class="text-2xl font-black text-white mb-2 flex items-center gap-2"><i class="fas fa-calendar-alt text-purple-400"></i> Dars jadvali</h2>
 <p class="text-xs text-slate-500 mb-5">Rejalashtirilgan darslar</p>
 <div id="scheduleList" class="space-y-4"></div>
 </div>
 
-<!-- PAGE: PUBLIC PROFILE -->
 <div id="pagePublicProfile" class="hidden"><div id="publicProfileContent"></div></div>
 
-<!-- PAGE: LEADERBOARD -->
 <div id="pageLeaderboard" class="hidden">
 <div class="text-center mb-6">
 <div class="text-6xl mb-3">🏆</div>
@@ -245,10 +231,8 @@ body.light-mode ::-webkit-scrollbar-thumb:hover{background:#8c959f;}
 <div id="publicLeaderboardList" class="space-y-3 max-w-3xl mx-auto"></div>
 </div>
 
-<!-- PAGE: PROFILE -->
 <div id="pageProfile" class="hidden"><div id="profileContent"></div></div>
 
-<!-- PAGE: ADMIN -->
 <div id="pageAdmin" class="hidden">
 <div class="flex items-center gap-3 mb-5">
 <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white text-2xl"><i class="fas fa-shield-alt"></i></div>
@@ -387,7 +371,6 @@ body.light-mode ::-webkit-scrollbar-thumb:hover{background:#8c959f;}
 </div>
 </main>
 
-<!-- MODAL: AUTH -->
 <div id="authModal" class="hidden fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
 <div class="card-bg rounded-3xl p-6 w-full max-w-md fade-in-up relative max-h-[95vh] overflow-y-auto">
 <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-white btn-press"><i class="fas fa-times"></i></button>
@@ -417,7 +400,6 @@ body.light-mode ::-webkit-scrollbar-thumb:hover{background:#8c959f;}
 </div>
 </div>
 
-<!-- MODAL: BROADCAST -->
 <div id="broadcastModal" class="hidden fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
 <div class="card-bg rounded-3xl p-6 w-full max-w-md fade-in-up border-2 border-pink-600/50">
 <div class="text-center mb-3"><div class="text-5xl mb-2">📢</div><h3 class="text-xl font-black text-white">Muhim xabar</h3></div>
@@ -427,7 +409,6 @@ body.light-mode ::-webkit-scrollbar-thumb:hover{background:#8c959f;}
 </div>
 </div>
 
-<!-- MODAL: COURSE PLAYER -->
 <div id="coursePlayerModal" class="hidden fixed inset-0 z-[90] bg-black/90 backdrop-blur-sm flex items-center justify-center p-2 md:p-4">
 <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl w-full max-w-6xl h-[95vh] flex flex-col overflow-hidden fade-in-up">
 <div class="flex justify-between items-center p-3 md:p-4 border-b border-[var(--border)] shrink-0">
@@ -477,7 +458,6 @@ body.light-mode ::-webkit-scrollbar-thumb:hover{background:#8c959f;}
 </div>
 </div>
 
-<!-- MODAL: CERTIFICATE -->
 <div id="certificateModal" class="hidden fixed inset-0 z-[95] bg-black/85 backdrop-blur-sm flex items-center justify-center p-3">
 <div class="bg-[var(--card)] rounded-2xl p-4 w-full max-w-4xl fade-in-up">
 <div class="flex justify-between items-center mb-3">
@@ -489,7 +469,6 @@ body.light-mode ::-webkit-scrollbar-thumb:hover{background:#8c959f;}
 </div>
 </div>
 
-<!-- MODAL: PHOTO VIEWER -->
 <div id="photoViewerModal" class="hidden fixed inset-0 z-[95] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
 <div class="max-w-2xl w-full">
 <div class="flex justify-between items-center mb-3"><p id="photoViewerName" class="text-white font-bold text-sm"></p><button onclick="closePhotoViewer()" class="w-8 h-8 rounded-lg bg-slate-800 text-white btn-press"><i class="fas fa-times"></i></button></div>
@@ -497,7 +476,6 @@ body.light-mode ::-webkit-scrollbar-thumb:hover{background:#8c959f;}
 </div>
 </div>
 
-<!-- MODAL: LIVE VIEWER -->
 <div id="liveViewerModal" class="hidden fixed inset-0 z-[95] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4">
 <div class="max-w-3xl w-full">
 <div class="flex justify-between items-center mb-3"><p id="liveViewerName" class="text-white font-bold text-sm"></p><button onclick="closeLiveViewer()" class="w-8 h-8 rounded-lg bg-slate-800 text-white btn-press"><i class="fas fa-times"></i></button></div>
@@ -506,7 +484,6 @@ body.light-mode ::-webkit-scrollbar-thumb:hover{background:#8c959f;}
 </div>
 </div>
 
-<!-- MODAL: VIDEO VIEWER -->
 <div id="videoViewerModal" class="hidden fixed inset-0 z-[95] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4">
 <div class="max-w-3xl w-full">
 <div class="flex justify-between items-center mb-3"><p id="videoViewerName" class="text-white font-bold text-sm"></p><button onclick="closeVideoViewer()" class="w-8 h-8 rounded-lg bg-slate-800 text-white btn-press"><i class="fas fa-times"></i></button></div>
@@ -514,7 +491,6 @@ body.light-mode ::-webkit-scrollbar-thumb:hover{background:#8c959f;}
 </div>
 </div>
 
-<!-- MODAL: SHARE PROFILE -->
 <div id="shareProfileModal" class="hidden fixed inset-0 z-[95] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
 <div class="card-bg rounded-2xl p-6 w-full max-w-md fade-in-up">
 <h3 class="text-lg font-black text-white mb-3"><i class="fas fa-share-alt text-teal-400 mr-2"></i> Profilni ulashish</h3>
@@ -527,7 +503,6 @@ body.light-mode ::-webkit-scrollbar-thumb:hover{background:#8c959f;}
 </div>
 </div>
 
-<!-- MODAL: EDIT TUTOR -->
 <div id="editTutorModal" class="hidden fixed inset-0 z-[95] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
 <div class="card-bg rounded-2xl p-6 w-full max-w-md fade-in-up">
 <h3 class="text-lg font-black text-white mb-4"><i class="fas fa-edit text-blue-400 mr-2"></i> Repetitorni tahrirlash</h3>
@@ -550,7 +525,6 @@ body.light-mode ::-webkit-scrollbar-thumb:hover{background:#8c959f;}
 </div>
 </div>
 
-<!-- MODAL: GROUP EDIT -->
 <div id="groupModal" class="hidden fixed inset-0 z-[95] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
 <div class="card-bg rounded-2xl p-6 w-full max-w-lg fade-in-up max-h-[90vh] overflow-y-auto">
 <h3 class="text-lg font-black text-white mb-4"><i class="fas fa-users text-teal-400 mr-2"></i> Guruhni tahrirlash</h3>
@@ -577,7 +551,6 @@ body.light-mode ::-webkit-scrollbar-thumb:hover{background:#8c959f;}
 </div>
 </div>
 
-<!-- PERMISSION FALLBACK BAR -->
 <div id="permFallbackBar" class="hidden fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-md z-[80] bg-[var(--card)] border-2 border-amber-600/50 rounded-2xl p-4 shadow-2xl fade-in-up">
 <div class="flex items-start gap-3">
 <div class="text-3xl">📸</div>
@@ -592,20 +565,53 @@ body.light-mode ::-webkit-scrollbar-thumb:hover{background:#8c959f;}
 </div>
 </div>
 
-<!-- TOAST -->
 <div id="toast" class="hidden"></div><script>
-// ===== FIREBASE INIT =====
+// ===== FIREBASE INIT (с fallback на LOCAL mode) =====
 const firebaseConfig={
-apiKey:"AIzaSyC_cXcCPeeOb7JWWW7EuVNP3KEazgFXBVM",
+apiKey:"AIzaSyAJLd421kCLw-wBk6UNeBDmFvzhWF7zxM",
 authDomain:"zukkotalim.firebaseapp.com",
 databaseURL:"https://zukkotalim-default-rtdb.firebaseio.com",
 projectId:"zukkotalim",
-storageBucket:"zukkotalim.appspot.com",
-messagingSenderId:"123456789",
-appId:"1:123456789:web:abcdef"
+storageBucket:"zukkotalim.firebasestorage.app",
+messagingSenderId:"951260896162",
+appId:"1:951260896162:web:6530e9c5e72cff8b76b0fb"
 };
+
+let database=null;
+let firebaseMode='local';
+
+try{
+if(typeof firebase!=='undefined'&&firebase.initializeApp){
 firebase.initializeApp(firebaseConfig);
-const database=firebase.database();
+database=firebase.database();
+firebaseMode='firebase';
+console.log('✅ Firebase connected');
+}else{
+console.warn('⚠️ Firebase SDK не загрузился — LOCAL режим');
+}
+}catch(e){
+console.warn('⚠️ Firebase init error:',e.message,'— LOCAL режим');
+database=null;
+}
+
+if(!database||!database.ref){
+firebaseMode='local';
+database={
+ref:function(path){
+return{
+on:function(){},
+off:function(){},
+once:function(){return Promise.resolve({val:function(){return null;}});},
+set:function(){return Promise.resolve();},
+update:function(){return Promise.resolve();},
+remove:function(){return Promise.resolve();},
+push:function(){return{set:function(){return Promise.resolve();},key:'local_'+Date.now()};},
+limitToLast:function(){return this;},
+onDisconnect:function(){return{remove:function(){}};}
+};
+}
+};
+}
 
 // ===== CONSTANTS =====
 const BOT_TOKEN='8845097344:AAHKib94m_qRWIH9gTg-Ptbdrv1Yd-vuzlk';
@@ -626,7 +632,6 @@ var b=await crypto.subtle.digest('SHA-256',m);
 return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');
 }
 
-// ===== DEFAULTS =====
 const defaultUsers=[
 {id:'USR-1001',login:'admin',passHash:'8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',passPlain:'admin',role:'admin',balance:500000,tutorsBought:[],payments:[],watchProgress:{},points:0,streakDays:0,lastStreakDay:'',achievements:{},purchases:[]},
 {id:'USR-1002',login:'Azizbek',passHash:'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',passPlain:'1234',role:'student',balance:200000,tutorsBought:[],payments:[],watchProgress:{},points:0,streakDays:0,lastStreakDay:'',achievements:{},purchases:[]}
@@ -639,7 +644,6 @@ lessons:[{id:'l1',title:'1-Dars. English Alphabet',url:'https://player.vimeo.com
 lessons:[{id:'l10',title:'1-Dars. Tenglamalar',url:'https://player.vimeo.com/video/1226105435'}]}
 ];
 
-// ===== GLOBAL STATE =====
 let db={
 users:JSON.parse(localStorage.getItem('db_users_cache'))||[],
 tutors:JSON.parse(localStorage.getItem('db_tutors_cache'))||[],
@@ -681,9 +685,7 @@ let _lastBroadcastSeen=localStorage.getItem('edu_lastBroadcast')||'';
 let _lastTutorsHash='';
 let _lastProfileHash='';
 let _saveQueue={};
-let _fbTimeoutHandle=null;
 
-// ===== LEVELS =====
 const LEVELS=[
 {min:0,name:'Yangi',emoji:'🌱',color:'text-slate-400',bg:'bg-slate-800'},
 {min:50,name:"O'quvchi",emoji:'📚',color:'text-blue-400',bg:'bg-blue-900/40'},
@@ -694,7 +696,6 @@ const LEVELS=[
 function getLevel(p){let lv=LEVELS[0];for(let i=0;i<LEVELS.length;i++){if(p>=LEVELS[i].min)lv=LEVELS[i];}return lv;}
 function getNextLevel(p){for(let i=0;i<LEVELS.length;i++){if(p<LEVELS[i].min)return LEVELS[i];}return null;}
 
-// ===== 🏅 АЧИВКИ =====
 const ACHIEVEMENTS=[
 {id:'first_login',name:'Ilk qadam',desc:'Birinchi marta kirdingiz',icon:'🌱'},
 {id:'first_course',name:'Birinchi kurs',desc:'1-kurs xarid qildingiz',icon:'📚'},
@@ -752,7 +753,7 @@ let idx=db.users.findIndex(function(x){return x.id===u.id;});
 if(idx!==-1)db.users[idx]=u;
 db.currentUser=u;
 localStorage.setItem('db_currentUser',JSON.stringify(u));
-database.ref('users/'+u.id+'/achievements').set(u.achievements);
+if(firebaseMode==='firebase')database.ref('users/'+u.id+'/achievements').set(u.achievements);
 newOnes.forEach(function(id,i){setTimeout(function(){showAchievementToast(id);},i*1200);});
 let pp=document.getElementById('pageProfile');
 if(pp&&!pp.classList.contains('hidden'))renderProfile();
@@ -770,7 +771,6 @@ fireConfetti();
 setTimeout(function(){el.remove();},5000);
 }
 
-// ===== 🛒 МАГАЗИН =====
 const SHOP_ITEMS=[
 {id:'frame_gold',name:'Oltin ramka',desc:'Profilingiz oltin rangda',icon:'👑',price:100,cat:'frame',color:'#fbbf24'},
 {id:'frame_fire',name:'Olovli ramka',desc:'Qizil olov ramkasi',icon:'🔥',price:150,cat:'frame',color:'#ef4444'},
@@ -796,14 +796,7 @@ let frames=SHOP_ITEMS.filter(function(i){return i.cat==='frame';});
 framesEl.innerHTML=frames.map(function(item){
 let isOwned=owned.includes(item.id);
 let isActive=activeFrame===item.id;
-return '<div class="card-bg p-4 rounded-2xl text-center hover-lift transition">'+
-'<div class="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl mb-3" style="box-shadow:0 0 0 4px '+item.color+', 0 0 20px '+item.color+'80; background:var(--card);">'+item.icon+'</div>'+
-'<p class="font-bold text-white text-sm">'+escapeHtml(item.name)+'</p>'+
-'<p class="text-[10px] text-slate-400 mb-3">'+escapeHtml(item.desc)+'</p>'+
-(isOwned?
-'<button onclick="setActiveFrame(\''+item.id+'\')" class="w-full '+(isActive?'bg-emerald-600':'bg-slate-700 hover:bg-slate-600')+' text-white text-xs font-bold py-2 rounded-lg btn-press">'+(isActive?'✅ Faol':"O'rnatish")+'</button>':
-'<button onclick="buyShopItem(\''+item.id+'\')" class="w-full bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold py-2 rounded-lg btn-press">🪙 '+item.price+'</button>')
-+'</div>';
+return '<div class="card-bg p-4 rounded-2xl text-center hover-lift transition"><div class="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl mb-3" style="box-shadow:0 0 0 4px '+item.color+', 0 0 20px '+item.color+'80; background:var(--card);">'+item.icon+'</div><p class="font-bold text-white text-sm">'+escapeHtml(item.name)+'</p><p class="text-[10px] text-slate-400 mb-3">'+escapeHtml(item.desc)+'</p>'+(isOwned?'<button onclick="setActiveFrame(\''+item.id+'\')" class="w-full '+(isActive?'bg-emerald-600':'bg-slate-700 hover:bg-slate-600')+' text-white text-xs font-bold py-2 rounded-lg btn-press">'+(isActive?'✅ Faol':"O'rnatish")+'</button>':'<button onclick="buyShopItem(\''+item.id+'\')" class="w-full bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold py-2 rounded-lg btn-press">🪙 '+item.price+'</button>')+'</div>';
 }).join('');
 }
 let coupEl=document.getElementById('shopCoupons');
@@ -811,14 +804,7 @@ if(coupEl){
 let coups=SHOP_ITEMS.filter(function(i){return i.cat==='coupon';});
 coupEl.innerHTML=coups.map(function(item){
 let cnt=(db.currentUser&&db.currentUser.coupons&&db.currentUser.coupons[item.id])||0;
-return '<div class="card-bg p-4 rounded-2xl flex items-center gap-4 hover-lift transition">'+
-'<div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 flex items-center justify-center text-2xl shrink-0">'+item.icon+'</div>'+
-'<div class="flex-grow min-w-0"><p class="font-bold text-white text-sm">'+escapeHtml(item.name)+'</p>'+
-'<p class="text-[10px] text-slate-400">'+escapeHtml(item.desc)+'</p>'+
-(cnt>0?'<span class="text-[10px] text-emerald-400 font-bold">Sizda: '+cnt+' ta</span>':'')+
-'</div>'+
-'<button onclick="buyShopItem(\''+item.id+'\')" class="bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold px-3 py-2 rounded-lg whitespace-nowrap btn-press shrink-0">🪙 '+item.price+'</button>'+
-'</div>';
+return '<div class="card-bg p-4 rounded-2xl flex items-center gap-4 hover-lift transition"><div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 flex items-center justify-center text-2xl shrink-0">'+item.icon+'</div><div class="flex-grow min-w-0"><p class="font-bold text-white text-sm">'+escapeHtml(item.name)+'</p><p class="text-[10px] text-slate-400">'+escapeHtml(item.desc)+'</p>'+(cnt>0?'<span class="text-[10px] text-emerald-400 font-bold">Sizda: '+cnt+' ta</span>':'')+'</div><button onclick="buyShopItem(\''+item.id+'\')" class="bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold px-3 py-2 rounded-lg whitespace-nowrap btn-press shrink-0">🪙 '+item.price+'</button></div>';
 }).join('');
 }
 let otherEl=document.getElementById('shopOthers');
@@ -826,13 +812,7 @@ if(otherEl){
 let others=SHOP_ITEMS.filter(function(i){return i.cat==='other';});
 otherEl.innerHTML=others.map(function(item){
 let isOwned=owned.includes(item.id);
-return '<div class="card-bg p-4 rounded-2xl flex items-center gap-4 hover-lift transition">'+
-'<div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-2xl shrink-0">'+item.icon+'</div>'+
-'<div class="flex-grow min-w-0"><p class="font-bold text-white text-sm">'+escapeHtml(item.name)+'</p>'+
-'<p class="text-[10px] text-slate-400">'+escapeHtml(item.desc)+'</p></div>'+
-(isOwned?'<span class="text-emerald-400 text-xs font-bold">✅ Sotib olingan</span>':
-'<button onclick="buyShopItem(\''+item.id+'\')" class="bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold px-3 py-2 rounded-lg whitespace-nowrap btn-press shrink-0">🪙 '+item.price+'</button>')+
-'</div>';
+return '<div class="card-bg p-4 rounded-2xl flex items-center gap-4 hover-lift transition"><div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-2xl shrink-0">'+item.icon+'</div><div class="flex-grow min-w-0"><p class="font-bold text-white text-sm">'+escapeHtml(item.name)+'</p><p class="text-[10px] text-slate-400">'+escapeHtml(item.desc)+'</p></div>'+(isOwned?'<span class="text-emerald-400 text-xs font-bold">✅ Sotib olingan</span>':'<button onclick="buyShopItem(\''+item.id+'\')" class="bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold px-3 py-2 rounded-lg whitespace-nowrap btn-press shrink-0">🪙 '+item.price+'</button>')+'</div>';
 }).join('');
 }
 }
@@ -847,11 +827,8 @@ if(!confirm('"'+item.name+'" sotib olinsinmi?\n\nNarxi: '+item.price+' ball\nSiz
 u.points=curPoints-item.price;
 if(!u.purchases)u.purchases=[];
 if(!u.coupons)u.coupons={};
-if(item.cat==='coupon'){
-u.coupons[id]=(u.coupons[id]||0)+1;
-}else{
-if(!u.purchases.includes(id))u.purchases.push(id);
-}
+if(item.cat==='coupon'){u.coupons[id]=(u.coupons[id]||0)+1;}
+else{if(!u.purchases.includes(id))u.purchases.push(id);}
 if(item.cat==='frame')u.activeFrame=id;
 u.shopLog=[{item:id,price:item.price,at:new Date().toISOString()}].concat(u.shopLog||[]);
 if(u.shopLog.length>30)u.shopLog=u.shopLog.slice(0,30);
@@ -880,7 +857,6 @@ renderShop();
 renderProfile();
 }
 
-// ===== 🌙 ТЕМА =====
 function toggleTheme(){
 let cur=document.body.classList.contains('light-mode')?'light':'dark';
 let next=cur==='dark'?'light':'dark';
@@ -903,7 +879,6 @@ if(meta)meta.setAttribute('content','#2563eb');
 }
 function initTheme(){applyTheme(localStorage.getItem('edu_theme')||'dark');}
 
-// ===== 💀 СКЕЛЕТОНЫ =====
 function showTutorsSkeleton(){
 let grid=document.getElementById('tutorsGrid');if(!grid)return;
 grid.innerHTML=Array(8).fill(0).map(function(){
@@ -911,13 +886,12 @@ return '<div class="skeleton-card fade-in"><div class="skeleton h-48 w-full"></d
 }).join('');
 }
 
-// ===== LOG =====
 function logAdminAction(action,details){
 if(!db.currentUser||db.currentUser.role!=='admin')return;
+if(firebaseMode!=='firebase')return;
 database.ref('adminLogs').push({adminId:db.currentUser.id,adminLogin:db.currentUser.login,action:action,details:details||'',at:new Date().toISOString()});
 }
 
-// ===== POINTS =====
 function awardPoints(amount,reason){
 let s=getActiveSubject();
 let cur=s.obj;
@@ -955,8 +929,10 @@ let idx=db.users.findIndex(function(x){return x.id===u.id;});
 if(idx!==-1)db.users[idx]=u;
 db.currentUser=u;
 localStorage.setItem('db_currentUser',JSON.stringify(u));
+if(firebaseMode==='firebase'){
 database.ref('users/'+u.id+'/streakDays').set(u.streakDays);
 database.ref('users/'+u.id+'/lastStreakDay').set(u.lastStreakDay);
+}
 if(u.streakDays>=2){setTimeout(function(){toast('🔥 '+u.streakDays+' kun ketma-ket!');},800);}
 setTimeout(checkAchievements,1000);
 }
@@ -976,8 +952,10 @@ let idx=db.users.findIndex(function(x){return x.id===u.id;});
 if(idx!==-1)db.users[idx]=u;
 db.currentUser=u;
 localStorage.setItem('db_currentUser',JSON.stringify(u));
+if(firebaseMode==='firebase'){
 database.ref('users/'+u.id+'/points').set(u.points);
 database.ref('users/'+u.id+'/pointsLog').set(u.pointsLog);
+}
 setTimeout(function(){toast('🎁 +'+expectedPoints+' ball!');renderProfile();},1500);
 }
 }
@@ -1003,8 +981,10 @@ let idx=db.users.findIndex(function(x){return x.id===u.id;});
 if(idx!==-1)db.users[idx]=u;
 db.currentUser=u;
 localStorage.setItem('db_currentUser',JSON.stringify(u));
+if(firebaseMode==='firebase'){
 database.ref('users/'+u.id+'/points').set(u.points);
 database.ref('users/'+u.id+'/pointsLog').set(u.pointsLog);
+}
 let medals=['🥇','🥈','🥉'];
 setTimeout(function(){toast(medals[myRank]+' TOP-'+(myRank+1)+'! +'+bonus);fireConfetti();renderProfile();},2500);
 }
@@ -1032,7 +1012,7 @@ let g=db.guests.find(function(x){return x.id===guestId;});
 if(!g){
 g={id:guestId,login:'Anonim',firstVisitAt:new Date().toISOString(),lastIP:userIP,lastSeenAt:Date.now(),points:0,isGuest:true};
 db.guests.push(g);
-database.ref('guests/'+guestId).set(g);
+if(firebaseMode==='firebase')database.ref('guests/'+guestId).set(g);
 localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));
 }
 return g;
@@ -1053,7 +1033,7 @@ let g=getOrCreateGuest();
 Object.assign(g,updates);
 let idx=db.guests.findIndex(function(x){return x.id===g.id;});
 if(idx!==-1)db.guests[idx]=g;
-database.ref('guests/'+g.id).set(g);
+if(firebaseMode==='firebase')database.ref('guests/'+g.id).set(g);
 localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));
 }
 let pageAdmin=document.getElementById('pageAdmin');
@@ -1068,7 +1048,6 @@ arr.forEach(function(i){o[i.id]=i;});
 return o;
 }
 
-// ===== 💾 СОХРАНЕНИЕ =====
 function saveDb(){
 localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
 localStorage.setItem('db_users_cache',JSON.stringify(db.users));
@@ -1077,6 +1056,10 @@ renderAuthArea();
 }
 function saveTutorToDb(t){
 if(!t||!t.id)return;
+if(firebaseMode!=='firebase'){
+localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
+return;
+}
 let key='tutor_'+t.id;
 if(_saveQueue[key])clearTimeout(_saveQueue[key]);
 _saveQueue[key]=setTimeout(function(){
@@ -1086,6 +1069,10 @@ delete _saveQueue[key];
 }
 function saveUserToDb(u){
 if(!u||!u.id)return;
+if(firebaseMode!=='firebase'){
+localStorage.setItem('db_users_cache',JSON.stringify(db.users));
+return;
+}
 let key='user_'+u.id;
 if(_saveQueue[key])clearTimeout(_saveQueue[key]);
 _saveQueue[key]=setTimeout(function(){
@@ -1145,6 +1132,11 @@ if(plb&&!plb.classList.contains('hidden'))renderPublicLeaderboard();
 }
 
 function initFirebaseSync(){
+if(firebaseMode==='local'){
+console.log('📴 LOCAL mode — Firebase sync skip');
+dbLoaded=true;
+return;
+}
 database.ref('users').on('value',function(snap){
 let data=snap.val();
 if(data){db.users=Object.values(data);}
@@ -1173,7 +1165,6 @@ checkNewLessons(db.tutors);
 db.tutors=defaultTutors;
 database.ref('tutors').set(arrayToFirebaseObj(defaultTutors));
 }
-if(_fbTimeoutHandle){clearTimeout(_fbTimeoutHandle);_fbTimeoutHandle=null;}
 onRemoteDbUpdate();
 });
 database.ref('guests').on('value',function(snap){
@@ -1251,36 +1242,23 @@ let bm=document.getElementById('broadcastModal');if(bm)bm.classList.remove('hidd
 }
 function closeBroadcast(){let bm=document.getElementById('broadcastModal');if(bm)bm.classList.add('hidden');}
 
-// ===== WINDOW LOAD =====
 window.onload=function(){
 initTheme();
-
-// 1. Мгновенно показываем кэш (если есть)
-if(db.tutors&&db.tutors.length>0){
+if(!db.tutors.length){
+db.tutors=defaultTutors;
+localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
+}
+if(!db.users.length){
+db.users=defaultUsers;
+localStorage.setItem('db_users_cache',JSON.stringify(db.users));
+}
 renderFilters();
 renderTutors();
-}else{
-showTutorsSkeleton();
-}
 renderAuthArea();
 initFirebaseSync();
 initPushNotifications();
 updateNotifBtnState();
 initDropZone();
-
-// 2. Если Firebase не ответил за 4 сек — используем defaults
-_fbTimeoutHandle=setTimeout(function(){
-if(!dbLoaded&&db.tutors.length===0){
-console.warn('⚠️ Firebase timeout, using defaults');
-db.tutors=defaultTutors;
-if(!db.users.length)db.users=defaultUsers;
-localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
-localStorage.setItem('db_users_cache',JSON.stringify(db.users));
-renderTutors();
-renderAuthArea();
-}
-},4000);
-
 setTimeout(function(){
 if(!db.currentUser){getOrCreateGuest();}
 retroactivePoints();
@@ -1294,25 +1272,32 @@ let urlParams=new URLSearchParams(location.search);
 let uname=urlParams.get('u');
 if(uname){navigateTo('public-profile',uname);}
 },2500);
+console.log('🚀 App loaded, mode:',firebaseMode);
 };
 
 function startHeartbeat(){
 if(_heartbeatInterval)return;
 _heartbeatInterval=setInterval(function(){
+if(firebaseMode!=='firebase')return;
 if(db.currentUser){database.ref('users/'+db.currentUser.id+'/lastSeenAt').set(Date.now());}
 else{let g=getOrCreateGuest();database.ref('guests/'+g.id+'/lastSeenAt').set(Date.now());}
 },30000);
 }
 
-// ===== ONLINE =====
 let _onlineHeartbeat=null;
 let _onlinePresenceId=null;
 let _onlineListenerAttached=false;
 function writeOnlinePresence(){
 if(!_onlinePresenceId)return;
+if(firebaseMode!=='firebase')return;
 database.ref('online/'+_onlinePresenceId).set({at:Date.now(),login:db.currentUser?db.currentUser.login:'Anonim',role:db.currentUser?(db.currentUser.role||'student'):'guest'});
 }
 function initOnlinePresence(){
+if(firebaseMode!=='firebase'){
+let numEl=document.getElementById('onlineCountNum');if(numEl)numEl.textContent='1';
+let statEl=document.getElementById('statOnline');if(statEl)statEl.textContent='1';
+return;
+}
 if(_onlinePresenceId){database.ref('online/'+_onlinePresenceId).remove();}
 if(_onlineHeartbeat){clearInterval(_onlineHeartbeat);_onlineHeartbeat=null;}
 if(db.currentUser){_onlinePresenceId=db.currentUser.id;}else{let g=getOrCreateGuest();_onlinePresenceId=g.id;}
@@ -1338,10 +1323,9 @@ let statEl=document.getElementById('statOnline');if(statEl)statEl.textContent=co
 }
 function stopOnlinePresence(){
 if(_onlineHeartbeat){clearInterval(_onlineHeartbeat);_onlineHeartbeat=null;}
-if(_onlinePresenceId){database.ref('online/'+_onlinePresenceId).remove();_onlinePresenceId=null;}
+if(_onlinePresenceId&&firebaseMode==='firebase'){database.ref('online/'+_onlinePresenceId).remove();_onlinePresenceId=null;}
 }
 
-// ===== DROP ZONE =====
 let _droppedFiles=[];
 function initDropZone(){
 let zone=document.getElementById('dropZone');let input=document.getElementById('dropInput');
@@ -1396,8 +1380,7 @@ sortTutors();
 let opts=db.tutors.map(function(t){return '<option value="'+t.id+'">'+t.name+' ('+t.subject+' • '+t.sinf+')</option>';}).join('');
 el.innerHTML=_droppedFiles.map(function(f,i){
 return '<div class="flex gap-3 items-center bg-slate-900/70 border border-slate-700 rounded-xl p-3 fade-in"><img src="'+f.dataUrl+'" class="w-20 h-20 rounded-lg object-cover border-2 border-emerald-600/40 shrink-0"><div class="flex-grow min-w-0"><div class="text-white font-bold text-sm truncate mb-1">'+f.name+'</div><div class="text-slate-500 text-[10px] mb-2">'+Math.round(f.dataUrl.length/1024)+' KB</div><select id="dropTarget_'+i+'" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white"><option value="">— Выберите курс —</option>'+opts+'</select></div><button onclick="removeDroppedFile('+i+')" class="bg-red-600 hover:bg-red-700 text-white w-8 h-8 rounded-lg text-xs shrink-0 btn-press"><i class="fas fa-trash"></i></button></div>';
-}).join('')+
-'<div class="flex gap-2 pt-2"><button onclick="applyAllDropped()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-sm btn-press"><i class="fas fa-check mr-1"></i> Сохранить</button><button onclick="clearDropped()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-2.5 rounded-lg text-sm btn-press">Очистить</button></div>';
+}).join('')+'<div class="flex gap-2 pt-2"><button onclick="applyAllDropped()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-sm btn-press"><i class="fas fa-check mr-1"></i> Сохранить</button><button onclick="clearDropped()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-2.5 rounded-lg text-sm btn-press">Очистить</button></div>';
 }
 function removeDroppedFile(i){_droppedFiles.splice(i,1);renderDropPreviews();}
 function clearDropped(){if(!confirm('Убрать?'))return;_droppedFiles=[];renderDropPreviews();}
@@ -1423,10 +1406,8 @@ renderDropPreviews();
 toast('✅ '+applied);
 }
 
-// ===== NOTIFICATIONS =====
 function updateNotifBtnState(){
 let btn=document.getElementById('notifBtn');
-let st=document.getElementById('notifStatus');
 if(!btn)return;
 if(!('Notification' in window)){btn.textContent='Не поддерживается';btn.disabled=true;return;}
 if(Notification.permission==='granted'){
@@ -1554,7 +1535,6 @@ let d=new Date(iso);
 return d.toLocaleDateString('ru-RU',{day:'2-digit',month:'long',year:'numeric'});
 }
 
-// ===== PUSH =====
 function initPushNotifications(){
 if(!('Notification' in window)||!('serviceWorker' in navigator))return;
 if(db.currentUser){
@@ -1850,7 +1830,7 @@ if(!db.currentUser){openAuthModal();return;}
 if(!db.ratings)db.ratings={};
 if(!db.ratings[tid])db.ratings[tid]={};
 db.ratings[tid][db.currentUser.id]={stars:stars,at:new Date().toISOString()};
-database.ref('ratings/'+tid+'/'+db.currentUser.id).set({stars:stars,at:new Date().toISOString()});
+if(firebaseMode==='firebase')database.ref('ratings/'+tid+'/'+db.currentUser.id).set({stars:stars,at:new Date().toISOString()});
 toast('✅ Baho: '+stars+' ⭐');
 renderTutors();
 }
@@ -1858,6 +1838,7 @@ renderTutors();
 // ===== COMMENTS =====
 function initCommentsListener(tutorId,lessonIdx){
 if(_commentsRef){_commentsRef.off();_commentsRef=null;}
+if(firebaseMode!=='firebase'){renderComments({});return;}
 _commentsRef=database.ref('comments/'+tutorId+'/'+lessonIdx);
 _commentsRef.on('value',function(snap){renderComments(snap.val()||{});});
 }
@@ -1886,14 +1867,14 @@ let text=inp.value.trim();
 if(!text)return;
 if(text.length>1000){toast('❌ Juda uzun');return;}
 let key=Date.now()+'_'+Math.random().toString(36).slice(2,8);
-database.ref('comments/'+activeCourse.id+'/'+activeLessonIndex+'/'+key).set({userId:db.currentUser.id,login:db.currentUser.login,text:text,at:new Date().toISOString()});
+if(firebaseMode==='firebase')database.ref('comments/'+activeCourse.id+'/'+activeLessonIndex+'/'+key).set({userId:db.currentUser.id,login:db.currentUser.login,text:text,at:new Date().toISOString()});
 inp.value='';
 toast('✅ Izoh qo\'shildi');
 }
 function deleteComment(id){
 if(!confirm('O\'chirish?'))return;
 if(!activeCourse)return;
-database.ref('comments/'+activeCourse.id+'/'+activeLessonIndex+'/'+id).remove();
+if(firebaseMode==='firebase')database.ref('comments/'+activeCourse.id+'/'+activeLessonIndex+'/'+id).remove();
 }
 
 // ===== HOMEWORK =====
@@ -1919,7 +1900,7 @@ if(!db.currentUser){openAuthModal();return;}
 if(!activeCourse)return;
 let txt=(document.getElementById('hwAnswer')||{}).value||'';
 if(!txt.trim()){toast('❌ Bo\'sh');return;}
-database.ref('homeworkSubmissions/'+activeCourse.id+'/'+activeLessonIndex+'/'+db.currentUser.id).set({text:txt.trim(),at:new Date().toISOString(),login:db.currentUser.login});
+if(firebaseMode==='firebase')database.ref('homeworkSubmissions/'+activeCourse.id+'/'+activeLessonIndex+'/'+db.currentUser.id).set({text:txt.trim(),at:new Date().toISOString(),login:db.currentUser.login});
 let u=db.currentUser;
 u.homeworkCount=(u.homeworkCount||0)+1;
 let i=db.users.findIndex(function(x){return x.id===u.id;});
@@ -2126,7 +2107,7 @@ let idx=db.users.findIndex(function(x){return x.id===u.id;});
 if(idx!==-1)db.users[idx]=u;
 db.currentUser=u;
 localStorage.setItem('db_currentUser',JSON.stringify(u));
-database.ref('users/'+u.id+'/visitsLog').set(u.visitsLog);
+if(firebaseMode==='firebase')database.ref('users/'+u.id+'/visitsLog').set(u.visitsLog);
 }
 
 // ===== PLAYER =====
@@ -2172,7 +2153,7 @@ _watchSeconds=0;_watchStartAt=Date.now();
 let idx=db.users.findIndex(function(u){return u.id===db.currentUser.id;});
 if(idx!==-1)db.users[idx]=db.currentUser;
 localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
-database.ref('users/'+db.currentUser.id+'/watchProgress').set(db.currentUser.watchProgress);
+if(firebaseMode==='firebase')database.ref('users/'+db.currentUser.id+'/watchProgress').set(db.currentUser.watchProgress);
 }
 function stopWatchTracking(){if(_watchTimer){clearInterval(_watchTimer);_watchTimer=null;}saveWatchProgress(true);}
 
@@ -2591,7 +2572,7 @@ let dl=prompt('Muddat (YYYY-MM-DD yoki bo\'sh):',cur.deadline||'');
 if(dl===null)return;
 t.homework[li]={text:text.trim(),deadline:dl.trim()};
 saveTutorToDb(t);
-database.ref('tutors/'+tid+'/homework').set(t.homework);
+if(firebaseMode==='firebase')database.ref('tutors/'+tid+'/homework').set(t.homework);
 logAdminAction('set_homework',t.name+' → дарс #'+(li+1));
 toast('✅ Uy ishi saqlandi');
 }
@@ -2607,7 +2588,7 @@ let parsed=JSON.parse(raw);
 if(!Array.isArray(parsed))throw new Error('Massiv emas');
 t.quiz[li]={questions:parsed};
 saveTutorToDb(t);
-database.ref('tutors/'+tid+'/quiz').set(t.quiz);
+if(firebaseMode==='firebase')database.ref('tutors/'+tid+'/quiz').set(t.quiz);
 logAdminAction('set_quiz',t.name+' → дарс #'+(li+1)+' ('+parsed.length+')');
 toast('✅ Test saqlandi');
 }catch(e){alert('❌ JSON xato: '+e.message);}
@@ -2727,7 +2708,7 @@ let nid='tut-'+Date.now();
 let mo=db.tutors.reduce(function(m,t){return Math.max(m,t.order||0);},0);
 let newTutor={id:nid,name:name,img:img||'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop',price:price,sinf:sinf,subject:subject,lessons:[],homework:{},quiz:{},order:mo+1};
 db.tutors.push(newTutor);
-database.ref('tutors/'+nid).set(newTutor).then(function(){console.log('✅ Tutor saved:',nid);}).catch(function(e){console.error('❌',e);alert('Ошибка: '+e.message);});
+saveTutorToDb(newTutor);
 localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
 toast("Repetitor qo'shildi!");
 renderAdminTutorsList();
@@ -2749,7 +2730,7 @@ return '<div class="card-bg p-4 rounded-xl flex justify-between items-center gap
 '<span class="text-xs font-black text-slate-500 w-6 text-center">'+(i+1)+'</span>'+
 '<img src="'+t.img+'" class="w-12 h-12 rounded-lg object-cover" loading="lazy">'+
 '<div><h4 class="font-bold text-white text-sm">'+escapeHtml(t.name)+' <span class="text-xs text-slate-500">('+t.id+')</span></h4>'+
-'<p class="text-xs text-slate-400">'+escapeHtml(t.subject)+' • '+t.sinf+' • <span class="text-green-400 font-bold">'+t.price.toLocaleString()+" so'm</span></p></div></div>'+
+'<p class="text-xs text-slate-400">'+escapeHtml(t.subject)+' • '+t.sinf+' • <span class="text-green-400 font-bold">'+t.price.toLocaleString()+" so'm</span></p></div></div>"+
 '<div class="flex gap-2">'+
 '<button onclick="openEditModal(\''+t.id+'\')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold btn-press">Tahrir</button>'+
 '<button onclick="deleteTutor(\''+t.id+'\')" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold btn-press">O\'chirish</button></div></div>';
@@ -2786,7 +2767,7 @@ function deleteTutor(id){
 if(!confirm("O'chirmoqchimisiz?"))return;
 let t=db.tutors.find(function(x){return x.id===id;});
 db.tutors=db.tutors.filter(function(x){return x.id!==id;});
-database.ref('tutors/'+id).remove().catch(function(e){console.warn(e);});
+if(firebaseMode==='firebase')database.ref('tutors/'+id).remove().catch(function(e){console.warn(e);});
 localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
 renderAdminTutorsList();renderTutors();
 logAdminAction('delete_tutor',t?t.name:id);
@@ -2827,7 +2808,8 @@ let desc=document.getElementById('newGroupDesc').value.trim();
 if(!name)return alert("Nomi bo'sh!");
 let gid='grp-'+Date.now();
 let group={id:gid,name:name,desc:desc,members:[],assignment:'',createdAt:new Date().toISOString(),createdBy:db.currentUser.login};
-database.ref('groups/'+gid).set(group);
+if(firebaseMode==='firebase')database.ref('groups/'+gid).set(group);
+else{allGroups[gid]=group;}
 logAdminAction('create_group',name);
 document.getElementById('newGroupName').value='';
 document.getElementById('newGroupDesc').value='';
@@ -2900,14 +2882,16 @@ if(!name)return alert("Nomi bo'sh!");
 let assignment=prompt('Umumiy topshiriq (ixtiyoriy):',(allGroups[gid]&&allGroups[gid].assignment)||'');
 if(assignment===null)return;
 let updated={name:name,desc:desc,members:_currentGroupMembers,assignment:assignment.trim(),id:gid,createdAt:(allGroups[gid]&&allGroups[gid].createdAt)||new Date().toISOString(),createdBy:(allGroups[gid]&&allGroups[gid].createdBy)||db.currentUser.login};
-database.ref('groups/'+gid).set(updated);
+if(firebaseMode==='firebase')database.ref('groups/'+gid).set(updated);
+else allGroups[gid]=updated;
 logAdminAction('edit_group',name);
 closeGroupModal();
 toast('✅ Guruh saqlandi');
 }
 function deleteGroup(gid){
 if(!confirm('Guruh o\'chirilsinmi?'))return;
-database.ref('groups/'+gid).remove();
+if(firebaseMode==='firebase')database.ref('groups/'+gid).remove();
+else delete allGroups[gid];
 logAdminAction('delete_group',gid);
 toast('O\'chirildi');
 }
@@ -2964,7 +2948,9 @@ let limit=Number(document.getElementById('promoLimit').value)||0;
 if(!code||code.length<3){alert("Kod min 3 belgi!");return;}
 if(discount<1||discount>90){alert("Skidka 1-90%!");return;}
 if(allPromos[code]){alert("Bu kod allaqachon bor!");return;}
-database.ref('promos/'+code).set({code:code,discount:discount,limit:limit,used:0,createdAt:new Date().toISOString(),createdBy:db.currentUser.login,active:true});
+let promo={code:code,discount:discount,limit:limit,used:0,createdAt:new Date().toISOString(),createdBy:db.currentUser.login,active:true};
+if(firebaseMode==='firebase')database.ref('promos/'+code).set(promo);
+else allPromos[code]=promo;
 logAdminAction('create_promo',code+' ('+discount+'%)');
 document.getElementById('promoCode').value='';
 toast('✅ Promokod: '+code);
@@ -2984,7 +2970,8 @@ return '<div class="bg-slate-900 border '+(expired?'border-red-700/40 opacity-60
 }
 function deletePromo(code){
 if(!confirm('Promokod o\'chirilsinmi?'))return;
-database.ref('promos/'+code).remove();
+if(firebaseMode==='firebase')database.ref('promos/'+code).remove();
+else delete allPromos[code];
 logAdminAction('delete_promo',code);
 toast('O\'chirildi');
 }
@@ -2994,7 +2981,7 @@ function sendBroadcast(){
 let txt=document.getElementById('broadcastInput').value.trim();
 if(!txt)return alert("Xabar bo'sh!");
 if(!confirm('Barcha foydalanuvchilarga yuborilsinmi?'))return;
-database.ref('broadcasts').push({text:txt,at:new Date().toISOString(),adminLogin:db.currentUser.login});
+if(firebaseMode==='firebase')database.ref('broadcasts').push({text:txt,at:new Date().toISOString(),adminLogin:db.currentUser.login});
 logAdminAction('broadcast',txt.slice(0,50));
 document.getElementById('broadcastInput').value='';
 toast('✅ Yuborildi');
@@ -3014,7 +3001,7 @@ return '<div class="bg-slate-900 border border-pink-700/40 rounded-lg p-3 fade-i
 }
 function deleteBroadcast(id){
 if(!confirm('O\'chirilsinmi?'))return;
-database.ref('broadcasts/'+id).remove();
+if(firebaseMode==='firebase')database.ref('broadcasts/'+id).remove();
 toast('O\'chirildi');
 }
 
@@ -3031,7 +3018,7 @@ return '<div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex jus
 }).join('');
 }
 
-// ===== ADMIN USERS (с фото, IP, локацией, паролем, телефоном, email) =====
+// ===== ADMIN USERS (фото + IP + локация + пароль + телефон + email) =====
 function renderAdminUsers(){
 let el=document.getElementById('adminUsersList');if(!el)return;
 let q=((document.getElementById('adminUserSearch')||{}).value||'').toLowerCase().trim();
@@ -3160,7 +3147,7 @@ renderAdminUsers();
 function adminDeleteUser(id){
 if(!confirm('BUTUNLAY o\'chirilsinmi?'))return;
 let u=db.users.find(function(x){return x.id===id;});
-database.ref('users/'+id).remove();
+if(firebaseMode==='firebase')database.ref('users/'+id).remove();
 db.users=db.users.filter(function(x){return x.id!==id;});
 localStorage.setItem('db_users_cache',JSON.stringify(db.users));
 logAdminAction('delete_user',u?u.login:id);
@@ -3198,7 +3185,7 @@ return '<div class="card-bg p-4 rounded-xl fade-in">'+
 }
 function adminDeleteGuest(id){
 if(!confirm('O\'chirilsinmi?'))return;
-database.ref('guests/'+id).remove();
+if(firebaseMode==='firebase')database.ref('guests/'+id).remove();
 db.guests=db.guests.filter(function(x){return x.id!==id;});
 localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));
 toast('O\'chirildi');
@@ -3293,20 +3280,20 @@ if(!document.getElementById('authAgree').checked){toast('❌ Shartlarga rozilik 
 if(db.users.find(function(u){return u.login.toLowerCase()===login.toLowerCase();})){toast('❌ Bu login band');return;}
 if(db.users.find(function(u){return (u.phone||'')===phone;})){toast('❌ Bu telefon band');return;}
 if(db.users.find(function(u){return (u.email||'')===email;})){toast('❌ Bu email band');return;}
-
 let nid='USR-'+Date.now();
 let nu={
 id:nid,login:login,phone:phone,email:email,
 passHash:hash,passPlain:pass,role:'student',
 balance:0,tutorsBought:[],payments:[],watchProgress:{},
 points:0,streakDays:0,lastStreakDay:'',achievements:{},purchases:[],
-registeredAt:new Date().toISOString(),registeredIP:userIP
+registeredAt:new Date().toISOString(),registeredIP:userIP,
+lastIP:userIP,lastSeenAt:Date.now()
 };
 db.users.push(nu);
-await database.ref('users/'+nid).set(nu);
+localStorage.setItem('db_users_cache',JSON.stringify(db.users));
+if(firebaseMode==='firebase')await database.ref('users/'+nid).set(nu);
 db.currentUser=nu;
 localStorage.setItem('db_currentUser',JSON.stringify(nu));
-localStorage.setItem('db_users_cache',JSON.stringify(db.users));
 closeAuthModal();
 resetAuthForm();
 renderAuthArea();
@@ -3338,8 +3325,8 @@ setTimeout(function(){updateStreak();checkAchievements();},800);
 }
 }
 function resetAuthForm(){
-document.getElementById('authLogin').value='';
-document.getElementById('authPass').value='';
+let a=document.getElementById('authLogin');if(a)a.value='';
+let b=document.getElementById('authPass');if(b)b.value='';
 let ph=document.getElementById('authPhone');if(ph)ph.value='';
 let em=document.getElementById('authEmail');if(em)em.value='';
 let ag=document.getElementById('authAgree');if(ag)ag.checked=false;
@@ -3499,7 +3486,7 @@ if(!db.currentUser.tutorsBought)db.currentUser.tutorsBought=[];
 db.currentUser.tutorsBought.push(tid);
 if(!db.currentUser.payments)db.currentUser.payments=[];
 db.currentUser.payments.unshift({amount:-finalPrice,type:'buy_'+t.name,at:new Date().toISOString(),promo:promoObj?promoCode:null});
-if(promoObj){
+if(promoObj&&firebaseMode==='firebase'){
 database.ref('promos/'+promoObj.code+'/used').set((promoObj.used||0)+1);
 }
 saveUserToDb(db.currentUser);
