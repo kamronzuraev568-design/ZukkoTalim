@@ -326,9 +326,7 @@ body.light-mode option{background:#fff!important;color:#1f2328!important;}
 </div>
 
 <div id="photoViewerModal" class="hidden fixed inset-0 z-[95] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"><div class="max-w-2xl w-full"><div class="flex justify-between items-center mb-3"><p id="photoViewerName" class="text-white font-bold text-sm"></p><button onclick="closePhotoViewer()" class="w-8 h-8 rounded-lg bg-slate-800 text-white btn-press"><i class="fas fa-times"></i></button></div><img id="photoViewerImg" class="w-full rounded-2xl border border-slate-700"></div></div>
-
 <div id="liveViewerModal" class="hidden fixed inset-0 z-[95] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4"><div class="max-w-3xl w-full"><div class="flex justify-between items-center mb-3"><p id="liveViewerName" class="text-white font-bold text-sm"></p><button onclick="closeLiveViewer()" class="w-8 h-8 rounded-lg bg-slate-800 text-white btn-press"><i class="fas fa-times"></i></button></div><img id="liveViewerImg" class="w-full max-h-[70vh] object-contain rounded-2xl border border-slate-700 mb-3"><div id="liveViewerStrip" class="flex gap-2 overflow-x-auto pb-2"></div></div></div>
-
 <div id="videoViewerModal" class="hidden fixed inset-0 z-[95] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4"><div class="max-w-3xl w-full"><div class="flex justify-between items-center mb-3"><p id="videoViewerName" class="text-white font-bold text-sm"></p><button onclick="closeVideoViewer()" class="w-8 h-8 rounded-lg bg-slate-800 text-white btn-press"><i class="fas fa-times"></i></button></div><video id="videoViewerPlayer" class="w-full rounded-2xl border border-slate-700" controls playsinline></video></div></div>
 
 <div id="shareProfileModal" class="hidden fixed inset-0 z-[95] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
@@ -420,7 +418,7 @@ let _snapViewerUserId=null,_snapViewerIndex=0,_snapViewerIsGuest=false;
 let _lessonTab='comments',_commentsRef=null,_quizAnswers={};
 let _lastBroadcastSeen=localStorage.getItem('edu_lastBroadcast')||'';
 let _lastTutorsHash='',_lastProfileHash='',_saveQueue={};
-let _deletedTutorIds=JSON.parse(localStorage.getItem('deleted_tutor_ids')||'[]');
+var _fbDeletedTutors={};
 const LEVELS=[{min:0,name:'Yangi',emoji:'🌱',color:'text-slate-400',bg:'bg-slate-800'},{min:50,name:"O'quvchi",emoji:'📚',color:'text-blue-400',bg:'bg-blue-900/40'},{min:200,name:'Bilimdon',emoji:'🎓',color:'text-emerald-400',bg:'bg-emerald-900/40'},{min:500,name:'Ustoz',emoji:'⭐',color:'text-amber-400',bg:'bg-amber-900/40'},{min:1000,name:'Legenda',emoji:'👑',color:'text-pink-400',bg:'bg-pink-900/40'}];
 function getLevel(p){let lv=LEVELS[0];for(let i=0;i<LEVELS.length;i++){if(p>=LEVELS[i].min)lv=LEVELS[i];}return lv;}
 function getNextLevel(p){for(let i=0;i<LEVELS.length;i++){if(p<LEVELS[i].min)return LEVELS[i];}return null;}
@@ -606,12 +604,28 @@ let plb=document.getElementById('pageLeaderboard');if(plb&&!plb.classList.contai
 }
 function initFirebaseSync(){
 if(firebaseMode==='local'){console.log('LOCAL mode');dbLoaded=true;return;}
+
+database.ref('deletedTutors').on('value',function(snap){
+_fbDeletedTutors=snap.val()||{};
+var changed=false;
+db.tutors=db.tutors.filter(function(t){
+if(_fbDeletedTutors[t.id]){changed=true;return false;}
+return true;
+});
+if(changed){
+localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
+renderTutors();
+var pa=document.getElementById('pageAdmin');
+if(pa&&!pa.classList.contains('hidden')&&currentAdminTab==='tutors')renderAdminTutorsList();
+}
+});
+
 database.ref('tutors').once('value').then(function(snap){
-let data=snap.val();
+var data=snap.val();
 if(data){
-let st=Object.values(data).filter(function(t){return !_deletedTutorIds.includes(t.id);});
-let sids={};st.forEach(function(t){sids[t.id]=true;});
-let lo=db.tutors.filter(function(t){return !sids[t.id]&&!_deletedTutorIds.includes(t.id);});
+var st=Object.values(data).filter(function(t){return !_fbDeletedTutors[t.id];});
+var sids={};st.forEach(function(t){sids[t.id]=true;});
+var lo=db.tutors.filter(function(t){return !sids[t.id]&&!_fbDeletedTutors[t.id];});
 db.tutors=st.concat(lo);
 if(lo.length>0)lo.forEach(function(t){database.ref('tutors/'+t.id).set(t);});
 }else{
@@ -619,32 +633,43 @@ if(!db.tutors.length)db.tutors=defaultTutors;
 database.ref('tutors').set(arrayToFirebaseObj(db.tutors));
 }
 localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
-migrateTutorOrder();renderTutors();
+migrateTutorOrder();
+renderTutors();
 }).catch(function(e){console.warn(e);});
+
 database.ref('tutors').on('value',function(snap){
-let data=snap.val();
-if(!data)return;
-let st=Object.values(data).filter(function(t){return !_deletedTutorIds.includes(t.id);});
-let sids={};st.forEach(function(t){sids[t.id]=true;});
-let lo=db.tutors.filter(function(t){return !sids[t.id]&&!_deletedTutorIds.includes(t.id);});
+var data=snap.val();
+if(!data){db.tutors=[];onRemoteDbUpdate();return;}
+var st=Object.values(data).filter(function(t){return !_fbDeletedTutors[t.id];});
+var sids={};st.forEach(function(t){sids[t.id]=true;});
+var lo=db.tutors.filter(function(t){return !sids[t.id]&&!_fbDeletedTutors[t.id];});
 if(lo.length>0)lo.forEach(function(t){database.ref('tutors/'+t.id).set(t);});
 db.tutors=st.concat(lo);
 localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
 onRemoteDbUpdate();
 });
+
 database.ref('users').on('value',function(snap){
-let data=snap.val();
+var data=snap.val();
 if(data)db.users=Object.values(data);
-if(db.currentUser){let fresh=db.users.find(function(u){return u.id===db.currentUser.id;});if(fresh){db.currentUser=fresh;localStorage.setItem('db_currentUser',JSON.stringify(fresh));if(fresh.banned){alert('Akkaunt bloklandi!');logout();return;}}else{db.currentUser=null;localStorage.removeItem('db_currentUser');}}
+if(db.currentUser){
+var fresh=db.users.find(function(u){return u.id===db.currentUser.id;});
+if(fresh){
+db.currentUser=fresh;
+localStorage.setItem('db_currentUser',JSON.stringify(fresh));
+if(fresh.banned){alert('Akkaunt bloklandi!');logout();return;}
+}else{db.currentUser=null;localStorage.removeItem('db_currentUser');}
+}
 onRemoteDbUpdate();
 });
-database.ref('guests').on('value',function(snap){let data=snap.val();db.guests=data?Object.values(data):[];localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));let pa=document.getElementById('pageAdmin');if(pa&&!pa.classList.contains('hidden')&&currentAdminTab==='guests')renderAdminGuests();});
-database.ref('promos').on('value',function(snap){allPromos=snap.val()||{};let pa=document.getElementById('pageAdmin');if(currentAdminTab==='promos'&&pa&&!pa.classList.contains('hidden'))renderPromosList();});
-database.ref('adminLogs').limitToLast(200).on('value',function(snap){let data=snap.val()||{};allLogs=Object.keys(data).map(function(k){let o=Object.assign({},data[k]);o._id=k;return o;}).sort(function(a,b){return new Date(b.at)-new Date(a.at);});let pa=document.getElementById('pageAdmin');if(currentAdminTab==='logs'&&pa&&!pa.classList.contains('hidden'))renderLogs();});
-database.ref('broadcasts').limitToLast(20).on('value',function(snap){let data=snap.val()||{};allBroadcasts=Object.keys(data).map(function(k){let o=Object.assign({},data[k]);o._id=k;return o;}).sort(function(a,b){return new Date(b.at)-new Date(a.at);});let pa=document.getElementById('pageAdmin');if(currentAdminTab==='broadcast'&&pa&&!pa.classList.contains('hidden'))renderBroadcastHistory();checkNewBroadcast();});
-database.ref('schedules').on('value',function(snap){allSchedules=snap.val()||{};let psc=document.getElementById('pageSchedule');if(psc&&!psc.classList.contains('hidden'))renderSchedule();});
-database.ref('groups').on('value',function(snap){allGroups=snap.val()||{};let pa=document.getElementById('pageAdmin');if(currentAdminTab==='groups'&&pa&&!pa.classList.contains('hidden'))renderGroupsList();let pg=document.getElementById('pageGroups');if(pg&&!pg.classList.contains('hidden'))renderMyGroups();});
-database.ref('ratings').on('value',function(snap){db.ratings=snap.val()||{};let ph=document.getElementById('pageHome');if(ph&&!ph.classList.contains('hidden'))renderTutors();});
+
+database.ref('guests').on('value',function(snap){var data=snap.val();db.guests=data?Object.values(data):[];localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));var pa=document.getElementById('pageAdmin');if(pa&&!pa.classList.contains('hidden')&&currentAdminTab==='guests')renderAdminGuests();});
+database.ref('promos').on('value',function(snap){allPromos=snap.val()||{};var pa=document.getElementById('pageAdmin');if(currentAdminTab==='promos'&&pa&&!pa.classList.contains('hidden'))renderPromosList();});
+database.ref('adminLogs').limitToLast(200).on('value',function(snap){var data=snap.val()||{};allLogs=Object.keys(data).map(function(k){var o=Object.assign({},data[k]);o._id=k;return o;}).sort(function(a,b){return new Date(b.at)-new Date(a.at);});var pa=document.getElementById('pageAdmin');if(currentAdminTab==='logs'&&pa&&!pa.classList.contains('hidden'))renderLogs();});
+database.ref('broadcasts').limitToLast(20).on('value',function(snap){var data=snap.val()||{};allBroadcasts=Object.keys(data).map(function(k){var o=Object.assign({},data[k]);o._id=k;return o;}).sort(function(a,b){return new Date(b.at)-new Date(a.at);});var pa=document.getElementById('pageAdmin');if(currentAdminTab==='broadcast'&&pa&&!pa.classList.contains('hidden'))renderBroadcastHistory();checkNewBroadcast();});
+database.ref('schedules').on('value',function(snap){allSchedules=snap.val()||{};var psc=document.getElementById('pageSchedule');if(psc&&!psc.classList.contains('hidden'))renderSchedule();});
+database.ref('groups').on('value',function(snap){allGroups=snap.val()||{};var pa=document.getElementById('pageAdmin');if(currentAdminTab==='groups'&&pa&&!pa.classList.contains('hidden'))renderGroupsList();var pg=document.getElementById('pageGroups');if(pg&&!pg.classList.contains('hidden'))renderMyGroups();});
+database.ref('ratings').on('value',function(snap){db.ratings=snap.val()||{};var ph=document.getElementById('pageHome');if(ph&&!ph.classList.contains('hidden'))renderTutors();});
 dbLoaded=true;
 }
 function checkNewBroadcast(){
@@ -1780,15 +1805,27 @@ toast('Saqlandi!');
 }
 function deleteTutor(id){
 if(!confirm('O\'chirmoqchimisiz?'))return;
-if(!_deletedTutorIds.includes(id))_deletedTutorIds.push(id);
-localStorage.setItem('deleted_tutor_ids',JSON.stringify(_deletedTutorIds));
 let t=db.tutors.find(function(x){return x.id===id;});
+if(!t)return;
+if(firebaseMode==='firebase'){
+toast('O\'chirilmoqda...');
+database.ref('tutors/'+id).remove().then(function(){
+var upd={};
+upd['deletedTutors/'+id]={at:Date.now(),by:db.currentUser?db.currentUser.login:'admin'};
+return database.ref().update(upd);
+}).then(function(){
 db.tutors=db.tutors.filter(function(x){return x.id!==id;});
 localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
-if(firebaseMode==='firebase')database.ref('tutors/'+id).remove().catch(function(e){console.warn(e);});
 renderAdminTutorsList();renderTutors();
-logAdminAction('delete_tutor',t?t.name:id);
+logAdminAction('delete_tutor',t.name);
 toast('O\'chirildi!');
+}).catch(function(e){toast('Xato: '+e.message);});
+}else{
+db.tutors=db.tutors.filter(function(x){return x.id!==id;});
+localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
+renderAdminTutorsList();renderTutors();
+toast('O\'chirildi!');
+}
 }
 function switchAdminTab(tab){
 currentAdminTab=tab;
