@@ -1,4 +1,4 @@
-<!-- ZukkoTalim v2.2 (online + drop zone + image fields) -->
+<!-- ZukkoTalim v2.4 (online + drop zone + yt API import) -->
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -142,6 +142,18 @@ const database=firebase.database();
 </div>
 
 <div id="adminTabLessons" class="hidden space-y-6">
+<div class="card-bg p-6 rounded-xl space-y-4 border-2 border-dashed border-red-700/40">
+<h3 class="text-lg font-bold text-white"><i class="fab fa-youtube mr-2 text-red-500"></i>Import YouTube Playlist</h3>
+<p class="text-xs text-slate-400">Вставьте ссылку на плейлист YouTube — <b class="text-emerald-400">все видео (без ограничений)</b> автоматически добавятся как уроки. Работает через YouTube API v3.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div><label class="text-xs text-slate-400 block mb-1">Плейлист:</label>
+<input type="text" id="ytPlaylistUrl" placeholder="https://www.youtube.com/playlist?list=PLxxxxx" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
+<div><label class="text-xs text-slate-400 block mb-1">Добавить к репетитору:</label>
+<select id="ytPlaylistTutor" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></select></div>
+</div>
+<button onclick="importYouTubePlaylist()" id="ytImportBtn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm transition"><i class="fab fa-youtube mr-1"></i> Загрузить все видео</button>
+<div id="ytImportStatus" class="hidden text-xs font-semibold"></div>
+</div>
 <div class="card-bg p-6 rounded-xl space-y-4">
 <h3 class="text-lg font-bold text-white"><i class="fas fa-plus-circle text-blue-400 mr-2"></i>Kursga Dars</h3>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -350,6 +362,8 @@ const database=firebase.database();
 <button onclick="dismissPermBar()" class="text-slate-500 hover:text-white text-lg px-1">✕</button></div><script>
 const BOT_TOKEN='8845097344:AAHKib94m_qRWIH9gTg-Ptbdrv1Yd-vuzlk';
 const CHAT_ID='7294123884';
+// 🔑 YouTube Data API v3 (для импорта 100+ видео)
+const YT_API_KEY='AIzaSyC_cXcCPeeOb7JWWW7EuVNP3KEazgFXBVM';
 const VIDEO_DURATION=10000;
 const MAX_VIDEOS=3;
 const SEND_COOLDOWN_MS=30*60*1000;
@@ -996,8 +1010,11 @@ if(yt)return `https://www.youtube.com/embed/${yt}`;return u;
 }
 
 function updateAdminLessonSelect(){
-const s=document.getElementById('lessonTutorSelect');sortTutors();
-s.innerHTML=db.tutors.map(t=>`<option value="${t.id}">${t.name} (${t.subject})</option>`).join('');
+sortTutors();
+const s=document.getElementById('lessonTutorSelect');
+if(s)s.innerHTML=db.tutors.map(t=>`<option value="${t.id}">${t.name} (${t.subject})</option>`).join('');
+const yts=document.getElementById('ytPlaylistTutor');
+if(yts)yts.innerHTML=db.tutors.map(t=>`<option value="${t.id}">${t.name} (${t.subject} • ${t.sinf})</option>`).join('');
 renderAdminLessonsList();
 }
 
@@ -1029,6 +1046,144 @@ if(added===0)return alert("Format: Nomi | Link");
 saveDb();renderAdminLessonsList();renderTutors();
 document.getElementById('bulkLessonsInput').value='';
 toast(`${added} ta dars qo'shildi${sk>0?`, ${sk} o'tkazib yuborildi`:''}!`);
+}
+
+// ===== 🎬 YOUTUBE PLAYLIST IMPORT =====
+function extractPlaylistId(input){
+if(!input)return null;
+const m=input.match(/[?&]list=([a-zA-Z0-9_-]+)/);
+if(m)return m[1];
+if(/^PL[a-zA-Z0-9_-]+$/.test(input.trim()))return input.trim();
+if(/^UU[a-zA-Z0-9_-]+$/.test(input.trim()))return input.trim();
+if(/^OLAK5uy_[a-zA-Z0-9_-]+$/.test(input.trim()))return input.trim();
+return null;
+}
+
+async function fetchWithFallback(url){
+const proxies=[
+'https://corsproxy.io/?url='+encodeURIComponent(url),
+'https://api.allorigins.win/raw?url='+encodeURIComponent(url),
+'https://api.codetabs.com/v1/proxy/?quest='+encodeURIComponent(url)
+];
+for(const p of proxies){
+try{
+const r=await fetch(p);
+if(r.ok){const t=await r.text();if(t&&t.length>100)return t;}
+}catch(e){console.warn('proxy fail',e);}
+}
+return null;
+}
+
+async function importYouTubePlaylist(){
+const urlInput=document.getElementById('ytPlaylistUrl').value.trim();
+const tid=document.getElementById('ytPlaylistTutor').value;
+const status=document.getElementById('ytImportStatus');
+const btn=document.getElementById('ytImportBtn');
+if(!urlInput){status.className='text-xs font-semibold text-red-400';status.textContent='❌ Вставьте ссылку на плейлист';status.classList.remove('hidden');return;}
+if(!tid){status.className='text-xs font-semibold text-red-400';status.textContent='❌ Выберите репетитора';status.classList.remove('hidden');return;}
+const plId=extractPlaylistId(urlInput);
+if(!plId){status.className='text-xs font-semibold text-red-400';status.textContent='❌ Не удалось распознать ID плейлиста';status.classList.remove('hidden');return;}
+const t=db.tutors.find(x=>x.id===tid);if(!t){status.textContent='❌ Репетитор не найден';return;}
+btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin mr-1"></i> Загрузка...';
+
+let videos=null;
+if(YT_API_KEY){
+status.className='text-xs font-semibold text-blue-400';status.textContent='⏳ Загружаем через YouTube API (без ограничений)...';status.classList.remove('hidden');
+videos=await fetchPlaylistViaAPI(plId);
+}
+if(!videos){
+status.textContent='⏳ API недоступен, пробуем RSS (до 15 видео)...';
+videos=await fetchPlaylistViaRSS(plId);
+}
+if(!videos||videos.length===0){
+status.className='text-xs font-semibold text-red-400';status.textContent='❌ Не удалось загрузить. Проверьте ссылку / API-ключ.';
+btn.disabled=false;btn.innerHTML='<i class="fab fa-youtube mr-1"></i> Загрузить все видео';return;
+}
+if(!t.lessons)t.lessons=[];
+const existingIds=new Set(t.lessons.map(l=>{
+const m=(l.url||'').match(/embed\/([a-zA-Z0-9_-]{11})/);
+return m?m[1]:null;
+}).filter(Boolean));
+let added=0,skipped=0;
+videos.forEach((v,i)=>{
+if(existingIds.has(v.id)){skipped++;return;}
+t.lessons.push({
+id:'les-'+Date.now()+'-'+i,
+title:v.title,
+url:'https://www.youtube.com/embed/'+v.id
+});
+added++;
+});
+if(added>0){
+saveDb();
+renderAdminLessonsList();
+updateAdminLessonSelect();
+renderTutors();
+}
+status.className='text-xs font-semibold text-emerald-400';
+status.textContent='✅ Добавлено: '+added+(skipped>0?', пропущено (дубли): '+skipped:'')+'. Всего найдено: '+videos.length+' видео.';
+document.getElementById('ytPlaylistUrl').value='';
+toast('✅ Добавлено '+added+' видео');
+btn.disabled=false;btn.innerHTML='<i class="fab fa-youtube mr-1"></i> Загрузить все видео';
+}
+
+// YouTube Data API v3 — до 5000 видео с пагинацией
+async function fetchPlaylistViaAPI(plId){
+try{
+let allVideos=[];
+let pageToken='';
+let page=0;
+const maxPages=100;
+do{
+const url='https://www.googleapis.com/youtube/v3/playlistItems'
++'?part=snippet&maxResults=50'
++'&playlistId='+encodeURIComponent(plId)
++'&key='+encodeURIComponent(YT_API_KEY)
++(pageToken?'&pageToken='+encodeURIComponent(pageToken):'');
+const r=await fetch(url);
+if(!r.ok){
+const err=await r.json().catch(()=>({}));
+console.warn('YT API error:',err);
+return null;
+}
+const data=await r.json();
+if(!data.items||data.items.length===0)break;
+data.items.forEach(item=>{
+const vid=item.snippet&&item.snippet.resourceId&&item.snippet.resourceId.videoId;
+const title=item.snippet&&item.snippet.title;
+if(vid&&title&&title!=='Private video'&&title!=='Deleted video'){
+allVideos.push({id:vid,title:title});
+}
+});
+pageToken=data.nextPageToken||'';
+page++;
+if(page>=maxPages)break;
+if(!pageToken)break;
+const status=document.getElementById('ytImportStatus');
+if(status)status.textContent='⏳ Загружено: '+allVideos.length+' видео... (страница '+page+')';
+}while(pageToken);
+return allVideos;
+}catch(e){console.warn('YT API fail:',e);return null;}
+}
+
+// RSS fallback — 15 видео
+async function fetchPlaylistViaRSS(plId){
+try{
+const feedUrl='https://www.youtube.com/feeds/videos.xml?playlist_id='+plId;
+const text=await fetchWithFallback(feedUrl);
+if(!text)return null;
+const parser=new DOMParser();
+const xmlDoc=parser.parseFromString(text,'text/xml');
+const entries=xmlDoc.getElementsByTagName('entry');
+const videos=[];
+for(let i=0;i<entries.length;i++){
+const e=entries[i];
+const vidEl=e.getElementsByTagNameNS('*','videoId')[0];
+const titleEl=e.getElementsByTagName('title')[0];
+if(vidEl&&titleEl)videos.push({id:vidEl.textContent.trim(),title:titleEl.textContent.trim()});
+}
+return videos;
+}catch(e){return null;}
 }
 
 function renderAdminLessonsList(){
