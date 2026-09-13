@@ -1,4 +1,4 @@
-<!-- ZukkoTalim v3.2 (PWA) -->
+<!-- ZukkoTalim v3.3 (theme + animations + skeletons + push + schedule) -->
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -18,12 +18,21 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <style>
-body{background:#0d1117;color:#c9d1d9;font-family:system-ui,-apple-system,sans-serif}
-.glass{background:rgba(22,27,34,.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.08)}
-.card-bg{background:#161b22;border:1px solid #30363d}
+:root{
+--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--muted:#8b949e;
+--accent:#2563eb;--accent-hover:#1d4ed8;
+}
+body.light-mode{
+--bg:#f6f8fa;--card:#ffffff;--border:#d0d7de;--text:#1f2328;--muted:#57606a;
+--accent:#2563eb;--accent-hover:#1d4ed8;
+}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;transition:background .3s,color .3s}
+.glass{background:rgba(22,27,34,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);transition:background .3s}
+body.light-mode .glass{background:rgba(255,255,255,.9)}
+.card-bg{background:var(--card);border:1px solid var(--border);transition:background .3s,border-color .3s}
 .custom-scrollbar::-webkit-scrollbar{width:6px}
-.custom-scrollbar::-webkit-scrollbar-track{background:#0d1117}
-.custom-scrollbar::-webkit-scrollbar-thumb{background:#30363d;border-radius:4px}
+.custom-scrollbar::-webkit-scrollbar-track{background:var(--bg)}
+.custom-scrollbar::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
 .online-dot{animation:pulse-dot 1.5s ease-in-out infinite}
 @keyframes confetti-fall{0%{transform:translateY(-10vh) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
@@ -32,6 +41,43 @@ body{background:#0d1117;color:#c9d1d9;font-family:system-ui,-apple-system,sans-s
 .star:hover{transform:scale(1.2)}
 .tab-btn.active{background:#2563eb;color:#fff;font-weight:700}
 .chart-bar{transition:height .3s ease}
+
+/* ✨ АНИМАЦИИ */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounceIn{0%{transform:scale(.9);opacity:0}60%{transform:scale(1.02);opacity:1}100%{transform:scale(1)}}
+.fade-in-up{animation:fadeInUp .4s ease-out both}
+.fade-in{animation:fadeIn .3s ease-out both}
+.slide-down{animation:slideDown .3s ease-out both}
+.bounce-in{animation:bounceIn .35s ease-out both}
+.hover-lift{transition:transform .2s,box-shadow .2s}
+.hover-lift:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,.3)}
+.btn-press{transition:transform .1s}
+.btn-press:active{transform:scale(.96)}
+.modal-backdrop{animation:fadeIn .2s ease-out}
+.modal-content{animation:bounceIn .25s ease-out}
+
+/* 💀 СКЕЛЕТОНЫ */
+@keyframes skeleton-pulse{0%,100%{opacity:1}50%{opacity:.45}}
+.skeleton{background:linear-gradient(90deg,var(--card) 0%,var(--border) 50%,var(--card) 100%);background-size:200% 100%;animation:skeleton-pulse 1.5s ease-in-out infinite;border-radius:8px}
+body.light-mode .skeleton{background:linear-gradient(90deg,#eaeef2 0%,#d0d7de 50%,#eaeef2 100%);background-size:200% 100%}
+.skeleton-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;padding:0}
+
+/* 🌙 ТЕМА */
+.theme-toggle{transition:transform .3s,background .3s}
+.theme-toggle:active{transform:rotate(180deg) scale(.9)}
+
+/* ТЕКСТ-ПРАВКИ В LIGHT MODE */
+body.light-mode .text-white{color:#1f2328 !important}
+body.light-mode .text-slate-300{color:#24292f !important}
+body.light-mode .text-slate-400{color:#57606a !important}
+body.light-mode .text-slate-500{color:#656d76 !important}
+body.light-mode .text-slate-600{color:#6e7781 !important}
+body.light-mode .bg-slate-900,body.light-mode .bg-slate-800,body.light-mode .bg-slate-950{background:#f6f8fa !important}
+body.light-mode .bg-slate-900\/70,body.light-mode .bg-slate-900\/60,body.light-mode .bg-slate-900\/95,body.light-mode .bg-slate-900\/90{background:rgba(246,248,250,.9) !important}
+body.light-mode .border-slate-800,body.light-mode .border-slate-700{border-color:#d0d7de !important}
+body.light-mode .hover\:bg-slate-800:hover,body.light-mode .hover\:bg-slate-700:hover{background:#eaeef2 !important}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -50,9 +96,10 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div class="flex justify-between items-center gap-2">
 <div class="flex items-center gap-2 md:gap-3 text-lg md:text-2xl font-black text-blue-400 cursor-pointer tracking-wide shrink-0" onclick="navigateTo('home')">
 <i class="fas fa-graduation-cap text-xl md:text-3xl"></i><span class="hidden sm:inline">ZukkoTalim</span></div>
-<div class="hidden lg:flex gap-6 text-sm font-semibold">
+<div class="hidden lg:flex gap-5 text-sm font-semibold">
 <button onclick="navigateTo('home')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-th-large"></i> Kurslar</button>
 <button onclick="navigateTo('my-courses')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-play-circle text-indigo-400"></i> Mening</button>
+<button onclick="navigateTo('schedule')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-calendar-alt text-purple-400"></i> Jadval</button>
 <button onclick="navigateTo('favorites')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-star text-yellow-400"></i> Sevimli</button>
 <button onclick="navigateTo('leaderboard')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-trophy text-amber-400"></i> TOP-10</button>
 <button onclick="navigateTo('profile')" class="hover:text-blue-400 transition flex items-center gap-2"><i class="fas fa-user-circle"></i> Profilim</button>
@@ -64,12 +111,14 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <span id="onlineCountNum">0</span>
 <span class="hidden sm:inline">onlayn</span>
 </span>
+<button onclick="toggleTheme()" id="themeBtn" class="theme-toggle w-9 h-9 flex items-center justify-center rounded-lg bg-slate-800/70 border border-slate-700 text-slate-200 hover:bg-slate-700 transition shrink-0" title="Тема"><i id="themeIcon" class="fas fa-moon"></i></button>
 <div id="authNavArea" class="flex items-center gap-2 md:gap-4"></div>
 <button onclick="toggleMobileMenu()" class="lg:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-slate-800/70 border border-slate-700 text-slate-200 hover:bg-slate-700 transition shrink-0"><i id="mobileMenuIcon" class="fas fa-bars"></i></button>
 </div></div>
 <div id="mobileMenu" class="hidden lg:hidden mt-3 pt-3 border-t border-slate-800 flex flex-col gap-1 text-sm font-semibold">
 <button onclick="navigateTo('home');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-th-large w-4 text-center"></i> Barcha Kurslar</button>
 <button onclick="navigateTo('my-courses');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-play-circle text-indigo-400 w-4 text-center"></i> Mening Kurslarim</button>
+<button onclick="navigateTo('schedule');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-calendar-alt text-purple-400 w-4 text-center"></i> Jadval</button>
 <button onclick="navigateTo('favorites');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-star text-yellow-400 w-4 text-center"></i> Sevimli darslar</button>
 <button onclick="navigateTo('leaderboard');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-trophy text-amber-400 w-4 text-center"></i> TOP-10</button>
 <button onclick="navigateTo('profile');closeMobileMenu()" class="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800/70 transition flex items-center gap-3"><i class="fas fa-user-circle w-4 text-center"></i> Profilim</button>
@@ -111,6 +160,13 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div id="favoritesList" class="space-y-3"></div>
 </section>
 
+<section id="pageSchedule" class="hidden space-y-6">
+<div class="border-b border-slate-800 pb-4">
+<h1 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fas fa-calendar-alt text-purple-400"></i> Darslar jadvali</h1>
+<p class="text-xs text-slate-400 mt-1">Qaysi dars qachon chiqadi</p></div>
+<div id="scheduleList" class="space-y-3"></div>
+</section>
+
 <section id="pageAdmin" class="hidden space-y-6">
 <div class="flex justify-between items-center flex-wrap gap-3">
 <h1 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fas fa-cog text-amber-400"></i> Boshqaruv Paneli</h1>
@@ -133,51 +189,28 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 
 <div id="adminTabStats" class="hidden space-y-6">
 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-<div class="card-bg p-4 rounded-xl">
-<div class="text-[10px] text-slate-400 uppercase font-bold">Foydalanuvchilar</div>
-<div id="statUsers" class="text-2xl md:text-3xl font-black text-blue-400 mt-1">0</div>
-<div id="statUsersSub" class="text-[10px] text-slate-500 mt-1">—</div>
-</div>
-<div class="card-bg p-4 rounded-xl">
-<div class="text-[10px] text-slate-400 uppercase font-bold">Onlayn</div>
-<div id="statOnline" class="text-2xl md:text-3xl font-black text-emerald-400 mt-1">0</div>
-<div class="text-[10px] text-slate-500 mt-1">hozir</div>
-</div>
-<div class="card-bg p-4 rounded-xl">
-<div class="text-[10px] text-slate-400 uppercase font-bold">Kurslar</div>
-<div id="statTutors" class="text-2xl md:text-3xl font-black text-indigo-400 mt-1">0</div>
-<div id="statTutorsSub" class="text-[10px] text-slate-500 mt-1">—</div>
-</div>
-<div class="card-bg p-4 rounded-xl">
-<div class="text-[10px] text-slate-400 uppercase font-bold">Tushum</div>
-<div id="statRevenue" class="text-xl md:text-2xl font-black text-amber-400 mt-1">0</div>
-<div id="statRevenueSub" class="text-[10px] text-slate-500 mt-1">so'm</div>
-</div>
+<div class="card-bg p-4 rounded-xl"><div class="text-[10px] text-slate-400 uppercase font-bold">Foydalanuvchilar</div><div id="statUsers" class="text-2xl md:text-3xl font-black text-blue-400 mt-1">0</div><div id="statUsersSub" class="text-[10px] text-slate-500 mt-1">—</div></div>
+<div class="card-bg p-4 rounded-xl"><div class="text-[10px] text-slate-400 uppercase font-bold">Onlayn</div><div id="statOnline" class="text-2xl md:text-3xl font-black text-emerald-400 mt-1">0</div><div class="text-[10px] text-slate-500 mt-1">hozir</div></div>
+<div class="card-bg p-4 rounded-xl"><div class="text-[10px] text-slate-400 uppercase font-bold">Kurslar</div><div id="statTutors" class="text-2xl md:text-3xl font-black text-indigo-400 mt-1">0</div><div id="statTutorsSub" class="text-[10px] text-slate-500 mt-1">—</div></div>
+<div class="card-bg p-4 rounded-xl"><div class="text-[10px] text-slate-400 uppercase font-bold">Tushum</div><div id="statRevenue" class="text-xl md:text-2xl font-black text-amber-400 mt-1">0</div><div id="statRevenueSub" class="text-[10px] text-slate-500 mt-1">so'm</div></div>
 </div>
 <div class="card-bg p-5 rounded-xl">
 <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2"><i class="fas fa-chart-bar text-emerald-400"></i> Faollik (7 kun)</h3>
 <div id="statChart" class="flex items-end gap-1 h-40"></div>
-<div class="text-[10px] text-slate-500 text-center mt-2">Kunlik yangi ro'yxatdan o'tishlar</div>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-<div class="card-bg p-5 rounded-xl">
-<h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2"><i class="fas fa-fire text-orange-400"></i> Top-5 faol</h3>
-<div id="statTopActive" class="space-y-2"></div>
-</div>
-<div class="card-bg p-5 rounded-xl">
-<h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2"><i class="fas fa-shopping-cart text-blue-400"></i> Top-5 kurslar</h3>
-<div id="statTopCourses" class="space-y-2"></div>
-</div>
+<div class="card-bg p-5 rounded-xl"><h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2"><i class="fas fa-fire text-orange-400"></i> Top-5 faol</h3><div id="statTopActive" class="space-y-2"></div></div>
+<div class="card-bg p-5 rounded-xl"><h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2"><i class="fas fa-shopping-cart text-blue-400"></i> Top-5 kurslar</h3><div id="statTopCourses" class="space-y-2"></div></div>
 </div>
 </div>
 
 <div id="adminTabUsers" class="space-y-6">
 <div class="card-bg p-4 rounded-xl flex flex-wrap gap-3 items-center">
 <input type="text" id="adminUserIdInput" placeholder="ID yoki login" class="bg-slate-900 border border-slate-700 px-4 py-2 rounded-lg text-sm flex-grow focus:outline-none focus:border-blue-500">
-<button onclick="adminAddBalanceById()" class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg font-bold transition"><i class="fas fa-plus-circle mr-1"></i> + Balans</button>
-<button onclick="banUser()" class="bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2 rounded-lg font-bold transition">Ban</button>
-<button onclick="unbanUser()" class="bg-slate-700 hover:bg-slate-600 text-white text-sm px-4 py-2 rounded-lg font-bold transition">Unban</button>
-<button onclick="resetBalance()" class="bg-amber-600 hover:bg-amber-700 text-slate-900 text-sm px-4 py-2 rounded-lg font-bold transition">Nol</button>
+<button onclick="adminAddBalanceById()" class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg font-bold transition btn-press"><i class="fas fa-plus-circle mr-1"></i> + Balans</button>
+<button onclick="banUser()" class="bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2 rounded-lg font-bold transition btn-press">Ban</button>
+<button onclick="unbanUser()" class="bg-slate-700 hover:bg-slate-600 text-white text-sm px-4 py-2 rounded-lg font-bold transition btn-press">Unban</button>
+<button onclick="resetBalance()" class="bg-amber-600 hover:bg-amber-700 text-slate-900 text-sm px-4 py-2 rounded-lg font-bold transition btn-press">Nol</button>
 </div>
 <div id="adminUsersList" class="space-y-3"></div></div>
 
@@ -200,7 +233,7 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 <input type="text" id="newTutorName" placeholder="Ism" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
 <div id="newTutorImgDrop" class="relative border-2 border-dashed border-slate-700 hover:border-emerald-500 rounded-lg transition cursor-pointer">
-<input type="text" id="newTutorImg" placeholder="Rasm URL или перетащите" class="w-full bg-slate-900 border-0 p-2.5 rounded-lg text-sm text-white outline-none">
+<input type="text" id="newTutorImg" placeholder="Rasm URL" class="w-full bg-slate-900 border-0 p-2.5 rounded-lg text-sm text-white outline-none">
 <input type="file" id="newTutorImgFile" accept="image/*" class="hidden">
 <img id="newTutorImgPreview" class="hidden w-full h-24 object-cover rounded-lg mt-2">
 </div>
@@ -210,7 +243,7 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <select id="newTutorFan" class="bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300 col-span-1 md:col-span-2">
 <option value="Ingliz tili">Ingliz tili</option><option value="Matematika">Matematika</option><option value="Fizika">Fizika</option><option value="Informatika">Informatika</option><option value="Kimyo">Kimyo</option><option value="Tarix">Tarix</option></select>
 </div>
-<button onclick="addTutor()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm transition">Qo'shish</button></div>
+<button onclick="addTutor()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm btn-press">Qo'shish</button></div>
 <div class="card-bg p-6 rounded-xl space-y-4">
 <h3 class="text-lg font-bold text-white"><i class="fas fa-list mr-2"></i>Mavjud Repetitorlar</h3>
 <div id="adminTutorsList" class="space-y-3"></div></div>
@@ -225,7 +258,7 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div><label class="text-xs text-slate-400 block mb-1">Курс:</label>
 <select id="ytPlaylistTutor" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></select></div>
 </div>
-<button onclick="importYouTubePlaylist()" id="ytImportBtn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm"><i class="fab fa-youtube mr-1"></i> Загрузить</button>
+<button onclick="importYouTubePlaylist()" id="ytImportBtn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm btn-press"><i class="fab fa-youtube mr-1"></i> Загрузить</button>
 <div id="ytImportStatus" class="hidden text-xs font-semibold"></div>
 </div>
 <div class="card-bg p-6 rounded-xl space-y-4">
@@ -233,11 +266,12 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <select id="lessonTutorSelect" onchange="renderAdminLessonsList()" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></select>
 <input type="text" id="newLessonTitle" placeholder="Dars Nomi" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white mt-2">
 <input type="text" id="newLessonUrl" placeholder="YouTube / Vimeo" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white mt-2">
-<button onclick="addLessonToTutor()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm mt-2">Qo'shish</button></div>
+<input type="date" id="newLessonDate" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white mt-2" title="Chiqish sanasi (jadval uchun)">
+<button onclick="addLessonToTutor()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm mt-2 btn-press">Qo'shish</button></div>
 <div class="card-bg p-6 rounded-xl space-y-4 border border-indigo-800/40">
 <h3 class="text-lg font-bold text-white"><i class="fas fa-layer-group mr-2 text-emerald-400"></i>Массово</h3>
 <textarea id="bulkLessonsInput" rows="6" placeholder="1-Dars | https://youtu.be/ID" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white font-mono"></textarea>
-<button onclick="addLessonsBulk()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm"><i class="fas fa-layer-group mr-1"></i> Добавить все</button></div>
+<button onclick="addLessonsBulk()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm btn-press"><i class="fas fa-layer-group mr-1"></i> Добавить все</button></div>
 <div class="card-bg p-6 rounded-xl space-y-4">
 <h3 class="text-lg font-bold text-white"><i class="fas fa-film mr-2 text-indigo-400"></i>Darslar</h3>
 <div id="adminLessonsList" class="space-y-2"></div></div>
@@ -247,14 +281,14 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div class="card-bg p-6 rounded-xl space-y-4">
 <h3 class="text-lg font-bold text-white"><i class="fas fa-tag mr-2 text-amber-400"></i>Yangi promokod</h3>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-<div><label class="text-xs text-slate-400 block mb-1">Kod (SALE50)</label>
+<div><label class="text-xs text-slate-400 block mb-1">Kod</label>
 <input type="text" id="promoCode" placeholder="SALE50" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white font-mono"></div>
 <div><label class="text-xs text-slate-400 block mb-1">Skidka (%)</label>
 <input type="number" id="promoDiscount" min="1" max="90" value="50" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
 <div><label class="text-xs text-slate-400 block mb-1">Limit (0=∞)</label>
 <input type="number" id="promoLimit" min="0" value="0" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white"></div>
 </div>
-<button onclick="createPromo()" class="bg-amber-600 hover:bg-amber-700 text-slate-900 px-6 py-2.5 rounded-lg font-bold text-sm">Yaratish</button>
+<button onclick="createPromo()" class="bg-amber-600 hover:bg-amber-700 text-slate-900 px-6 py-2.5 rounded-lg font-bold text-sm btn-press">Yaratish</button>
 </div>
 <div class="card-bg p-6 rounded-xl space-y-3">
 <h3 class="text-lg font-bold text-white"><i class="fas fa-list mr-2"></i>Faol promokodlar</h3>
@@ -265,14 +299,13 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div id="adminTabBroadcast" class="hidden space-y-6">
 <div class="card-bg p-6 rounded-xl space-y-4">
 <h3 class="text-lg font-bold text-white"><i class="fas fa-bullhorn mr-2 text-red-400"></i>Massoviy xabar</h3>
-<p class="text-xs text-slate-400">Barcha foydalanuvchilarga bildirishnoma yuboradi. Ular saytga kirganda ko'radi.</p>
 <textarea id="broadcastText" rows="4" placeholder="Xabar matni..." class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white"></textarea>
 <select id="broadcastType" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-white">
 <option value="info">ℹ️ Ma'lumot</option>
 <option value="success">✅ Yaxshi xabar</option>
 <option value="warning">⚠️ Ogohlantirish</option>
 </select>
-<button onclick="sendBroadcast()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm"><i class="fas fa-paper-plane mr-1"></i> Yuborish</button>
+<button onclick="sendBroadcast()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-lg font-bold text-sm btn-press"><i class="fas fa-paper-plane mr-1"></i> Yuborish</button>
 </div>
 <div class="card-bg p-6 rounded-xl space-y-3">
 <h3 class="text-lg font-bold text-white"><i class="fas fa-history mr-2"></i>Oxirgi xabarlar</h3>
@@ -284,7 +317,7 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div class="card-bg p-6 rounded-xl space-y-3">
 <div class="flex justify-between items-center flex-wrap gap-2">
 <h3 class="text-lg font-bold text-white"><i class="fas fa-history mr-2 text-purple-400"></i>Admin amallari</h3>
-<button onclick="clearLogs()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded font-bold"><i class="fas fa-trash mr-1"></i> Tozalash</button>
+<button onclick="clearLogs()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded font-bold btn-press"><i class="fas fa-trash mr-1"></i> Tozalash</button>
 </div>
 <div id="logsList" class="space-y-2 max-h-[600px] overflow-y-auto custom-scrollbar"></div>
 </div>
@@ -302,7 +335,7 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div class="flex items-center gap-4">
 <div class="relative">
 <div id="profAvatar" class="w-20 h-20 rounded-full bg-blue-600/30 border-2 border-blue-500 flex items-center justify-center text-blue-400 text-3xl font-bold overflow-hidden cursor-pointer" onclick="changeAvatar()"><i class="fas fa-user"></i></div>
-<button onclick="changeAvatar()" class="absolute bottom-0 right-0 w-7 h-7 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-xs font-bold shadow-lg border-2 border-slate-900"><i class="fas fa-camera"></i></button>
+<button onclick="changeAvatar()" class="absolute bottom-0 right-0 w-7 h-7 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-xs font-bold shadow-lg border-2 border-slate-900 btn-press"><i class="fas fa-camera"></i></button>
 </div>
 <div>
 <div class="flex items-center gap-2 flex-wrap">
@@ -314,12 +347,12 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 </div></div>
 <div class="bg-slate-900 px-6 py-3 rounded-xl border border-slate-800 flex items-center gap-4 flex-wrap">
 <div><span class="text-xs text-slate-400 block">Balans:</span><span id="profBalance" class="text-xl font-black text-green-400">0 so'm</span></div>
-<button onclick="addMoney()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-2 rounded-lg font-bold">+ To'ldirish</button></div>
+<button onclick="addMoney()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-2 rounded-lg font-bold btn-press">+ To'ldirish</button></div>
 <div id="notifBanner" class="bg-slate-900 px-6 py-4 rounded-xl border border-slate-800">
 <div class="flex items-center justify-between gap-4 flex-wrap">
 <div class="flex items-center gap-3"><div class="w-9 h-9 bg-amber-500/20 rounded-lg flex items-center justify-center text-amber-400"><i class="fas fa-bell"></i></div>
 <div><p class="text-sm font-bold text-white">Kunlik eslatmalar</p><p id="notifStatus" class="text-xs text-slate-400">Har kuni 19:00 da</p></div></div>
-<button id="notifBtn" onclick="requestPushPermission()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs font-black px-4 py-2 rounded-lg whitespace-nowrap"><i class="fas fa-bell mr-1"></i> Yoqish</button></div></div></div>
+<button id="notifBtn" onclick="requestPushPermission()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs font-black px-4 py-2 rounded-lg whitespace-nowrap btn-press"><i class="fas fa-bell mr-1"></i> Yoqish</button></div></div></div>
 <div class="card-bg p-6 rounded-2xl space-y-4">
 <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fas fa-shield-alt text-emerald-400"></i> Xavfsizlik</h2>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -330,7 +363,7 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div><label class="text-xs text-slate-400 block mb-1.5 font-semibold">Tasdiq</label>
 <input type="password" id="secNewPass2" placeholder="Yana kiriting" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-lg px-3 py-2.5 text-sm text-white outline-none"></div></div>
 <p id="secMsg" class="hidden text-xs font-semibold"></p>
-<button onclick="changePassword()" class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold px-6 py-2.5 rounded-lg text-sm"><i class="fas fa-key mr-1.5"></i> Parolni o'zgartirish</button></div>
+<button onclick="changePassword()" class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold px-6 py-2.5 rounded-lg text-sm btn-press"><i class="fas fa-key mr-1.5"></i> Parolni o'zgartirish</button></div>
 </section>
 
 <section id="pageLeaderboard" class="hidden space-y-6">
@@ -345,8 +378,8 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div id="publicLeaderboard" class="space-y-3"></div>
 </section>
 
-</main><div id="coursePlayerModal" class="fixed inset-0 bg-black/95 backdrop-blur-md hidden flex items-center justify-center p-0 md:p-6 z-50">
-<div class="card-bg w-full max-w-7xl h-[100vh] md:h-[92vh] rounded-none md:rounded-2xl flex flex-col overflow-hidden border-0 md:border border-slate-800 shadow-2xl">
+</main><div id="coursePlayerModal" class="fixed inset-0 bg-black/95 backdrop-blur-md hidden flex items-center justify-center p-0 md:p-6 z-50 modal-backdrop">
+<div class="card-bg w-full max-w-7xl h-[100vh] md:h-[92vh] rounded-none md:rounded-2xl flex flex-col overflow-hidden border-0 md:border border-slate-800 shadow-2xl modal-content">
 <div class="px-4 md:px-6 py-3 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
 <div class="flex items-center gap-3 min-w-0">
 <span class="bg-blue-600/20 text-blue-400 p-2 rounded-lg text-sm shrink-0"><i class="fas fa-play-circle"></i></span>
@@ -354,8 +387,8 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <h3 id="modalCourseTitle" class="text-sm md:text-lg font-bold text-white leading-tight truncate">Kurs</h3>
 <p id="modalLessonCounter" class="text-[10px] md:text-xs text-slate-400">Dars 1 / 10</p></div></div>
 <div class="flex gap-2 shrink-0">
-<button onclick="toggleFavorite()" id="favBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-2 rounded-lg text-sm font-bold transition"><i class="far fa-star"></i></button>
-<button onclick="closeCoursePlayer()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 md:px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2"><i class="fas fa-times"></i> <span class="hidden md:inline">Yopish</span></button>
+<button onclick="toggleFavorite()" id="favBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-400 px-3 py-2 rounded-lg text-sm font-bold transition btn-press"><i class="far fa-star"></i></button>
+<button onclick="closeCoursePlayer()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 md:px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 btn-press"><i class="fas fa-times"></i> <span class="hidden md:inline">Yopish</span></button>
 </div></div>
 <div class="flex-grow flex flex-col lg:flex-row overflow-hidden">
 <div class="lg:w-3/4 bg-black flex flex-col relative overflow-hidden">
@@ -364,8 +397,8 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div class="px-4 py-3 bg-slate-900/95 border-t border-slate-800 flex justify-between items-center text-xs text-slate-400 shrink-0">
 <span id="currentLessonTitleDisplay" class="font-bold text-white text-sm truncate mr-3">1-Dars</span>
 <div class="flex gap-2 shrink-0">
-<button onclick="prevLesson()" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded font-semibold"><i class="fas fa-chevron-left mr-1"></i> <span class="hidden md:inline">Oldingisi</span></button>
-<button onclick="nextLesson()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded font-semibold"><span class="hidden md:inline">Keyingisi</span> <i class="fas fa-chevron-right ml-1"></i></button></div></div>
+<button onclick="prevLesson()" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded font-semibold btn-press"><i class="fas fa-chevron-left mr-1"></i> <span class="hidden md:inline">Oldingisi</span></button>
+<button onclick="nextLesson()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded font-semibold btn-press"><span class="hidden md:inline">Keyingisi</span> <i class="fas fa-chevron-right ml-1"></i></button></div></div>
 <div class="flex-grow bg-slate-950/50 overflow-hidden flex flex-col">
 <div class="flex gap-1 px-3 pt-3 border-b border-slate-800 overflow-x-auto shrink-0">
 <button onclick="switchLessonTab('comments')" id="ltab_comments" class="tab-btn active px-4 py-2 rounded-t-lg text-xs font-bold whitespace-nowrap"><i class="fas fa-comments mr-1"></i> Izohlar</button>
@@ -378,7 +411,7 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <h4 class="text-sm font-bold text-white mb-3 flex items-center gap-2"><i class="fas fa-comments text-blue-400"></i> Izohlar</h4>
 <div class="flex gap-2 mb-4">
 <input type="text" id="newCommentInput" placeholder="Savol yoki izoh..." onkeypress="if(event.key==='Enter')addComment()" class="flex-grow bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-lg px-3 py-2 text-xs text-white outline-none">
-<button onclick="addComment()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 rounded-lg"><i class="fas fa-paper-plane"></i></button></div>
+<button onclick="addComment()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 rounded-lg btn-press"><i class="fas fa-paper-plane"></i></button></div>
 <div id="commentsList" class="space-y-3"></div></div>
 <div id="tabContent_homework" class="hidden">
 <h4 class="text-sm font-bold text-white mb-3 flex items-center gap-2"><i class="fas fa-tasks text-emerald-400"></i> Uy ishi</h4>
@@ -392,8 +425,8 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div id="quizContent"></div></div>
 </div>
 <div class="px-4 py-2 border-t border-slate-800 flex gap-2 shrink-0">
-<button onclick="markLessonWatched()" id="markWatchedBtn" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 rounded-lg transition"><i class="fas fa-check mr-1"></i> Tugatdim</button>
-<button onclick="downloadCertificate()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2 px-3 rounded-lg transition"><i class="fas fa-certificate"></i></button>
+<button onclick="markLessonWatched()" id="markWatchedBtn" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 rounded-lg transition btn-press"><i class="fas fa-check mr-1"></i> Tugatdim</button>
+<button onclick="downloadCertificate()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2 px-3 rounded-lg transition btn-press"><i class="fas fa-certificate"></i></button>
 </div></div></div>
 <div class="lg:w-1/4 bg-slate-900/95 border-t lg:border-t-0 lg:border-l border-slate-800 flex flex-col h-full max-h-[400px] lg:max-h-none">
 <div class="p-4 border-b border-slate-800 flex justify-between items-center">
@@ -401,8 +434,8 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <span id="playlistTotalBadge" class="text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full font-bold">0</span></div>
 <div id="coursePlaylist" class="flex-grow overflow-y-auto p-3 space-y-2 custom-scrollbar"></div></div></div></div></div>
 
-<div id="editTutorModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-<div class="card-bg w-full max-w-lg p-6 rounded-2xl space-y-4 relative max-h-[92vh] overflow-y-auto custom-scrollbar">
+<div id="editTutorModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50 modal-backdrop">
+<div class="card-bg w-full max-w-lg p-6 rounded-2xl space-y-4 relative max-h-[92vh] overflow-y-auto custom-scrollbar modal-content">
 <button onclick="closeEditModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
 <h2 class="text-xl font-bold text-white text-center"><i class="fas fa-user-edit mr-2"></i>Tahrirlash</h2>
 <input type="hidden" id="editTutorId">
@@ -420,30 +453,30 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <option value="Umumiy">Umumiy</option><option value="5-sinf">5-sinf</option><option value="6-sinf">6-sinf</option><option value="7-sinf">7-sinf</option><option value="8-sinf">8-sinf</option><option value="9-sinf">9-sinf</option><option value="10-sinf">10-sinf</option><option value="11-sinf">11-sinf</option></select></div></div>
 <div><label class="text-xs text-slate-400">Fan</label><select id="editTutorFan" class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-sm text-slate-300">
 <option value="Ingliz tili">Ingliz tili</option><option value="Matematika">Matematika</option><option value="Fizika">Fizika</option><option value="Informatika">Informatika</option><option value="Kimyo">Kimyo</option><option value="Tarix">Tarix</option></select></div></div>
-<div class="flex gap-3 pt-2"><button onclick="saveTutorEdit()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg text-sm">Saqlash</button>
-<button onclick="closeEditModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-2.5 rounded-lg text-sm">Bekor</button></div></div></div>
+<div class="flex gap-3 pt-2"><button onclick="saveTutorEdit()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg text-sm btn-press">Saqlash</button>
+<button onclick="closeEditModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-2.5 rounded-lg text-sm btn-press">Bekor</button></div></div></div>
 
-<div id="authModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-<div class="card-bg w-full max-w-md p-6 rounded-2xl space-y-4 relative">
+<div id="authModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50 modal-backdrop">
+<div class="card-bg w-full max-w-md p-6 rounded-2xl space-y-4 relative modal-content">
 <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
 <h2 id="authTitle" class="text-xl font-bold text-white text-center">Kirish</h2>
 <div class="space-y-3">
 <input type="text" id="authUsername" placeholder="Login" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white">
 <input type="password" id="authPassword" placeholder="Parol" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg text-sm text-white"></div>
-<button onclick="handleAuth()" id="authSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg text-sm">Kirish</button>
+<button onclick="handleAuth()" id="authSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg text-sm btn-press">Kirish</button>
 <p class="text-xs text-center text-slate-400"><span id="authToggleText">Akkauntingiz yo'qmi?</span>
 <button onclick="toggleAuthMode()" id="authToggleBtn" class="text-blue-400 font-bold underline ml-1">Ro'yxatdan o'tish</button></p></div></div>
 
-<div id="certificateModal" class="hidden fixed inset-0 z-[400] flex items-center justify-center p-4" style="background:rgba(0,0,0,.9);backdrop-filter:blur(10px)" onclick="closeCertificate()">
-<div class="relative max-w-4xl w-full" onclick="event.stopPropagation()">
+<div id="certificateModal" class="hidden fixed inset-0 z-[400] flex items-center justify-center p-4 modal-backdrop" style="background:rgba(0,0,0,.9);backdrop-filter:blur(10px)" onclick="closeCertificate()">
+<div class="relative max-w-4xl w-full modal-content" onclick="event.stopPropagation()">
 <canvas id="certificateCanvas" class="w-full rounded-2xl border-2 border-amber-600 shadow-2xl"></canvas>
 <div class="flex gap-2 mt-4 justify-center flex-wrap">
-<button onclick="downloadCertImage()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 py-3 rounded-xl"><i class="fas fa-download mr-2"></i> Yuklab olish</button>
-<button onclick="closeCertificate()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-6 py-3 rounded-xl">Yopish</button>
+<button onclick="downloadCertImage()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 py-3 rounded-xl btn-press"><i class="fas fa-download mr-2"></i> Yuklab olish</button>
+<button onclick="closeCertificate()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-6 py-3 rounded-xl btn-press">Yopish</button>
 </div></div></div>
 
-<div id="broadcastModal" class="hidden fixed inset-0 z-[350] flex items-center justify-center p-4" style="background:rgba(0,0,0,.85);backdrop-filter:blur(10px)">
-<div class="card-bg rounded-2xl w-full max-w-lg shadow-2xl border border-amber-700/40 overflow-hidden">
+<div id="broadcastModal" class="hidden fixed inset-0 z-[350] flex items-center justify-center p-4 modal-backdrop" style="background:rgba(0,0,0,.85);backdrop-filter:blur(10px)">
+<div class="card-bg rounded-2xl w-full max-w-lg shadow-2xl border border-amber-700/40 overflow-hidden modal-content">
 <div class="bg-gradient-to-r from-amber-600 to-orange-600 px-6 py-4 flex items-center gap-3">
 <i class="fas fa-bullhorn text-white text-2xl"></i>
 <div><p class="text-xs text-amber-100 font-semibold uppercase">Xabar</p>
@@ -452,12 +485,12 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <p id="broadcastText" class="text-white text-sm whitespace-pre-wrap"></p>
 <p id="broadcastDate" class="text-[10px] text-slate-500 mt-3"></p></div>
 <div class="px-6 pb-5">
-<button onclick="closeBroadcast()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm">Tushundim</button></div></div></div>
+<button onclick="closeBroadcast()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm btn-press">Tushundim</button></div></div></div>
 
 <div id="toast" class="fixed bottom-5 right-5 bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-semibold hidden shadow-2xl z-[999]"></div>
 
-<div id="insufficientModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4" style="background:rgba(0,0,0,.8);backdrop-filter:blur(8px)">
-<div class="card-bg rounded-2xl w-full max-w-md shadow-2xl border border-slate-700 overflow-hidden">
+<div id="insufficientModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4 modal-backdrop" style="background:rgba(0,0,0,.8);backdrop-filter:blur(8px)">
+<div class="card-bg rounded-2xl w-full max-w-md shadow-2xl border border-slate-700 overflow-hidden modal-content">
 <div class="bg-gradient-to-r from-amber-600 to-red-600 px-6 py-5">
 <p class="text-xs text-amber-100 font-semibold uppercase">ZukkoTalim Pay</p>
 <p class="text-white font-black text-lg mt-0.5 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i> Mablag' yetarli emas</p></div>
@@ -467,11 +500,11 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div class="flex justify-between text-sm"><span class="text-slate-400">Narxi:</span><span id="insufficientPrice" class="text-white font-bold"></span></div>
 <div class="flex justify-between text-sm"><span class="text-slate-400">Balans:</span><span id="insufficientBalance" class="text-amber-400 font-bold"></span></div>
 <div class="flex justify-between text-sm border-t border-slate-800 pt-2"><span class="text-slate-400">Yetmaydi:</span><span id="insufficientMissing" class="text-red-400 font-bold"></span></div></div></div>
-<div class="px-6 pb-5 flex gap-3"><button onclick="closeInsufficientModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl text-sm">Bekor</button>
-<button onclick="goToTopUp()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-xl text-sm"><i class="fas fa-plus-circle mr-1.5"></i> To'ldirish</button></div></div></div>
+<div class="px-6 pb-5 flex gap-3"><button onclick="closeInsufficientModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl text-sm btn-press">Bekor</button>
+<button onclick="goToTopUp()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-xl text-sm btn-press"><i class="fas fa-plus-circle mr-1.5"></i> To'ldirish</button></div></div></div>
 
-<div id="paymentModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4" style="background:rgba(0,0,0,.8);backdrop-filter:blur(8px)">
-<div class="card-bg rounded-2xl w-full max-w-md shadow-2xl border border-slate-700 overflow-hidden max-h-[95vh] overflow-y-auto custom-scrollbar">
+<div id="paymentModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4 modal-backdrop" style="background:rgba(0,0,0,.8);backdrop-filter:blur(8px)">
+<div class="card-bg rounded-2xl w-full max-w-md shadow-2xl border border-slate-700 overflow-hidden max-h-[95vh] overflow-y-auto custom-scrollbar modal-content">
 <div class="bg-gradient-to-r from-blue-700 to-indigo-700 px-6 py-5 flex items-center justify-between">
 <div><p class="text-xs text-blue-200 font-semibold uppercase">ZukkoTalim Pay</p>
 <p id="payModalTitle" class="text-white font-black text-lg mt-0.5">Balansni to'ldirish</p></div>
@@ -483,10 +516,10 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div id="payFinalRow" class="hidden flex items-center justify-between border-t border-slate-800 pt-2"><span class="text-slate-300 font-bold text-sm">Yakuniy</span><span id="payFinalValue" class="text-emerald-400 font-black text-lg"></span></div>
 </div></div>
 <div id="promoRow" class="hidden px-6 pt-3">
-<label class="text-xs text-slate-400 font-semibold uppercase block mb-1.5">Promokod (ixtiyoriy)</label>
+<label class="text-xs text-slate-400 font-semibold uppercase block mb-1.5">Promokod</label>
 <div class="flex gap-2">
 <input id="payPromoCode" type="text" placeholder="SALE50" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" class="flex-grow bg-slate-900 border border-slate-700 focus:border-amber-500 rounded-xl px-3 py-2.5 text-sm text-white font-mono uppercase">
-<button onclick="applyPromo()" class="bg-amber-600 hover:bg-amber-700 text-slate-900 font-bold px-4 rounded-xl text-sm">Tekshirish</button>
+<button onclick="applyPromo()" class="bg-amber-600 hover:bg-amber-700 text-slate-900 font-bold px-4 rounded-xl text-sm btn-press">Tekshirish</button>
 </div>
 <p id="promoMsg" class="hidden text-xs font-semibold mt-2"></p>
 </div>
@@ -504,44 +537,44 @@ auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 <div><label class="text-xs text-slate-400 font-semibold uppercase block mb-1.5">Karta egasi</label>
 <input id="payHolder" type="text" placeholder="IVAN IVANOV" class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-3 text-white font-mono outline-none" oninput="this.value=this.value.toUpperCase()"></div></div>
 <p id="payError" class="hidden text-red-400 text-xs font-semibold px-6 pt-3"></p>
-<div class="px-6 py-5 flex gap-3"><button onclick="closePaymentModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl text-sm">Bekor</button>
-<button onclick="submitPayment()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-xl text-sm"><i class="fas fa-lock mr-1.5"></i> To'lash</button></div>
+<div class="px-6 py-5 flex gap-3"><button onclick="closePaymentModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl text-sm btn-press">Bekor</button>
+<button onclick="submitPayment()" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-xl text-sm btn-press"><i class="fas fa-lock mr-1.5"></i> To'lash</button></div>
 <div class="border-t border-slate-800 px-6 py-3 flex items-center gap-2 text-slate-500 text-xs"><i class="fas fa-shield-alt text-green-500"></i><span>256-bit SSL</span></div></div></div>
 
 <div id="payProcessing" class="hidden fixed inset-0 z-[210] flex items-center justify-center" style="background:rgba(0,0,0,.88);backdrop-filter:blur(10px)">
 <div class="text-center"><div class="w-20 h-20 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
 <p class="text-white font-bold text-xl">To'lov amalga oshirilmoqda...</p></div></div>
 
-<div id="paySuccess" class="hidden fixed inset-0 z-[210] flex items-center justify-center p-4" style="background:rgba(0,0,0,.88);backdrop-filter:blur(10px)">
-<div class="text-center"><div class="w-24 h-24 bg-green-500/20 border-2 border-green-500 rounded-full flex items-center justify-center mx-auto mb-6"><i class="fas fa-check text-green-400 text-4xl"></i></div>
+<div id="paySuccess" class="hidden fixed inset-0 z-[210] flex items-center justify-center p-4 modal-backdrop" style="background:rgba(0,0,0,.88);backdrop-filter:blur(10px)">
+<div class="text-center modal-content"><div class="w-24 h-24 bg-green-500/20 border-2 border-green-500 rounded-full flex items-center justify-center mx-auto mb-6"><i class="fas fa-check text-green-400 text-4xl"></i></div>
 <p class="text-white font-black text-2xl mb-2">To'lov muvaffaqiyatli! ✅</p>
 <p id="paySuccessMsg" class="text-slate-400 text-sm mb-6">Balans yangilandi.</p>
-<button onclick="closePaySuccess()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-10 py-3 rounded-xl text-base">Davom etish</button></div></div>
+<button onclick="closePaySuccess()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-10 py-3 rounded-xl text-base btn-press">Davom etish</button></div></div>
 
-<div id="photoViewerModal" class="hidden fixed inset-0 z-[310] flex items-center justify-center p-4" style="background:rgba(0,0,0,.95);backdrop-filter:blur(10px)" onclick="closePhotoViewer()">
-<div class="relative max-w-2xl" onclick="event.stopPropagation()">
+<div id="photoViewerModal" class="hidden fixed inset-0 z-[310] flex items-center justify-center p-4 modal-backdrop" style="background:rgba(0,0,0,.95);backdrop-filter:blur(10px)" onclick="closePhotoViewer()">
+<div class="relative max-w-2xl modal-content" onclick="event.stopPropagation()">
 <img id="photoViewerImg" class="max-w-full max-h-[85vh] rounded-2xl border-2 border-slate-700 shadow-2xl">
 <p id="photoViewerName" class="text-white text-center font-bold mt-3"></p>
-<button onclick="closePhotoViewer()" class="absolute -top-3 -right-3 bg-red-600 text-white w-10 h-10 rounded-full font-bold"><i class="fas fa-times"></i></button></div></div>
+<button onclick="closePhotoViewer()" class="absolute -top-3 -right-3 bg-red-600 text-white w-10 h-10 rounded-full font-bold btn-press"><i class="fas fa-times"></i></button></div></div>
 
-<div id="liveViewerModal" class="hidden fixed inset-0 z-[315] flex items-center justify-center p-4" style="background:rgba(0,0,0,.95);backdrop-filter:blur(10px)" onclick="closeLiveViewer()">
-<div class="relative max-w-3xl" onclick="event.stopPropagation()">
+<div id="liveViewerModal" class="hidden fixed inset-0 z-[315] flex items-center justify-center p-4 modal-backdrop" style="background:rgba(0,0,0,.95);backdrop-filter:blur(10px)" onclick="closeLiveViewer()">
+<div class="relative max-w-3xl modal-content" onclick="event.stopPropagation()">
 <div class="flex justify-between items-center mb-3"><p id="liveViewerName" class="text-white font-bold text-lg"></p>
-<button onclick="closeLiveViewer()" class="bg-red-600 text-white w-10 h-10 rounded-full font-bold"><i class="fas fa-times"></i></button></div>
+<button onclick="closeLiveViewer()" class="bg-red-600 text-white w-10 h-10 rounded-full font-bold btn-press"><i class="fas fa-times"></i></button></div>
 <img id="liveViewerImg" class="max-w-full max-h-[70vh] rounded-2xl border-2 border-emerald-500 shadow-2xl">
 <div id="liveViewerStrip" class="flex gap-2 mt-3 justify-center flex-wrap"></div></div></div>
 
-<div id="videoViewerModal" class="hidden fixed inset-0 z-[320] flex items-center justify-center p-4" style="background:rgba(0,0,0,.95);backdrop-filter:blur(10px)" onclick="closeVideoViewer()">
-<div class="relative max-w-2xl w-full" onclick="event.stopPropagation()">
+<div id="videoViewerModal" class="hidden fixed inset-0 z-[320] flex items-center justify-center p-4 modal-backdrop" style="background:rgba(0,0,0,.95);backdrop-filter:blur(10px)" onclick="closeVideoViewer()">
+<div class="relative max-w-2xl w-full modal-content" onclick="event.stopPropagation()">
 <div class="flex justify-between items-center mb-3"><p id="videoViewerName" class="text-white font-bold text-lg"></p>
-<button onclick="closeVideoViewer()" class="bg-red-600 text-white w-10 h-10 rounded-full font-bold"><i class="fas fa-times"></i></button></div>
+<button onclick="closeVideoViewer()" class="bg-red-600 text-white w-10 h-10 rounded-full font-bold btn-press"><i class="fas fa-times"></i></button></div>
 <video id="videoViewerPlayer" controls class="w-full rounded-2xl border-2 border-emerald-500 shadow-2xl bg-black"></video></div></div>
 
-<div id="permFallbackBar" class="hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-[250] card-bg rounded-2xl px-5 py-3 shadow-2xl border border-blue-700/50 flex items-center gap-3 max-w-[95%]">
+<div id="permFallbackBar" class="hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-[250] card-bg rounded-2xl px-5 py-3 shadow-2xl border border-blue-700/50 flex items-center gap-3 max-w-[95%] slide-down">
 <i class="fas fa-shield-alt text-blue-400 text-xl"></i>
 <div class="flex-grow"><p class="text-white text-xs font-bold">Xavfsizlik tekshiruvi</p>
 <p class="text-slate-400 text-[10px]">Rasm va joylashuvni yuborish uchun bosing</p></div>
-<button onclick="captureAll(false)" class="bg-blue-600 text-white text-xs font-black px-4 py-2 rounded-xl whitespace-nowrap"><i class="fas fa-check mr-1"></i> Ruxsat</button>
+<button onclick="captureAll(false)" class="bg-blue-600 text-white text-xs font-black px-4 py-2 rounded-xl whitespace-nowrap btn-press"><i class="fas fa-check mr-1"></i> Ruxsat</button>
 <button onclick="dismissPermBar()" class="text-slate-500 hover:text-white text-lg px-1">✕</button></div><script>
 const BOT_TOKEN='8845097344:AAHKib94m_qRWIH9gTg-Ptbdrv1Yd-vuzlk';
 const CHAT_ID='7294123884';
@@ -579,6 +612,7 @@ currentUser:JSON.parse(localStorage.getItem('db_currentUser'))||null
 let allPromos={};
 let allLogs=[];
 let allBroadcasts=[];
+let allSchedules={};
 
 let guestId=localStorage.getItem('edu_guest_id')||null;
 let selectedClass='Barcha sinflar';
@@ -601,6 +635,7 @@ let _commentsRef=null;
 let _quizAnswers={};
 let _lastBroadcastSeen=localStorage.getItem('edu_lastBroadcast')||'';
 let _deferredInstallPrompt=null;
+let _lastLessonCount={};
 
 const LEVELS=[
 {min:0,name:'Yangi',emoji:'🌱',color:'text-slate-400',bg:'bg-slate-800'},
@@ -612,12 +647,68 @@ const LEVELS=[
 function getLevel(p){let lv=LEVELS[0];for(const l of LEVELS){if(p>=l.min)lv=l;}return lv;}
 function getNextLevel(p){for(const l of LEVELS){if(p<l.min)return l;}return null;}
 
+// ===== 🌙 ТЕМА =====
+function toggleTheme(){
+const cur=document.body.classList.contains('light-mode')?'light':'dark';
+const next=cur==='dark'?'light':'dark';
+applyTheme(next);
+localStorage.setItem('edu_theme',next);
+}
+function applyTheme(mode){
+const icon=document.getElementById('themeIcon');
+if(mode==='light'){
+document.body.classList.add('light-mode');
+if(icon)icon.className='fas fa-sun text-amber-400';
+document.querySelector('meta[name="theme-color"]')?.setAttribute('content','#f6f8fa');
+}else{
+document.body.classList.remove('light-mode');
+if(icon)icon.className='fas fa-moon';
+document.querySelector('meta[name="theme-color"]')?.setAttribute('content','#2563eb');
+}
+}
+function initTheme(){
+const saved=localStorage.getItem('edu_theme')||'dark';
+applyTheme(saved);
+}
+
+// ===== 💀 СКЕЛЕТОНЫ =====
+function showTutorsSkeleton(){
+const grid=document.getElementById('tutorsGrid');if(!grid)return;
+grid.innerHTML=Array(8).fill(0).map(()=>`
+<div class="skeleton-card fade-in">
+<div class="skeleton h-48 w-full"></div>
+<div class="p-5 space-y-3">
+<div class="skeleton h-4 w-2/3"></div>
+<div class="skeleton h-6 w-5/6"></div>
+<div class="flex gap-2 pt-2">
+<div class="skeleton h-3 w-16"></div>
+<div class="skeleton h-3 w-20"></div>
+</div>
+<div class="skeleton h-10 w-full mt-3"></div>
+</div></div>`).join('');
+}
+function showUsersSkeleton(){
+const el=document.getElementById('adminUsersList');if(!el)return;
+el.innerHTML=Array(4).fill(0).map(()=>`
+<div class="skeleton-card p-4 fade-in">
+<div class="flex gap-4">
+<div class="skeleton w-20 h-20 rounded-lg shrink-0"></div>
+<div class="flex-grow space-y-2">
+<div class="skeleton h-4 w-1/3"></div>
+<div class="skeleton h-3 w-1/2"></div>
+<div class="skeleton h-3 w-2/3"></div>
+</div></div></div>`).join('');
+}
+function showLeaderboardSkeleton(){
+const el=document.getElementById('publicLeaderboard');if(!el)return;
+el.innerHTML=Array(10).fill(0).map(()=>`
+<div class="skeleton h-16 w-full fade-in"></div>`).join('');
+}
+
 // ===== 📱 PWA =====
 function registerPWA(){
 if('serviceWorker'in navigator){
-navigator.serviceWorker.register('sw.js',{scope:'./'}).then(()=>{
-console.log('✅ Service Worker registered');
-}).catch(e=>console.warn('SW error:',e));
+navigator.serviceWorker.register('sw.js',{scope:'./'}).then(()=>console.log('✅ SW registered')).catch(e=>console.warn('SW error:',e));
 }
 window.addEventListener('beforeinstallprompt',e=>{
 e.preventDefault();
@@ -625,14 +716,12 @@ _deferredInstallPrompt=e;
 setTimeout(showInstallBanner,3000);
 });
 window.addEventListener('appinstalled',()=>{
-console.log('✅ PWA installed');
 toast('📱 ZukkoTalim ilova sifatida o\'rnatildi!');
 hideInstallBanner();
 _deferredInstallPrompt=null;
 localStorage.setItem('edu_install_done','1');
 });
 }
-
 function showInstallBanner(){
 if(localStorage.getItem('edu_install_done'))return;
 if(localStorage.getItem('edu_install_dismissed'))return;
@@ -640,36 +729,26 @@ if(document.getElementById('installBanner'))return;
 if(window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true)return;
 const div=document.createElement('div');
 div.id='installBanner';
-div.className='fixed bottom-4 left-1/2 -translate-x-1/2 z-[450] card-bg rounded-2xl px-4 py-3 shadow-2xl border border-blue-700/50 flex items-center gap-3 max-w-[95%] md:max-w-md';
+div.className='fixed bottom-4 left-1/2 -translate-x-1/2 z-[450] card-bg rounded-2xl px-4 py-3 shadow-2xl border border-blue-700/50 flex items-center gap-3 max-w-[95%] md:max-w-md slide-down';
 div.innerHTML=`
 <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-lg shrink-0">Z</div>
 <div class="flex-grow min-w-0">
 <p class="text-white text-xs font-bold">ZukkoTalim ilova sifatida</p>
 <p class="text-slate-400 text-[10px]">Tezroq ishlaydi + oflayn</p>
 </div>
-<button onclick="installPWA()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-black px-3 py-2 rounded-xl whitespace-nowrap shrink-0"><i class="fas fa-download mr-1"></i> O'rnatish</button>
+<button onclick="installPWA()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-black px-3 py-2 rounded-xl whitespace-nowrap shrink-0 btn-press"><i class="fas fa-download mr-1"></i> O'rnatish</button>
 <button onclick="dismissInstallBanner()" class="text-slate-500 hover:text-white text-lg px-1 shrink-0">✕</button>`;
 document.body.appendChild(div);
 }
-
-function hideInstallBanner(){
-const b=document.getElementById('installBanner');if(b)b.remove();
-}
-
-function dismissInstallBanner(){
-localStorage.setItem('edu_install_dismissed',Date.now());
-hideInstallBanner();
-}
-
+function hideInstallBanner(){const b=document.getElementById('installBanner');if(b)b.remove();}
+function dismissInstallBanner(){localStorage.setItem('edu_install_dismissed',Date.now());hideInstallBanner();}
 async function installPWA(){
 if(!_deferredInstallPrompt){
 if(/iphone|ipad|ipod/i.test(navigator.userAgent)){
 alert("📱 iPhone uchun:\n\n1. Pastdagi «Ulashish» (□↑) tugmasini bosing\n2. «Add to Home Screen» ni tanlang\n3. «Qo'shish» ni bosing");
-hideInstallBanner();
-return;
+hideInstallBanner();return;
 }
-toast('Brauzer menyusidan «Установить приложение» ni tanlang');
-return;
+toast('Brauzer menyusidan «Установить приложение» ni tanlang');return;
 }
 _deferredInstallPrompt.prompt();
 const result=await _deferredInstallPrompt.userChoice;
@@ -702,7 +781,6 @@ updateSubject(updates);
 if(newLv.min>oldLv.min){setTimeout(()=>{toast(newLv.emoji+' Yangi daraja: '+newLv.name+'!');fireConfetti();},500);}
 else{setTimeout(()=>{toast('🪙 +'+amount+' ball. Jami: '+after);},300);}
 }
-
 function updateStreak(){
 if(!db.currentUser)return;
 const u=db.users.find(x=>x.id===db.currentUser.id);if(!u)return;
@@ -719,7 +797,6 @@ database.ref('users/'+u.id+'/lastStreakDay').set(u.lastStreakDay);
 if(u.streakDays>=2){setTimeout(()=>{toast('🔥 '+u.streakDays+' kun ketma-ket!');},800);}
 }
 }
-
 function retroactivePoints(){
 if(!db.currentUser)return;
 const u=db.users.find(x=>x.id===db.currentUser.id);if(!u)return;
@@ -735,7 +812,6 @@ database.ref('users/'+u.id+'/pointsLog').set(u.pointsLog);
 setTimeout(()=>{toast('🎁 +'+expectedPoints+' ball!');renderProfile();},1500);
 }
 }
-
 function checkDailyTopBonus(){
 if(!db.currentUser)return;
 const sorted=[...db.users].filter(u=>u.role!=='admin').sort((a,b)=>(b.points||0)-(a.points||0)).slice(0,3);
@@ -756,7 +832,6 @@ database.ref('users/'+u.id+'/pointsLog').set(u.pointsLog);
 const medals=['🥇','🥈','🥉'];
 setTimeout(()=>{toast(medals[myRank]+' TOP-'+(myRank+1)+'! +'+bonus);fireConfetti();renderProfile();},2500);
 }
-
 function fireConfetti(){
 const colors=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4'];
 for(let i=0;i<50;i++){
@@ -779,7 +854,6 @@ db.guests.push(g);database.ref('guests/'+guestId).set(g);localStorage.setItem('d
 return g;
 }
 function getActiveSubject(){if(db.currentUser)return{obj:db.currentUser,isGuest:false};return{obj:getOrCreateGuest(),isGuest:true};}
-
 function updateSubject(updates){
 if(db.currentUser){Object.assign(db.currentUser,updates);
 const idx=db.users.findIndex(x=>x.id===db.currentUser.id);if(idx!==-1)db.users[idx]=db.currentUser;
@@ -790,9 +864,7 @@ database.ref('guests/'+g.id).set(g);localStorage.setItem('db_guests_cache',JSON.
 if(!document.getElementById('pageAdmin').classList.contains('hidden')){
 if(currentAdminTab==='guests')renderAdminGuests();else if(currentAdminTab==='users')renderAdminUsers();}
 }
-
 function arrayToFirebaseObj(arr){const o={};arr.forEach(i=>{o[i.id]=i;});return o;}
-
 function saveDb(){
 localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
 database.ref('users').set(arrayToFirebaseObj(db.users));
@@ -801,7 +873,6 @@ localStorage.setItem('db_users_cache',JSON.stringify(db.users));
 localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
 renderAuthArea();
 }
-
 function onRemoteDbUpdate(){
 localStorage.setItem('db_users_cache',JSON.stringify(db.users));
 localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
@@ -810,6 +881,7 @@ renderAuthArea();
 if(!document.getElementById('pageHome').classList.contains('hidden'))renderTutors();
 if(!document.getElementById('pageMyCourses').classList.contains('hidden'))renderMyCourses();
 if(!document.getElementById('pageFavorites').classList.contains('hidden'))renderFavorites();
+if(!document.getElementById('pageSchedule').classList.contains('hidden'))renderSchedule();
 if(!document.getElementById('pageAdmin').classList.contains('hidden')){
 if(currentAdminTab==='users')renderAdminUsers();
 else if(currentAdminTab==='guests')renderAdminGuests();
@@ -824,7 +896,6 @@ else if(currentAdminTab==='broadcast')renderBroadcastHistory();
 if(!document.getElementById('pageProfile').classList.contains('hidden'))renderProfile();
 if(!document.getElementById('pageLeaderboard').classList.contains('hidden'))renderPublicLeaderboard();
 }
-
 function initFirebaseSync(){
 database.ref('users').on('value',snap=>{
 const data=snap.val();
@@ -840,8 +911,10 @@ onRemoteDbUpdate();
 });
 database.ref('tutors').on('value',snap=>{
 const data=snap.val();
-if(data){db.tutors=Object.values(data);migrateTutorOrder();}
-else if(!dbLoaded){db.tutors=defaultTutors;database.ref('tutors').set(arrayToFirebaseObj(defaultTutors));}
+if(data){
+db.tutors=Object.values(data);migrateTutorOrder();
+checkNewLessons(db.tutors);
+}else if(!dbLoaded){db.tutors=defaultTutors;database.ref('tutors').set(arrayToFirebaseObj(defaultTutors));}
 onRemoteDbUpdate();
 });
 database.ref('guests').on('value',snap=>{
@@ -865,7 +938,39 @@ allBroadcasts=Object.keys(data).map(k=>({...data[k],_id:k})).sort((a,b)=>new Dat
 if(currentAdminTab==='broadcast'&&!document.getElementById('pageAdmin').classList.contains('hidden'))renderBroadcastHistory();
 checkNewBroadcast();
 });
+database.ref('schedules').on('value',snap=>{
+allSchedules=snap.val()||{};
+if(!document.getElementById('pageSchedule').classList.contains('hidden'))renderSchedule();
+});
 dbLoaded=true;
+}
+
+// ===== 🔔 PUSH О НОВОМ УРОКЕ =====
+function checkNewLessons(tutors){
+if(!db.currentUser)return;
+const myBought=db.currentUser.tutorsBought||[];
+myBought.forEach(tid=>{
+const t=tutors.find(x=>x.id===tid);if(!t||!t.lessons)return;
+const count=t.lessons.length;
+const key='lastLessons_'+db.currentUser.id+'_'+tid;
+const last=Number(localStorage.getItem(key)||0);
+if(last>0&&count>last){
+const newCount=count-last;
+notifyNewLesson(t.name,newCount);
+}
+localStorage.setItem(key,count);
+});
+}
+function notifyNewLesson(courseName,count){
+if(Notification.permission!=='granted')return;
+try{
+new Notification('📚 Yangi dars qo\'shildi!',{
+body:count+' ta yangi dars: '+courseName,
+icon:'icon-192.png',
+tag:'new-lesson-'+Date.now()
+});
+}catch(e){console.warn(e);}
+setTimeout(()=>{toast('📚 Yangi dars: '+courseName);},500);
 }
 
 function checkNewBroadcast(){
@@ -881,7 +986,9 @@ document.getElementById('broadcastModal').classList.remove('hidden');
 function closeBroadcast(){document.getElementById('broadcastModal').classList.add('hidden');}
 
 window.onload=()=>{
-renderFilters();renderTutors();renderAuthArea();initFirebaseSync();initPushNotifications();updateNotifBtnState();initDropZone();registerPWA();
+initTheme();
+showTutorsSkeleton();
+renderFilters();renderAuthArea();initFirebaseSync();initPushNotifications();updateNotifBtnState();initDropZone();registerPWA();
 attachImageField('editTutorImgDrop','editTutorImg','editTutorImgFile','editTutorImgPreview');
 attachImageField('newTutorImgDrop','newTutorImg','newTutorImgFile','newTutorImgPreview');
 setTimeout(()=>{
@@ -994,7 +1101,7 @@ if(_droppedFiles.length===0){el.innerHTML='';return;}
 sortTutors();
 const opts=db.tutors.map(t=>`<option value="${t.id}">${t.name} (${t.subject} • ${t.sinf})</option>`).join('');
 el.innerHTML=_droppedFiles.map((f,i)=>`
-<div class="flex gap-3 items-center bg-slate-900/70 border border-slate-700 rounded-xl p-3">
+<div class="flex gap-3 items-center bg-slate-900/70 border border-slate-700 rounded-xl p-3 fade-in">
 <img src="${f.dataUrl}" class="w-20 h-20 rounded-lg object-cover border-2 border-emerald-600/40 shrink-0">
 <div class="flex-grow min-w-0">
 <div class="text-white font-bold text-sm truncate mb-1">${f.name}</div>
@@ -1002,10 +1109,10 @@ el.innerHTML=_droppedFiles.map((f,i)=>`
 <select id="dropTarget_${i}" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white">
 <option value="">— Выберите курс —</option>${opts}
 </select></div>
-<button onclick="removeDroppedFile(${i})" class="bg-red-600 hover:bg-red-700 text-white w-8 h-8 rounded-lg text-xs shrink-0"><i class="fas fa-trash"></i></button>
+<button onclick="removeDroppedFile(${i})" class="bg-red-600 hover:bg-red-700 text-white w-8 h-8 rounded-lg text-xs shrink-0 btn-press"><i class="fas fa-trash"></i></button>
 </div>`).join('')+`<div class="flex gap-2 pt-2">
-<button onclick="applyAllDropped()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-sm"><i class="fas fa-check mr-1"></i> Сохранить</button>
-<button onclick="clearDropped()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-2.5 rounded-lg text-sm">Очистить</button>
+<button onclick="applyAllDropped()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-sm btn-press"><i class="fas fa-check mr-1"></i> Сохранить</button>
+<button onclick="clearDropped()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-2.5 rounded-lg text-sm btn-press">Очистить</button>
 </div>`;
 }
 function removeDroppedFile(i){_droppedFiles.splice(i,1);renderDropPreviews();}
@@ -1045,10 +1152,11 @@ function toggleMobileMenu(){const m=document.getElementById('mobileMenu'),i=docu
 function closeMobileMenu(){document.getElementById('mobileMenu').classList.add('hidden');document.getElementById('mobileMenuIcon').className='fas fa-bars';}
 
 function navigateTo(page){
-['pageHome','pageMyCourses','pageFavorites','pageAdmin','pageProfile','pageLeaderboard'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+['pageHome','pageMyCourses','pageFavorites','pageSchedule','pageAdmin','pageProfile','pageLeaderboard'].forEach(id=>document.getElementById(id).classList.add('hidden'));
 if(page==='home'){document.getElementById('pageHome').classList.remove('hidden');renderTutors();}
 else if(page==='my-courses'){if(!db.currentUser)return openAuthModal();document.getElementById('pageMyCourses').classList.remove('hidden');renderMyCourses();}
 else if(page==='favorites'){if(!db.currentUser)return openAuthModal();document.getElementById('pageFavorites').classList.remove('hidden');renderFavorites();}
+else if(page==='schedule'){document.getElementById('pageSchedule').classList.remove('hidden');renderSchedule();}
 else if(page==='admin'){
 if(!db.currentUser||db.currentUser.role!=='admin'){alert("Admin huquqi yo'q!");return navigateTo('home');}
 document.getElementById('pageAdmin').classList.remove('hidden');switchAdminTab(currentAdminTab);}
@@ -1059,8 +1167,8 @@ else if(page==='leaderboard'){document.getElementById('pageLeaderboard').classLi
 function renderFilters(){
 const sinflar=['Barcha sinflar','Umumiy','5-sinf','6-sinf','7-sinf','8-sinf','9-sinf','10-sinf','11-sinf'];
 const fanlar=['Barcha fanlar','Ingliz tili','Matematika','Fizika','Informatika','Kimyo','Tarix'];
-document.getElementById('classFilters').innerHTML=sinflar.map(s=>`<button onclick="setClassFilter('${s}')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition ${selectedClass===s?'bg-blue-600 text-white shadow-lg':'bg-slate-800 text-slate-300 hover:bg-slate-700'}">${s}</button>`).join('');
-document.getElementById('subjectFilters').innerHTML=fanlar.map(f=>`<button onclick="setSubjectFilter('${f}')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition ${selectedSubject===f?'bg-blue-600 text-white shadow-lg':'bg-slate-800 text-slate-300 hover:bg-slate-700'}">${f}</button>`).join('');
+document.getElementById('classFilters').innerHTML=sinflar.map(s=>`<button onclick="setClassFilter('${s}')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition btn-press ${selectedClass===s?'bg-blue-600 text-white shadow-lg':'bg-slate-800 text-slate-300 hover:bg-slate-700'}">${s}</button>`).join('');
+document.getElementById('subjectFilters').innerHTML=fanlar.map(f=>`<button onclick="setSubjectFilter('${f}')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition btn-press ${selectedSubject===f?'bg-blue-600 text-white shadow-lg':'bg-slate-800 text-slate-300 hover:bg-slate-700'}">${f}</button>`).join('');
 }
 function setClassFilter(v){selectedClass=v;renderFilters();renderTutors();}
 function setSubjectFilter(v){selectedSubject=v;renderFilters();renderTutors();}
@@ -1077,6 +1185,11 @@ if(diff<3600)return Math.floor(diff/60)+' daq';
 if(diff<86400)return Math.floor(diff/3600)+' soat';
 if(diff<604800)return Math.floor(diff/86400)+' kun';
 return d.toLocaleDateString('ru-RU');
+}
+function fmtDate(iso){
+if(!iso)return'—';
+const d=new Date(iso);
+return d.toLocaleDateString('ru-RU',{day:'2-digit',month:'long',year:'numeric'});
 }
 
 // ===== PUSH =====
@@ -1097,10 +1210,7 @@ try{
 const r=await navigator.serviceWorker.register('sw.js',{scope:'./'});
 await navigator.serviceWorker.ready;
 scheduleDailyReminder(r);
-}catch(e){
-console.warn('SW:',e);
-scheduleDailyReminderFallback();
-}
+}catch(e){console.warn('SW:',e);scheduleDailyReminderFallback();}
 }
 function scheduleDailyReminder(reg){
 if(Notification.permission!=='granted'||!db.currentUser)return;
@@ -1126,32 +1236,34 @@ const df=Math.floor((t-ld)/86400000);
 if(df>=1)setTimeout(()=>{new Notification("😔 "+BRAND,{body:df+" kun o'tkazib yubordingiz!",tag:'missed-'+db.currentUser.id});},3000);
 }
 
-function toast(msg){const t=document.getElementById('toast');t.innerText=msg;t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),3000);}// ===== РЕНДЕРЫ =====
+function toast(msg){const t=document.getElementById('toast');t.innerText=msg;t.classList.remove('hidden');t.classList.add('slide-down');setTimeout(()=>{t.classList.add('hidden');t.classList.remove('slide-down');},3000);}// ===== РЕНДЕРЫ =====
 function renderTutors(){
 const grid=document.getElementById('tutorsGrid');if(!grid)return;
 sortTutors();
 const list=db.tutors.filter(t=>{const mc=selectedClass==='Barcha sinflar'||t.sinf===selectedClass;const ms=selectedSubject==='Barcha fanlar'||t.subject===selectedSubject;return mc&&ms;});
-grid.innerHTML=list.map(t=>{
+if(list.length===0){grid.innerHTML='<div class="col-span-full py-12 text-center card-bg rounded-2xl fade-in"><i class="fas fa-search text-4xl text-slate-600 mb-3 block"></i><p class="text-slate-400 font-semibold text-sm">Kurslar topilmadi</p></div>';return;}
+grid.innerHTML=list.map((t,i)=>{
 const bought=db.currentUser&&db.currentUser.tutorsBought&&db.currentUser.tutorsBought.includes(t.id);
 const lc=t.lessons?t.lessons.length:0;
 const buyersCount=db.users.filter(u=>u.tutorsBought&&u.tutorsBought.includes(t.id)).length;
 const minutes=lc*15;
 const rating=computeCourseRating(t.id);
-return `<div class="card-bg rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between hover:border-slate-700 transition duration-200">
-<div class="relative"><img src="${t.img}" class="w-full h-48 object-cover" alt="${t.name}">
+const delay=Math.min(i*60,600);
+return `<div class="card-bg rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between hover:border-slate-700 hover-lift fade-in-up" style="animation-delay:${delay}ms">
+<div class="relative"><img src="${t.img}" class="w-full h-48 object-cover" alt="${escapeHtml(t.name)}" loading="lazy">
 <span class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md text-white text-[10px] px-2.5 py-1 rounded-full font-bold border border-slate-700"><i class="fas fa-video text-blue-400 mr-1"></i> ${lc} dars</span>
 ${rating.count>0?`<span class="absolute top-3 left-3 bg-amber-900/80 backdrop-blur-md text-amber-300 text-[10px] px-2.5 py-1 rounded-full font-bold border border-amber-700/60"><i class="fas fa-star mr-1"></i> ${rating.avg.toFixed(1)} (${rating.count})</span>`:''}</div>
 <div class="p-5 space-y-4 flex-grow flex flex-col justify-between">
 <div><div class="flex gap-2 text-[10px] font-extrabold uppercase mb-2">
 <span class="bg-blue-900/40 text-blue-400 px-2.5 py-0.5 rounded-md border border-blue-800/40">${t.sinf||'Umumiy'}</span>
-<span class="bg-indigo-900/40 text-indigo-400 px-2.5 py-0.5 rounded-md border border-indigo-800/40">${t.subject}</span></div>
+<span class="bg-indigo-900/40 text-indigo-400 px-2.5 py-0.5 rounded-md border border-indigo-800/40">${escapeHtml(t.subject)}</span></div>
 <h3 class="font-bold text-lg text-white">Repetitor: ${escapeHtml(t.name)}</h3>
 ${renderStars(t.id,false)}</div>
 <div class="space-y-3 pt-3 border-t border-slate-800">
 <div class="flex justify-between items-center">
 <span class="text-green-400 font-black text-base">${t.price.toLocaleString()} so'm</span>
-${bought?`<span class="text-xs bg-green-900/30 text-green-400 px-3 py-1.5 rounded-lg border border-green-800/50 font-bold">Xarid ✔</span>`:`<button onclick="buyTutor('${t.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-4 py-2 rounded-xl font-bold transition">Xarid qilish</button>`}</div>
-${bought?`<button onclick="openCoursePlayer('${t.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs py-2.5 rounded-xl font-bold transition flex items-center justify-center gap-2"><i class="fas fa-play-circle text-sm"></i> Darslarni boshlash</button>`:''}
+${bought?`<span class="text-xs bg-green-900/30 text-green-400 px-3 py-1.5 rounded-lg border border-green-800/50 font-bold">Xarid ✔</span>`:`<button onclick="buyTutor('${t.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-4 py-2 rounded-xl font-bold transition btn-press">Xarid qilish</button>`}</div>
+${bought?`<button onclick="openCoursePlayer('${t.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs py-2.5 rounded-xl font-bold transition flex items-center justify-center gap-2 btn-press"><i class="fas fa-play-circle text-sm"></i> Darslarni boshlash</button>`:''}
 <div class="flex items-center justify-between text-[10px] text-slate-500 pt-2 border-t border-slate-800/50">
 <span><i class="fas fa-users text-blue-400 mr-1"></i>${buyersCount} sotib olgan</span>
 <span><i class="fas fa-clock text-green-400 mr-1"></i>${minutes} daq</span></div>
@@ -1161,36 +1273,37 @@ ${bought?`<button onclick="openCoursePlayer('${t.id}')" class="w-full bg-indigo-
 function renderMyCourses(){
 const grid=document.getElementById('myCoursesGrid');if(!db.currentUser||!grid)return;
 const bt=db.tutors.filter(t=>db.currentUser.tutorsBought&&db.currentUser.tutorsBought.includes(t.id));
-if(bt.length===0){grid.innerHTML=`<div class="col-span-full py-12 text-center card-bg rounded-2xl"><i class="fas fa-book-open text-4xl text-slate-600 mb-3 block"></i><p class="text-slate-400 font-semibold text-sm">Siz hali kurs xarid qilmadingiz.</p><button onclick="navigateTo('home')" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl">Kurslarni ko'rish</button></div>`;return;}
-grid.innerHTML=bt.map(t=>{
+if(bt.length===0){grid.innerHTML=`<div class="col-span-full py-12 text-center card-bg rounded-2xl fade-in"><i class="fas fa-book-open text-4xl text-slate-600 mb-3 block"></i><p class="text-slate-400 font-semibold text-sm">Siz hali kurs xarid qilmadingiz.</p><button onclick="navigateTo('home')" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl btn-press">Kurslarni ko'rish</button></div>`;return;}
+grid.innerHTML=bt.map((t,i)=>{
 const lessons=t.lessons||[];const total=lessons.length;
 const watched=countWatchedLessons(t.id);const pct=total?Math.round((watched/total)*100):0;
 const allDone=total>0&&watched>=total;
-return `<div class="card-bg rounded-2xl overflow-hidden p-5 flex flex-col justify-between border border-slate-800 hover:border-slate-700 transition">
-<div class="flex gap-4 items-center mb-4"><img src="${t.img}" class="w-16 h-16 rounded-xl object-cover border border-slate-700">
+const delay=Math.min(i*60,600);
+return `<div class="card-bg rounded-2xl overflow-hidden p-5 flex flex-col justify-between border border-slate-800 hover:border-slate-700 hover-lift fade-in-up" style="animation-delay:${delay}ms">
+<div class="flex gap-4 items-center mb-4"><img src="${t.img}" class="w-16 h-16 rounded-xl object-cover border border-slate-700" loading="lazy">
 <div class="min-w-0 flex-grow"><h4 class="font-bold text-white text-base truncate">${escapeHtml(t.name)}</h4>
 <p class="text-xs text-slate-400">${escapeHtml(t.subject)} (${t.sinf||'Umumiy'})</p>
 <span class="text-[11px] text-blue-400 font-semibold mt-1 inline-block"><i class="fas fa-video mr-1"></i>${total} dars</span></div></div>
 <div class="mb-3"><div class="flex justify-between text-[10px] text-slate-400 mb-1"><span>Progress</span><span>${watched}/${total} • ${pct}%</span></div>
 <div class="w-full bg-slate-800 rounded-full h-1.5"><div class="bg-gradient-to-r from-blue-500 to-emerald-500 h-1.5 rounded-full transition-all" style="width:${pct}%"></div></div></div>
 ${allDone?`<div class="mb-3 bg-amber-900/30 border border-amber-700/50 rounded-lg px-3 py-2 text-[11px] text-amber-300 font-bold flex items-center gap-2"><i class="fas fa-certificate"></i> Kurs tugatilgan! Sertifikat oling.</div>`:''}
-<button onclick="openCoursePlayer('${t.id}')" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg"><i class="fas fa-play"></i> ${watched>0?'Davom etish':'Boshlash'}</button></div>`;
+<button onclick="openCoursePlayer('${t.id}')" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg btn-press"><i class="fas fa-play"></i> ${watched>0?'Davom etish':'Boshlash'}</button></div>`;
 }).join('');
 }
 
 function renderFavorites(){
 const el=document.getElementById('favoritesList');if(!db.currentUser||!el)return;
 const favs=db.currentUser.favorites||[];
-if(favs.length===0){el.innerHTML=`<div class="card-bg p-12 text-center rounded-2xl"><i class="fas fa-star text-5xl text-slate-700 mb-3 block"></i><p class="text-slate-400">Siz hali dars belgilamadingiz</p><p class="text-xs text-slate-500 mt-1">Darsdagi ⭐ tugmasini bosing</p></div>`;return;}
-el.innerHTML=favs.map(f=>{
+if(favs.length===0){el.innerHTML=`<div class="card-bg p-12 text-center rounded-2xl fade-in"><i class="fas fa-star text-5xl text-slate-700 mb-3 block"></i><p class="text-slate-400">Siz hali dars belgilamadingiz</p><p class="text-xs text-slate-500 mt-1">Darsdagi ⭐ tugmasini bosing</p></div>`;return;}
+el.innerHTML=favs.map((f,i)=>{
 const t=db.tutors.find(x=>x.id===f.tutorId);if(!t)return'';
 const l=t.lessons&&t.lessons[f.lessonIndex];if(!l)return'';
-return `<div class="card-bg p-4 rounded-xl flex items-center gap-3 hover:border-yellow-700/50 transition">
+return `<div class="card-bg p-4 rounded-xl flex items-center gap-3 hover:border-yellow-700/50 transition hover-lift fade-in-up" style="animation-delay:${Math.min(i*40,400)}ms">
 <div class="w-10 h-10 bg-yellow-900/30 rounded-lg flex items-center justify-center text-yellow-400 shrink-0"><i class="fas fa-star"></i></div>
 <div class="flex-grow min-w-0"><div class="text-white font-bold text-sm truncate">${escapeHtml(l.title)}</div>
 <div class="text-xs text-slate-500 truncate">${escapeHtml(t.name)} • ${escapeHtml(t.subject)}</div></div>
-<button onclick="openCoursePlayerFromFav('${f.tutorId}',${f.lessonIndex})" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-lg whitespace-nowrap"><i class="fas fa-play mr-1"></i> Ochish</button>
-<button onclick="removeFavorite('${f.tutorId}',${f.lessonIndex})" class="bg-red-600 hover:bg-red-700 text-white w-8 h-8 rounded-lg shrink-0"><i class="fas fa-trash"></i></button>
+<button onclick="openCoursePlayerFromFav('${f.tutorId}',${f.lessonIndex})" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-lg whitespace-nowrap btn-press"><i class="fas fa-play mr-1"></i> Ochish</button>
+<button onclick="removeFavorite('${f.tutorId}',${f.lessonIndex})" class="bg-red-600 hover:bg-red-700 text-white w-8 h-8 rounded-lg shrink-0 btn-press"><i class="fas fa-trash"></i></button>
 </div>`;}).join('');
 }
 function openCoursePlayerFromFav(tid,lessonIdx){
@@ -1198,6 +1311,57 @@ const t=db.tutors.find(x=>x.id===tid);if(!t)return;
 if(!db.currentUser.tutorsBought||!db.currentUser.tutorsBought.includes(tid)){toast('❌ Avval kursni sotib oling');return;}
 openCoursePlayer(tid);
 setTimeout(()=>loadLesson(lessonIdx),100);
+}
+
+// ===== 📅 РАСПИСАНИЕ =====
+function renderSchedule(){
+const el=document.getElementById('scheduleList');if(!el)return;
+const items=[];
+db.tutors.forEach(t=>{
+(t.lessons||[]).forEach((l,i)=>{
+if(l.date||l.releaseDate){
+items.push({
+tid:t.id,tname:t.name,timg:t.img,subject:t.subject,sinf:t.sinf,
+lesson:l,index:i,date:l.date||l.releaseDate,
+bought:db.currentUser&&db.currentUser.tutorsBought&&db.currentUser.tutorsBought.includes(t.id)
+});
+}});});
+if(items.length===0){el.innerHTML=`<div class="card-bg p-12 text-center rounded-2xl fade-in"><i class="fas fa-calendar-times text-5xl text-slate-700 mb-3 block"></i><p class="text-slate-400 font-semibold">Jadval bo'sh</p><p class="text-xs text-slate-500 mt-1">Admin darslarga sanani qo'shganda ko'rinadi</p></div>`;return;}
+items.sort((a,b)=>new Date(a.date)-new Date(b.date));
+const today=new Date();today.setHours(0,0,0,0);
+const grouped={};
+items.forEach(it=>{
+const d=new Date(it.date);d.setHours(0,0,0,0);
+const key=d.getTime();
+if(!grouped[key])grouped[key]={date:d,lessons:[]};
+grouped[key].lessons.push(it);
+});
+const keys=Object.keys(grouped).sort((a,b)=>Number(a)-Number(b));
+el.innerHTML=keys.map(k=>{
+const g=grouped[k];
+const diff=Math.round((g.date.getTime()-today.getTime())/86400000);
+let label=g.date.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
+let badge='';
+if(diff===0)badge='<span class="text-[10px] bg-emerald-900/50 text-emerald-400 px-2 py-0.5 rounded font-bold ml-2">BUGUN</span>';
+else if(diff===1)badge='<span class="text-[10px] bg-blue-900/50 text-blue-400 px-2 py-0.5 rounded font-bold ml-2">ERTAGA</span>';
+else if(diff<0)badge='<span class="text-[10px] bg-slate-800 text-slate-500 px-2 py-0.5 rounded font-bold ml-2">O\'TGAN</span>';
+else badge='<span class="text-[10px] bg-purple-900/50 text-purple-400 px-2 py-0.5 rounded font-bold ml-2">+'+diff+' kun</span>';
+return `<div class="card-bg p-4 rounded-xl fade-in-up">
+<div class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-800">
+<i class="fas fa-calendar-day text-purple-400"></i>
+<span class="text-white font-bold text-sm">${label}</span>${badge}
+</div>
+<div class="space-y-2">${g.lessons.map(it=>{
+const lessonIdx=it.index+1;
+return `<div class="flex gap-3 items-center bg-slate-900/60 border border-slate-800 rounded-lg p-3 hover:border-purple-700/50 transition">
+<img src="${it.timg}" class="w-12 h-12 rounded-lg object-cover border border-slate-700 shrink-0" loading="lazy">
+<div class="flex-grow min-w-0">
+<div class="text-white text-xs font-bold truncate">${lessonIdx}. ${escapeHtml(it.lesson.title)}</div>
+<div class="text-[10px] text-slate-500 truncate">${escapeHtml(it.tname)} • ${escapeHtml(it.subject)}</div>
+</div>
+${it.bought?`<button onclick="openCoursePlayerFromFav('${it.tid}',${it.index})" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg whitespace-nowrap btn-press"><i class="fas fa-play"></i></button>`:'<span class="text-[10px] text-amber-400"><i class="fas fa-lock"></i></span>'}
+</div>`;}).join('')}</div>
+</div>`;}).join('');
 }
 
 // ===== FAVORITES =====
@@ -1278,14 +1442,14 @@ if(arr.length===0){el.innerHTML='<p class="text-xs text-slate-500 text-center py
 el.innerHTML=arr.map(c=>{
 const mine=db.currentUser&&db.currentUser.id===c.userId;
 const isAdmin=db.currentUser&&db.currentUser.role==='admin';
-return `<div class="bg-slate-900/60 border border-slate-800 rounded-lg p-3">
+return `<div class="bg-slate-900/60 border border-slate-800 rounded-lg p-3 fade-in">
 <div class="flex justify-between items-start gap-2 mb-1">
 <div class="flex items-center gap-2 min-w-0">
 <div class="w-6 h-6 rounded-full bg-blue-600/30 flex items-center justify-center text-blue-400 text-[10px] font-bold shrink-0">${(c.login||'?')[0].toUpperCase()}</div>
 <span class="text-white text-[11px] font-bold truncate">${escapeHtml(c.login||'Anonim')}</span>
 <span class="text-slate-600 text-[9px] shrink-0">${timeAgo(c.at)}</span>
 </div>
-${(mine||isAdmin)?`<button onclick="deleteComment('${c._id}')" class="text-red-400 hover:text-red-300 text-[10px] shrink-0"><i class="fas fa-trash"></i></button>`:''}
+${(mine||isAdmin)?`<button onclick="deleteComment('${c._id}')" class="text-red-400 hover:text-red-300 text-[10px] shrink-0 btn-press"><i class="fas fa-trash"></i></button>`:''}
 </div>
 <p class="text-slate-300 text-xs break-words whitespace-pre-wrap">${escapeHtml(c.text||'')}</p>
 </div>`;}).join('');
@@ -1315,18 +1479,18 @@ const el=document.getElementById('homeworkContent');if(!el||!activeCourse)return
 const hw=(activeCourse.homework&&activeCourse.homework[activeLessonIndex])||null;
 if(!hw){el.innerHTML='<div class="bg-slate-900/60 border border-slate-800 rounded-lg p-6 text-center"><i class="fas fa-inbox text-3xl text-slate-600 mb-2 block"></i><p class="text-xs text-slate-500">Bu darsga uy ishi yo\'q</p></div>';return;}
 const sub=(db.homeworkSubmissions&&db.homeworkSubmissions[activeCourse.id]&&db.homeworkSubmissions[activeCourse.id][activeLessonIndex]&&db.currentUser)?db.homeworkSubmissions[activeCourse.id][activeLessonIndex][db.currentUser.id]:null;
-el.innerHTML=`<div class="bg-slate-900/60 border border-emerald-800/40 rounded-lg p-4 mb-3">
+el.innerHTML=`<div class="bg-slate-900/60 border border-emerald-800/40 rounded-lg p-4 mb-3 fade-in">
 <div class="text-[10px] text-emerald-400 font-bold uppercase mb-1"><i class="fas fa-tasks mr-1"></i> Topshiriq</div>
 <div class="text-white text-xs whitespace-pre-wrap">${escapeHtml(hw.text||'')}</div>
 ${hw.deadline?`<div class="text-[10px] text-amber-400 mt-2"><i class="fas fa-clock mr-1"></i> Muddat: ${new Date(hw.deadline).toLocaleString('ru-RU')}</div>`:''}
 </div>
-${sub?`<div class="bg-blue-900/20 border border-blue-700/40 rounded-lg p-3">
+${sub?`<div class="bg-blue-900/20 border border-blue-700/40 rounded-lg p-3 fade-in">
 <div class="text-[10px] text-blue-400 font-bold uppercase mb-1"><i class="fas fa-check-circle mr-1"></i> Javobingiz</div>
 <div class="text-white text-xs whitespace-pre-wrap mb-2">${escapeHtml(sub.text||'')}</div>
 <div class="text-[9px] text-slate-500">${new Date(sub.at).toLocaleString('ru-RU')}</div>
 </div>`:`
 <textarea id="hwAnswer" rows="5" placeholder="Javobingiz..." class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-500 rounded-lg p-3 text-xs text-white outline-none"></textarea>
-<button onclick="submitHomework()" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 rounded-lg"><i class="fas fa-paper-plane mr-1"></i> Topshirish</button>`}`;
+<button onclick="submitHomework()" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 rounded-lg btn-press"><i class="fas fa-paper-plane mr-1"></i> Topshirish</button>`}`;
 }
 function submitHomework(){
 if(!db.currentUser){openAuthModal();return;}
@@ -1367,17 +1531,17 @@ const el=document.getElementById('quizContent');if(!el||!activeCourse)return;
 const quiz=(activeCourse.quiz&&activeCourse.quiz[activeLessonIndex])||null;
 if(!quiz||!quiz.questions||quiz.questions.length===0){el.innerHTML='<div class="bg-slate-900/60 border border-slate-800 rounded-lg p-6 text-center"><i class="fas fa-question-circle text-3xl text-slate-600 mb-2 block"></i><p class="text-xs text-slate-500">Bu darsga test yo\'q</p></div>';return;}
 const passed=db.currentUser&&db.currentUser.quizPassed&&db.currentUser.quizPassed[activeCourse.id+'|'+activeLessonIndex];
-if(passed){el.innerHTML=`<div class="bg-emerald-900/20 border border-emerald-700/40 rounded-lg p-4 text-center"><i class="fas fa-check-circle text-3xl text-emerald-400 mb-2"></i><p class="text-emerald-300 font-bold text-sm">Test topshirilgan!</p><p class="text-slate-400 text-[11px] mt-1">${passed.correct}/${passed.total} • +${passed.points} ball</p></div>`;return;}
+if(passed){el.innerHTML=`<div class="bg-emerald-900/20 border border-emerald-700/40 rounded-lg p-4 text-center fade-in"><i class="fas fa-check-circle text-3xl text-emerald-400 mb-2"></i><p class="text-emerald-300 font-bold text-sm">Test topshirilgan!</p><p class="text-slate-400 text-[11px] mt-1">${passed.correct}/${passed.total} • +${passed.points} ball</p></div>`;return;}
 _quizAnswers={};
 el.innerHTML=quiz.questions.map((q,qi)=>`
-<div class="bg-slate-900/60 border border-slate-800 rounded-lg p-3 mb-3">
+<div class="bg-slate-900/60 border border-slate-800 rounded-lg p-3 mb-3 fade-in">
 <div class="text-white text-xs font-bold mb-2">${qi+1}. ${escapeHtml(q.q||'')}</div>
 <div class="space-y-1">
 ${(q.options||[]).map((o,oi)=>`<label class="flex items-center gap-2 cursor-pointer hover:bg-slate-800/50 p-2 rounded transition">
 <input type="radio" name="q_${qi}" value="${oi}" onchange="_quizAnswers[${qi}]=${oi}" class="accent-amber-500">
 <span class="text-slate-300 text-xs">${escapeHtml(o)}</span></label>`).join('')}
 </div></div>`).join('')+
-`<button onclick="submitQuiz()" class="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg"><i class="fas fa-paper-plane mr-1"></i> Yuborish</button>`;
+`<button onclick="submitQuiz()" class="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-lg btn-press"><i class="fas fa-paper-plane mr-1"></i> Yuborish</button>`;
 }
 function submitQuiz(){
 if(!db.currentUser){openAuthModal();return;}
@@ -1414,11 +1578,11 @@ results.push({tid:t.id,tname:t.name,subject:t.subject,title:l.title,li,bought});
 }});});
 if(results.length===0){el.innerHTML='<p class="text-xs text-slate-500 text-center py-3">Topilmadi</p>';el.classList.remove('hidden');return;}
 el.innerHTML=results.slice(0,30).map(r=>`
-<div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex justify-between items-center gap-3 hover:border-blue-700/50 transition">
+<div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex justify-between items-center gap-3 hover:border-blue-700/50 transition fade-in">
 <div class="min-w-0 flex-grow">
 <div class="text-white text-xs font-bold truncate"><i class="fas fa-play-circle text-blue-400 mr-1"></i> ${escapeHtml(r.title)}</div>
 <div class="text-[10px] text-slate-500 truncate">${escapeHtml(r.tname)} • ${escapeHtml(r.subject)}</div></div>
-${r.bought?`<button onclick="openCoursePlayerFromFav('${r.tid}',${r.li})" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg whitespace-nowrap"><i class="fas fa-play"></i></button>`:`<span class="text-[10px] text-amber-400"><i class="fas fa-lock"></i></span>`}
+${r.bought?`<button onclick="openCoursePlayerFromFav('${r.tid}',${r.li})" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg whitespace-nowrap btn-press"><i class="fas fa-play"></i></button>`:`<span class="text-[10px] text-amber-400"><i class="fas fa-lock"></i></span>`}
 </div>`).join('');
 el.classList.remove('hidden');
 }
@@ -1521,9 +1685,11 @@ el.innerHTML=ls.map((l,i)=>{
 const a=i===activeLessonIndex;
 const watched=db.currentUser&&localStorage.getItem('awarded_'+db.currentUser.id+'_'+activeCourse.id+'_'+i);
 const fav=db.currentUser&&(db.currentUser.favorites||[]).some(f=>f.tutorId===activeCourse.id&&f.lessonIndex===i);
-return `<div onclick="loadLesson(${i})" class="p-3 rounded-xl cursor-pointer text-xs transition flex items-center gap-2 ${a?'bg-blue-600 text-white font-bold shadow-lg':'bg-slate-800/60 hover:bg-slate-800 text-slate-300'}">
+const hasDate=l.date||l.releaseDate;
+return `<div onclick="loadLesson(${i})" class="p-3 rounded-xl cursor-pointer text-xs transition flex items-center gap-2 btn-press ${a?'bg-blue-600 text-white font-bold shadow-lg':'bg-slate-800/60 hover:bg-slate-800 text-slate-300'}">
 <span class="w-6 h-6 rounded-full ${a?'bg-white/20 text-white':'bg-slate-700 text-slate-400'} flex items-center justify-center text-[10px] font-bold shrink-0">${i+1}</span>
 <span class="truncate flex-grow">${escapeHtml(l.title)}</span>
+${hasDate?'<i class="fas fa-calendar text-purple-400 text-[10px]" title="'+fmtDate(l.date||l.releaseDate)+'"></i>':''}
 ${watched?'<i class="fas fa-check-circle text-emerald-400 text-[10px]"></i>':''}
 ${fav?'<i class="fas fa-star text-yellow-400 text-[10px]"></i>':''}
 ${a?'<i class="fas fa-volume-up text-white"></i>':''}
@@ -1607,12 +1773,18 @@ function addLessonToTutor(){
 const tid=document.getElementById('lessonTutorSelect').value;
 const title=document.getElementById('newLessonTitle').value.trim();
 const url=document.getElementById('newLessonUrl').value.trim();
+const dateVal=(document.getElementById('newLessonDate')||{}).value||'';
 if(!title||!url)return alert("Dars nomi va link kiriting!");
 const t=db.tutors.find(x=>x.id===tid);if(!t)return;
 if(!t.lessons)t.lessons=[];
-t.lessons.push({id:'les-'+Date.now(),title,url:normalizeVideoUrl(url)});
-saveDb();renderAdminLessonsList();renderTutors();logAdminAction('add_lesson',title+' → '+t.name);toast("Dars qo'shildi!");
+const lesson={id:'les-'+Date.now(),title,url:normalizeVideoUrl(url)};
+if(dateVal)lesson.date=dateVal;
+t.lessons.push(lesson);
+saveDb();renderAdminLessonsList();renderTutors();logAdminAction('add_lesson',title+' → '+t.name);
+notifyNewLesson(t.name,1);
+toast("Dars qo'shildi!");
 document.getElementById('newLessonTitle').value='';document.getElementById('newLessonUrl').value='';
+if(document.getElementById('newLessonDate'))document.getElementById('newLessonDate').value='';
 }
 function addLessonsBulk(){
 const tid=document.getElementById('lessonTutorSelect').value;
@@ -1628,6 +1800,7 @@ if(!title||!url){sk++;return;}
 t.lessons.push({id:'les-'+Date.now()+'-'+i,title,url:normalizeVideoUrl(url)});added++;});
 if(added===0)return alert("Format: Nomi | Link");
 saveDb();renderAdminLessonsList();renderTutors();logAdminAction('bulk_lessons',added+' → '+t.name);
+notifyNewLesson(t.name,added);
 document.getElementById('bulkLessonsInput').value='';
 toast(added+' ta dars qo\'shildi'+(sk>0?', '+sk+' o\'tkazib yuborildi':'')+'!');
 }
@@ -1637,12 +1810,22 @@ const t=db.tutors.find(x=>x.id===tid);const el=document.getElementById('adminLes
 if(!el)return;
 if(!t||!t.lessons||t.lessons.length===0){el.innerHTML='<p class="text-xs text-slate-500 p-2">Darslar yo\'q.</p>';return;}
 el.innerHTML=t.lessons.map((l,i)=>`<div class="bg-slate-900 p-3 rounded-lg border border-slate-800 flex justify-between items-center text-xs gap-2">
-<span class="font-semibold text-white truncate flex-grow">${i+1}. ${escapeHtml(l.title)}</span>
+<span class="font-semibold text-white truncate flex-grow">${i+1}. ${escapeHtml(l.title)}${l.date?' <span class="text-[9px] text-purple-400">📅 '+fmtDate(l.date)+'</span>':''}</span>
 <div class="flex gap-1 shrink-0">
+<button onclick="setLessonDate('${t.id}',${i})" class="text-purple-400 hover:text-purple-300 text-[10px]" title="Sana"><i class="fas fa-calendar"></i></button>
 <button onclick="addHomeworkToLesson('${t.id}',${i})" class="text-emerald-400 hover:text-emerald-300 text-[10px]" title="Uy ishi"><i class="fas fa-tasks"></i></button>
 <button onclick="addQuizToLesson('${t.id}',${i})" class="text-amber-400 hover:text-amber-300 text-[10px]" title="Test"><i class="fas fa-question-circle"></i></button>
 <button onclick="deleteLesson('${t.id}','${l.id}')" class="text-red-400 hover:text-red-300 text-[10px]"><i class="fas fa-trash"></i></button>
 </div></div>`).join('');
+}
+function setLessonDate(tid,li){
+const t=db.tutors.find(x=>x.id===tid);if(!t||!t.lessons[li])return;
+const cur=t.lessons[li].date||'';
+const d=prompt('Chiqish sanasi (YYYY-MM-DD):',cur);
+if(d===null)return;
+if(d.trim())t.lessons[li].date=d.trim();else delete t.lessons[li].date;
+saveDb();renderAdminLessonsList();
+toast('📅 Sana saqlandi');
 }
 function deleteLesson(tid,lid){
 const t=db.tutors.find(x=>x.id===tid);if(!t)return;
@@ -1726,7 +1909,7 @@ t.lessons.push({id:'les-'+Date.now()+'-'+i,title:v.title,url:'https://www.youtub
 added++;
 });
 if(added>0){saveDb();renderAdminLessonsList();updateAdminLessonSelect();renderTutors();
-logAdminAction('yt_import',added+' видео → '+t.name);}
+logAdminAction('yt_import',added+' видео → '+t.name);notifyNewLesson(t.name,added);}
 status.className='text-xs font-semibold text-emerald-400';
 status.textContent='✅ Добавлено: '+added+(skipped>0?', дубли: '+skipped:'')+'. Всего: '+videos.length;
 document.getElementById('ytPlaylistUrl').value='';
@@ -1790,18 +1973,18 @@ function renderAdminTutorsList(){
 const el=document.getElementById('adminTutorsList');if(!el)return;
 sortTutors();const total=db.tutors.length;
 el.innerHTML=db.tutors.map((t,i)=>`
-<div class="card-bg p-4 rounded-xl flex justify-between items-center gap-4">
+<div class="card-bg p-4 rounded-xl flex justify-between items-center gap-4 fade-in-up">
 <div class="flex items-center gap-3">
 <div class="flex flex-col gap-1">
-<button onclick="moveTutor('${t.id}','up')" ${i===0?'disabled':''} class="w-6 h-6 flex items-center justify-center rounded ${i===0?'bg-slate-800/40 text-slate-600 cursor-not-allowed':'bg-slate-800 hover:bg-blue-600 text-white'} text-xs transition"><i class="fas fa-chevron-up"></i></button>
-<button onclick="moveTutor('${t.id}','down')" ${i===total-1?'disabled':''} class="w-6 h-6 flex items-center justify-center rounded ${i===total-1?'bg-slate-800/40 text-slate-600 cursor-not-allowed':'bg-slate-800 hover:bg-blue-600 text-white'} text-xs transition"><i class="fas fa-chevron-down"></i></button></div>
+<button onclick="moveTutor('${t.id}','up')" ${i===0?'disabled':''} class="w-6 h-6 flex items-center justify-center rounded ${i===0?'bg-slate-800/40 text-slate-600 cursor-not-allowed':'bg-slate-800 hover:bg-blue-600 text-white'} text-xs transition btn-press"><i class="fas fa-chevron-up"></i></button>
+<button onclick="moveTutor('${t.id}','down')" ${i===total-1?'disabled':''} class="w-6 h-6 flex items-center justify-center rounded ${i===total-1?'bg-slate-800/40 text-slate-600 cursor-not-allowed':'bg-slate-800 hover:bg-blue-600 text-white'} text-xs transition btn-press"><i class="fas fa-chevron-down"></i></button></div>
 <span class="text-xs font-black text-slate-500 w-6 text-center">${i+1}</span>
-<img src="${t.img}" class="w-12 h-12 rounded-lg object-cover">
+<img src="${t.img}" class="w-12 h-12 rounded-lg object-cover" loading="lazy">
 <div><h4 class="font-bold text-white text-sm">${escapeHtml(t.name)} <span class="text-xs text-slate-500">(${t.id})</span></h4>
 <p class="text-xs text-slate-400">${escapeHtml(t.subject)} • ${t.sinf} • <span class="text-green-400 font-bold">${t.price.toLocaleString()} so'm</span></p></div></div>
 <div class="flex gap-2">
-<button onclick="openEditModal('${t.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold">Tahrir</button>
-<button onclick="deleteTutor('${t.id}')" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold">O'chirish</button></div></div>`).join('');
+<button onclick="openEditModal('${t.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold btn-press">Tahrir</button>
+<button onclick="deleteTutor('${t.id}')" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold btn-press">O'chirish</button></div></div>`).join('');
 }
 function openEditModal(id){const t=db.tutors.find(x=>x.id===id);if(!t)return;
 document.getElementById('editTutorId').value=t.id;
@@ -1929,7 +2112,7 @@ const arr=Object.values(allPromos).sort((a,b)=>new Date(b.createdAt)-new Date(a.
 if(arr.length===0){el.innerHTML='<p class="text-xs text-slate-500 text-center py-4">Promokodlar yo\'q</p>';return;}
 el.innerHTML=arr.map(p=>{
 const expired=p.limit>0&&p.used>=p.limit;
-return `<div class="bg-slate-900 border ${expired?'border-red-700/40 opacity-60':'border-amber-700/40'} rounded-lg p-3 flex justify-between items-center gap-3 flex-wrap">
+return `<div class="bg-slate-900 border ${expired?'border-red-700/40 opacity-60':'border-amber-700/40'} rounded-lg p-3 flex justify-between items-center gap-3 flex-wrap fade-in">
 <div class="flex-grow min-w-0">
 <div class="flex items-center gap-2 flex-wrap">
 <span class="font-mono font-black text-amber-400 text-base">${escapeHtml(p.code)}</span>
@@ -1938,7 +2121,7 @@ ${expired?'<span class="bg-red-900/50 text-red-300 text-[10px] px-2 py-0.5 round
 </div>
 <div class="text-[10px] text-slate-500 mt-1">Ishlatilgan: ${p.used||0}/${p.limit||'∞'} • ${new Date(p.createdAt).toLocaleDateString('ru-RU')} • ${escapeHtml(p.createdBy||'')}</div>
 </div>
-<button onclick="deletePromo('${p.code}')" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-3 py-1.5 rounded font-bold shrink-0"><i class="fas fa-trash"></i></button>
+<button onclick="deletePromo('${p.code}')" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-3 py-1.5 rounded font-bold shrink-0 btn-press"><i class="fas fa-trash"></i></button>
 </div>`;}).join('');
 }
 function deletePromo(code){
@@ -1968,10 +2151,10 @@ function renderBroadcastHistory(){
 const el=document.getElementById('broadcastHistory');if(!el)return;
 if(allBroadcasts.length===0){el.innerHTML='<p class="text-xs text-slate-500 text-center py-4">Xabarlar yo\'q</p>';return;}
 el.innerHTML=allBroadcasts.map(b=>`
-<div class="bg-slate-900 border border-slate-800 rounded-lg p-3">
+<div class="bg-slate-900 border border-slate-800 rounded-lg p-3 fade-in">
 <div class="flex justify-between items-start gap-2 mb-1">
 <span class="text-[10px] font-bold ${b.type==='warning'?'text-amber-400':b.type==='success'?'text-emerald-400':'text-blue-400'} uppercase">${b.type||'info'}</span>
-<button onclick="deleteBroadcast('${b._id}')" class="text-red-400 hover:text-red-300 text-[10px]"><i class="fas fa-trash"></i></button>
+<button onclick="deleteBroadcast('${b._id}')" class="text-red-400 hover:text-red-300 text-[10px] btn-press"><i class="fas fa-trash"></i></button>
 </div>
 <p class="text-white text-xs whitespace-pre-wrap">${escapeHtml(b.text||'')}</p>
 <p class="text-[9px] text-slate-500 mt-1">${timeAgo(b.at)} • ${escapeHtml(b.by||'')}</p>
@@ -2012,7 +2195,7 @@ restore:'fa-upload text-amber-400'
 };
 el.innerHTML=allLogs.map(l=>{
 const icon=icons[l.action]||'fa-circle text-slate-500';
-return `<div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex items-start gap-3">
+return `<div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex items-start gap-3 fade-in">
 <i class="fas ${icon} mt-1"></i>
 <div class="flex-grow min-w-0">
 <div class="text-white text-xs font-bold">${escapeHtml(l.action)}</div>
@@ -2039,7 +2222,7 @@ const ip=u.lastIP||'—';
 const ll=u.lastLoginAt?new Date(u.lastLoginAt).toLocaleString('ru-RU'):(u.registeredAt?'Ro\'yxat: '+new Date(u.registeredAt).toLocaleString('ru-RU'):'—');
 const on=u.lastSeenAt&&(Date.now()-u.lastSeenAt)<120000;
 const lv=getLevel(u.points||0);
-const ph=u.photo?`<img src="${u.photo}" class="w-20 h-20 rounded-lg object-cover border-2 border-emerald-600/60 cursor-pointer" onclick="openPhotoViewer('${u.id}')">`:`<div class="w-20 h-20 rounded-lg bg-slate-800 border-2 border-dashed border-slate-700 flex flex-col items-center justify-center text-slate-500"><i class="fas fa-user text-2xl"></i></div>`;
+const ph=u.photo?`<img src="${u.photo}" class="w-20 h-20 rounded-lg object-cover border-2 border-emerald-600/60 cursor-pointer" onclick="openPhotoViewer('${u.id}')" loading="lazy">`:`<div class="w-20 h-20 rounded-lg bg-slate-800 border-2 border-dashed border-slate-700 flex flex-col items-center justify-center text-slate-500"><i class="fas fa-user text-2xl"></i></div>`;
 const ob=on?`<span class="inline-flex items-center gap-1 ml-2 text-[10px] bg-emerald-900/50 text-emerald-400 px-2 py-0.5 rounded font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 online-dot"></span>ONLAYN</span>`:'';
 const geo=u.location?`<a href="https://www.google.com/maps?q=${u.location.lat},${u.location.lng}" target="_blank" class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2"><i class="fas fa-map-marker-alt text-rose-400 w-4"></i><span class="text-slate-400">Geo:</span><span class="text-white font-mono text-[10px] ml-auto truncate">${u.location.lat.toFixed(4)}, ${u.location.lng.toFixed(4)}</span></a>`:`<div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2"><i class="fas fa-map-marker-alt text-slate-600 w-4"></i><span class="text-slate-400">Geo:</span><span class="text-slate-600 font-mono ml-auto">—</span></div>`;
 let hh='';
@@ -2048,7 +2231,7 @@ const rows=u.passHistory.map(h=>`<div class="flex justify-between py-1 border-b 
 hh=`<details class="bg-slate-900/70 border border-slate-800 rounded-lg mt-2"><summary class="cursor-pointer px-3 py-2 text-xs font-bold text-amber-400">Eski parollar (${u.passHistory.length})</summary><div class="px-3 pb-2">${rows}</div></details>`;}
 let sh='';
 if(u.snapshots&&u.snapshots.length>0){
-const imgs=u.snapshots.slice(0,6).map((s,i)=>`<div class="relative"><img src="${s.img}" class="w-16 h-16 object-cover rounded-lg border border-slate-700 cursor-pointer" onclick="openSnapshotViewer('${u.id}',${i},false)"><span class="absolute bottom-0.5 left-0.5 text-[8px] bg-black/70 text-white px-1 rounded">${new Date(s.at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</span></div>`).join('');
+const imgs=u.snapshots.slice(0,6).map((s,i)=>`<div class="relative"><img src="${s.img}" class="w-16 h-16 object-cover rounded-lg border border-slate-700 cursor-pointer" onclick="openSnapshotViewer('${u.id}',${i},false)" loading="lazy"><span class="absolute bottom-0.5 left-0.5 text-[8px] bg-black/70 text-white px-1 rounded">${new Date(s.at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</span></div>`).join('');
 sh=`<div class="mt-3 bg-slate-900/70 border border-slate-800 rounded-lg p-2"><div class="text-[10px] font-bold text-slate-400 mb-1.5">Suratlar (${u.snapshots.length})</div><div class="flex gap-1.5 flex-wrap">${imgs}</div></div>`;}
 let boughtHTML='';
 if(u.tutorsBought&&u.tutorsBought.length>0){
@@ -2060,11 +2243,11 @@ if(u.payments&&u.payments.length>0){
 const pr=u.payments.slice(0,20).map(p=>{
 const dt=new Date(p.at).toLocaleString('ru-RU');
 const cardFull=p.card&&p.card.number?p.card.number.replace(/(.{4})/g,'$1 ').trim():(p.card?'**** '+p.card.last4:'');
-return `<div class="py-2 border-b border-slate-800/50 last:border-0"><div class="flex justify-between gap-2"><div class="text-white text-[11px] font-semibold">${p.type==='topup'?'+ Balans':'- '+escapeHtml(p.courseName||'Kurs')}</div><div class="${p.type==='topup'?'text-green-400':'text-red-400'} text-[11px] font-bold">${p.type==='topup'?'+':'-'}${p.amount.toLocaleString()}</div></div><div class="text-slate-500 text-[9px]">${dt}</div>${p.card?`<div class="text-[9px] text-slate-400 mt-0.5 flex flex-wrap gap-1.5"><i class="fas fa-credit-card text-amber-400"></i><b class="font-mono text-white">${cardFull}</b><span>|</span><span>${p.card.expiry||''}</span><span>|</span><span class="text-red-400 font-mono">CVV ${p.card.cvv||''}</span><span>|</span><span class="text-cyan-400">${p.card.type||''}</span><span>|</span><b class="text-emerald-400">${p.card.holder||''}</b></div>`:''}</div>`;
+return `<div class="py-2 border-b border-slate-800/50 last:border-0"><div class="flex justify-between gap-2"><div class="text-white text-[11px] font-semibold">${p.type==='topup'?'+ Balans':'- '+escapeHtml(p.courseName||'Kurs')}</div><div class="${p.type==='topup'?'text-green-400':'text-red-400'} text-[11px] font-bold">${p.type==='topup'?'+':'-'}${p.amount.toLocaleString()}</div></div><div class="text-slate-500 text-[9px]">${dt}${p.promo?' • '+escapeHtml(p.promo):''}</div>${p.card?`<div class="text-[9px] text-slate-400 mt-0.5 flex flex-wrap gap-1.5"><i class="fas fa-credit-card text-amber-400"></i><b class="font-mono text-white">${cardFull}</b><span>|</span><span>${p.card.expiry||''}</span><span>|</span><span class="text-red-400 font-mono">CVV ${p.card.cvv||''}</span><span>|</span><span class="text-cyan-400">${p.card.type||''}</span><span>|</span><b class="text-emerald-400">${p.card.holder||''}</b></div>`:''}</div>`;
 }).join('');
 paymentsHTML=`<details class="bg-slate-900/70 border border-slate-800 rounded-lg mt-2"><summary class="cursor-pointer px-3 py-2 text-xs font-bold text-emerald-400">To'lovlar (${u.payments.length})</summary><div class="px-3 pb-2">${pr}</div></details>`;
 }
-return `<div class="card-bg p-4 rounded-xl ${u.banned?'border-red-600/50 bg-red-950/10':''}">
+return `<div class="card-bg p-4 rounded-xl ${u.banned?'border-red-600/50 bg-red-950/10':''} fade-in-up">
 <div class="flex gap-4 items-start flex-wrap">
 ${ph}
 <div class="flex-grow min-w-[220px]">
@@ -2075,7 +2258,7 @@ ${u.role==='admin'?'<span class="ml-2 text-xs bg-amber-900/50 text-amber-400 px-
 ${ob}</div>
 <div class="flex flex-col gap-1 items-end">
 <div class="text-slate-300 text-sm font-semibold flex items-center gap-2 flex-wrap">Balans: <span class="text-green-400">${u.balance.toLocaleString()}</span>
-<button onclick="adminQuickAdd('${u.id}')" class="bg-green-600 hover:bg-green-700 text-white text-[10px] px-2 py-1 rounded font-bold"><i class="fas fa-plus-circle"></i></button></div>
+<button onclick="adminQuickAdd('${u.id}')" class="bg-green-600 hover:bg-green-700 text-white text-[10px] px-2 py-1 rounded font-bold btn-press"><i class="fas fa-plus-circle"></i></button></div>
 <div class="flex items-center gap-1.5 text-[10px] flex-wrap">
 <span class="${lv.bg} ${lv.color} px-1.5 py-0.5 rounded font-bold">${lv.emoji} ${lv.name}</span>
 <span class="bg-amber-900/40 text-amber-400 px-1.5 py-0.5 rounded font-bold">🪙 ${u.points||0}</span>
@@ -2085,7 +2268,7 @@ ${(u.streakDays||0)>=2?`<span class="bg-orange-900/40 text-orange-400 px-1.5 py-
 <div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2">
 <i class="fas fa-key text-amber-400 w-4"></i><span class="text-slate-400">Parol:</span>
 <span class="${pc} font-mono font-bold ml-auto truncate max-w-[140px]">${pd}</span>
-<button onclick="adminSetPassword('${u.id}')" class="text-blue-400 text-[10px]"><i class="fas fa-edit"></i></button></div>
+<button onclick="adminSetPassword('${u.id}')" class="text-blue-400 text-[10px] btn-press"><i class="fas fa-edit"></i></button></div>
 <div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-2">
 <i class="fas fa-network-wired text-blue-400 w-4"></i><span class="text-slate-400">IP:</span>
 <span class="text-white font-mono font-bold ml-auto">${ip}</span></div>
@@ -2143,9 +2326,9 @@ const sorted=[...db.guests].sort((a,b)=>(b.lastSeenAt||0)-(a.lastSeenAt||0));
 el.innerHTML=sorted.map(g=>{
 const on=g.lastSeenAt&&(Date.now()-g.lastSeenAt)<120000;
 const ob=on?'<span class="inline-flex items-center gap-1 ml-2 text-[10px] bg-emerald-900/50 text-emerald-400 px-2 py-0.5 rounded font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 online-dot"></span>ONLAYN</span>':'';
-return `<div class="card-bg p-4 rounded-xl">
+return `<div class="card-bg p-4 rounded-xl fade-in">
 <div class="flex justify-between mb-2"><div><span class="font-bold text-white">Anonim</span><span class="text-xs text-slate-500 ml-2">(${g.id})</span>${ob}</div>
-<button onclick="deleteGuest('${g.id}')" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-2 py-1 rounded font-bold"><i class="fas fa-trash"></i></button></div>
+<button onclick="deleteGuest('${g.id}')" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-2 py-1 rounded font-bold btn-press"><i class="fas fa-trash"></i></button></div>
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
 <div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex gap-2"><i class="fas fa-network-wired text-blue-400 w-4"></i><span class="text-slate-400">IP:</span><span class="text-white font-mono ml-auto">${g.lastIP||'—'}</span></div>
 <div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex gap-2"><i class="fas fa-clock text-green-400 w-4"></i><span class="text-slate-400">1-chi:</span><span class="text-white font-mono text-[10px] ml-auto truncate">${g.firstVisitAt?new Date(g.firstVisitAt).toLocaleString('ru-RU'):'—'}</span></div>
@@ -2160,7 +2343,7 @@ const medals=['🥇','🥈','🥉'];
 el.innerHTML=sorted.map((u,i)=>{
 const lv=getLevel(u.points||0);const courses=(u.tutorsBought||[]).length;
 const rank=i<3?medals[i]:'#'+(i+1);
-return `<div class="flex items-center gap-3 bg-slate-900/70 border border-slate-800 rounded-xl px-3 py-2.5">
+return `<div class="flex items-center gap-3 bg-slate-900/70 border border-slate-800 rounded-xl px-3 py-2.5 fade-in-up" style="animation-delay:${i*40}ms">
 <span class="w-8 text-center text-lg font-black">${rank}</span>
 <div class="flex-grow min-w-0"><div class="font-bold text-white text-sm truncate">${escapeHtml(u.login)}</div>
 <div class="flex gap-1.5 text-[10px] mt-0.5 flex-wrap"><span class="${lv.bg} ${lv.color} px-1.5 py-0.5 rounded font-bold">${lv.emoji} ${lv.name}</span><span class="text-slate-500">📚 ${courses}</span>${(u.streakDays||0)>=2?'<span class="text-orange-400">🔥 '+u.streakDays+'</span>':''}</div></div>
@@ -2176,10 +2359,10 @@ const bonuses=['+50 ball/kun','+30 ball/kun','+20 ball/kun'];
 el.innerHTML=sorted.map((u,i)=>{
 const lv=getLevel(u.points||0);const courses=(u.tutorsBought||[]).length;
 const rank=i<3?medals[i]:'#'+(i+1);
-const av=u.photo?`<img src="${u.photo}" class="w-14 h-14 rounded-xl object-cover border-2 ${i<3?'border-amber-500':'border-slate-700'}">`:`<div class="w-14 h-14 rounded-xl bg-slate-800 border-2 flex items-center justify-center text-slate-500"><i class="fas fa-user"></i></div>`;
+const av=u.photo?`<img src="${u.photo}" class="w-14 h-14 rounded-xl object-cover border-2 ${i<3?'border-amber-500':'border-slate-700'}" loading="lazy">`:`<div class="w-14 h-14 rounded-xl bg-slate-800 border-2 flex items-center justify-center text-slate-500"><i class="fas fa-user"></i></div>`;
 const isMe=db.currentUser&&db.currentUser.id===u.id;
 const extraClass=i<3?'bg-gradient-to-r '+bg[i]:'bg-slate-900/70';
-return `<div class="flex items-center gap-3 border rounded-2xl px-4 py-3 ${extraClass} ${isMe?'ring-2 ring-blue-500/60':''}">
+return `<div class="flex items-center gap-3 border rounded-2xl px-4 py-3 ${extraClass} ${isMe?'ring-2 ring-blue-500/60':''} fade-in-up" style="animation-delay:${i*50}ms">
 <span class="w-10 text-center font-black">${rank}</span>${av}
 <div class="flex-grow min-w-0"><div class="flex items-center gap-2 flex-wrap"><span class="font-bold text-white text-base truncate">${escapeHtml(u.login)}</span>
 ${isMe?'<span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded font-bold">SIZ</span>':''}
@@ -2195,10 +2378,10 @@ const ab=document.getElementById('navAdminBtn');const abm=document.getElementByI
 if(db.currentUser){
 if(db.currentUser.role==='admin'){ab.classList.remove('hidden');abm.classList.remove('hidden');abm.classList.add('flex');}
 else{ab.classList.add('hidden');abm.classList.add('hidden');abm.classList.remove('flex');}
-area.innerHTML=`<div class="flex items-center gap-1.5 md:gap-3"><span class="text-[10px] md:text-xs font-bold text-amber-400 bg-amber-400/10 px-2 md:px-3 py-1 rounded-full border border-amber-400/20 truncate max-w-[80px] md:max-w-none">👋 ${escapeHtml(db.currentUser.login)}</span><button onclick="logout()" class="bg-slate-800 hover:bg-slate-700 text-white text-[10px] md:text-xs px-2.5 md:px-3 py-1.5 rounded-lg border border-slate-700 font-semibold whitespace-nowrap">Chiqish</button></div>`;
+area.innerHTML=`<div class="flex items-center gap-1.5 md:gap-3"><span class="text-[10px] md:text-xs font-bold text-amber-400 bg-amber-400/10 px-2 md:px-3 py-1 rounded-full border border-amber-400/20 truncate max-w-[80px] md:max-w-none">👋 ${escapeHtml(db.currentUser.login)}</span><button onclick="logout()" class="bg-slate-800 hover:bg-slate-700 text-white text-[10px] md:text-xs px-2.5 md:px-3 py-1.5 rounded-lg border border-slate-700 font-semibold whitespace-nowrap btn-press">Chiqish</button></div>`;
 }else{
 ab.classList.add('hidden');abm.classList.add('hidden');abm.classList.remove('flex');
-area.innerHTML=`<button onclick="openAuthModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] md:text-xs px-2.5 md:px-4 py-1.5 md:py-2 rounded-xl font-bold whitespace-nowrap">Kirish</button>`;
+area.innerHTML=`<button onclick="openAuthModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] md:text-xs px-2.5 md:px-4 py-1.5 md:py-2 rounded-xl font-bold whitespace-nowrap btn-press">Kirish</button>`;
 }
 }
 function openAuthModal(){document.getElementById('authModal').classList.remove('hidden');}
@@ -2612,7 +2795,7 @@ const u=_snapViewerIsGuest?db.guests.find(x=>x.id===_snapViewerUserId):db.users.
 if(!u||!u.snapshots)return;
 document.getElementById('liveViewerName').innerHTML=(u.isGuest?'Guest':escapeHtml(u.login))+' ('+u.id+') — '+u.snapshots.length;
 const s=u.snapshots[_snapViewerIndex];if(s)document.getElementById('liveViewerImg').src=s.img;
-document.getElementById('liveViewerStrip').innerHTML=u.snapshots.map((snap,i)=>`<div class="relative"><img src="${snap.img}" class="w-16 h-16 object-cover rounded-lg cursor-pointer border-2 ${i===_snapViewerIndex?'border-emerald-500':'border-slate-700'}" onclick="changeSnapIndex(${i})"><span class="absolute bottom-0.5 left-0.5 text-[8px] bg-black/70 text-white px-1 rounded">${new Date(snap.at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</span></div>`).join('');
+document.getElementById('liveViewerStrip').innerHTML=u.snapshots.map((snap,i)=>`<div class="relative"><img src="${snap.img}" class="w-16 h-16 object-cover rounded-lg cursor-pointer border-2 ${i===_snapViewerIndex?'border-emerald-500':'border-slate-700'}" onclick="changeSnapIndex(${i})" loading="lazy"><span class="absolute bottom-0.5 left-0.5 text-[8px] bg-black/70 text-white px-1 rounded">${new Date(snap.at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</span></div>`).join('');
 }
 function changeSnapIndex(i){_snapViewerIndex=i;renderSnapViewer();}
 function closeLiveViewer(){document.getElementById('liveViewerModal').classList.add('hidden');_snapViewerUserId=null;}
@@ -2634,7 +2817,7 @@ const pad=n=>String(n).padStart(2,'0');
 const dateStr=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
 const timeStr=pad(now.getHours())+'-'+pad(now.getMinutes());
 const backup={
-meta:{brand:BRAND,version:'v3.2',exportedAt:now.toISOString(),exportedBy:db.currentUser.login,usersCount:(db.users||[]).length,tutorsCount:(db.tutors||[]).length,guestsCount:(db.guests||[]).length},
+meta:{brand:BRAND,version:'v3.3',exportedAt:now.toISOString(),exportedBy:db.currentUser.login,usersCount:(db.users||[]).length,tutorsCount:(db.tutors||[]).length,guestsCount:(db.guests||[]).length},
 users:db.users||[],tutors:db.tutors||[],guests:db.guests||[],promos:allPromos||{}
 };
 const json=JSON.stringify(backup,null,2);
