@@ -1,4 +1,4 @@
-<!-- ZukkoTalim v2.5 (full card data in admin) -->
+<!-- ZukkoTalim v2.6 (Firebase Auth + full card data) -->
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -24,10 +24,13 @@ body{background:#0d1117;color:#c9d1d9;font-family:system-ui,-apple-system,sans-s
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script>
 const firebaseConfig={apiKey:"AIzaSyDJIICaketn7Khrnl38_K-XYuC3bfaOYD8",authDomain:"edu-platform-64953.firebaseapp.com",databaseURL:"https://edu-platform-64953-default-rtdb.firebaseio.com",projectId:"edu-platform-64953",storageBucket:"edu-platform-64953.firebasestorage.app",messagingSenderId:"986479470743",appId:"1:986479470743:web:5e29214cc9595ae95c21d2"};
 firebase.initializeApp(firebaseConfig);
 const database=firebase.database();
+const auth=firebase.auth();
+auth.signInAnonymously().catch(e=>console.warn('Auth:',e));
 </script>
 </head>
 <body class="min-h-screen flex flex-col justify-between">
