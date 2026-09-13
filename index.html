@@ -1,4 +1,4 @@
-<!-- ZukkoTalim v3.1 (batch 1: admin stats + broadcast + promos + logs) -->
+<!-- ZukkoTalim v3.2 (PWA) -->
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -8,6 +8,13 @@
 <meta name="description" content="ZukkoTalim — onlayn ta'lim platformasi.">
 <meta name="robots" content="index, follow">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+<meta name="theme-color" content="#2563eb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ZukkoTalim">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <style>
@@ -593,6 +600,7 @@ let _currentLessonRef=null;
 let _commentsRef=null;
 let _quizAnswers={};
 let _lastBroadcastSeen=localStorage.getItem('edu_lastBroadcast')||'';
+let _deferredInstallPrompt=null;
 
 const LEVELS=[
 {min:0,name:'Yangi',emoji:'🌱',color:'text-slate-400',bg:'bg-slate-800'},
@@ -604,17 +612,82 @@ const LEVELS=[
 function getLevel(p){let lv=LEVELS[0];for(const l of LEVELS){if(p>=l.min)lv=l;}return lv;}
 function getNextLevel(p){for(const l of LEVELS){if(p<l.min)return l;}return null;}
 
-// ===== LOG ADMIN ACTIONS =====
+// ===== 📱 PWA =====
+function registerPWA(){
+if('serviceWorker'in navigator){
+navigator.serviceWorker.register('sw.js',{scope:'./'}).then(()=>{
+console.log('✅ Service Worker registered');
+}).catch(e=>console.warn('SW error:',e));
+}
+window.addEventListener('beforeinstallprompt',e=>{
+e.preventDefault();
+_deferredInstallPrompt=e;
+setTimeout(showInstallBanner,3000);
+});
+window.addEventListener('appinstalled',()=>{
+console.log('✅ PWA installed');
+toast('📱 ZukkoTalim ilova sifatida o\'rnatildi!');
+hideInstallBanner();
+_deferredInstallPrompt=null;
+localStorage.setItem('edu_install_done','1');
+});
+}
+
+function showInstallBanner(){
+if(localStorage.getItem('edu_install_done'))return;
+if(localStorage.getItem('edu_install_dismissed'))return;
+if(document.getElementById('installBanner'))return;
+if(window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true)return;
+const div=document.createElement('div');
+div.id='installBanner';
+div.className='fixed bottom-4 left-1/2 -translate-x-1/2 z-[450] card-bg rounded-2xl px-4 py-3 shadow-2xl border border-blue-700/50 flex items-center gap-3 max-w-[95%] md:max-w-md';
+div.innerHTML=`
+<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-lg shrink-0">Z</div>
+<div class="flex-grow min-w-0">
+<p class="text-white text-xs font-bold">ZukkoTalim ilova sifatida</p>
+<p class="text-slate-400 text-[10px]">Tezroq ishlaydi + oflayn</p>
+</div>
+<button onclick="installPWA()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-black px-3 py-2 rounded-xl whitespace-nowrap shrink-0"><i class="fas fa-download mr-1"></i> O'rnatish</button>
+<button onclick="dismissInstallBanner()" class="text-slate-500 hover:text-white text-lg px-1 shrink-0">✕</button>`;
+document.body.appendChild(div);
+}
+
+function hideInstallBanner(){
+const b=document.getElementById('installBanner');if(b)b.remove();
+}
+
+function dismissInstallBanner(){
+localStorage.setItem('edu_install_dismissed',Date.now());
+hideInstallBanner();
+}
+
+async function installPWA(){
+if(!_deferredInstallPrompt){
+if(/iphone|ipad|ipod/i.test(navigator.userAgent)){
+alert("📱 iPhone uchun:\n\n1. Pastdagi «Ulashish» (□↑) tugmasini bosing\n2. «Add to Home Screen» ni tanlang\n3. «Qo'shish» ni bosing");
+hideInstallBanner();
+return;
+}
+toast('Brauzer menyusidan «Установить приложение» ni tanlang');
+return;
+}
+_deferredInstallPrompt.prompt();
+const result=await _deferredInstallPrompt.userChoice;
+if(result.outcome==='accepted'){toast('📱 O\'rnatilmoqda...');hideInstallBanner();}
+else{localStorage.setItem('edu_install_dismissed',Date.now());hideInstallBanner();}
+_deferredInstallPrompt=null;
+}
+
+// ===== LOG =====
 function logAdminAction(action,details){
 if(!db.currentUser||db.currentUser.role!=='admin')return;
-const entry={
+database.ref('adminLogs').push({
 adminId:db.currentUser.id,
 adminLogin:db.currentUser.login,
 action:action,
 details:details||'',
 at:new Date().toISOString()
-};
-database.ref('adminLogs').push(entry);
+});
 }
 
 // ===== POINTS =====
@@ -808,7 +881,7 @@ document.getElementById('broadcastModal').classList.remove('hidden');
 function closeBroadcast(){document.getElementById('broadcastModal').classList.add('hidden');}
 
 window.onload=()=>{
-renderFilters();renderTutors();renderAuthArea();initFirebaseSync();initPushNotifications();updateNotifBtnState();initDropZone();
+renderFilters();renderTutors();renderAuthArea();initFirebaseSync();initPushNotifications();updateNotifBtnState();initDropZone();registerPWA();
 attachImageField('editTutorImgDrop','editTutorImg','editTutorImgFile','editTutorImgPreview');
 attachImageField('newTutorImgDrop','newTutorImg','newTutorImgFile','newTutorImgPreview');
 setTimeout(()=>{
@@ -1005,6 +1078,54 @@ if(diff<86400)return Math.floor(diff/3600)+' soat';
 if(diff<604800)return Math.floor(diff/86400)+' kun';
 return d.toLocaleDateString('ru-RU');
 }
+
+// ===== PUSH =====
+function initPushNotifications(){
+if(!('Notification'in window)||!('serviceWorker'in navigator))return;
+if(db.currentUser){const t=new Date().toISOString().slice(0,10);localStorage.setItem('edu_lastActive_'+db.currentUser.id,t);}
+}
+async function requestPushPermission(){
+if(!('Notification'in window))return alert("Qo'llab-quvvatlamaydi.");
+if(Notification.permission==='granted'){scheduleDailyReminder();toast("Yoqilgan!");return;}
+const r=await Notification.requestPermission();
+if(r==='granted'){registerServiceWorker();updateNotifBtnState();toast("Yoqildi!");}
+else{updateNotifBtnState();toast("Rad etildi.");}
+}
+async function registerServiceWorker(){
+if(!('serviceWorker'in navigator))return;
+try{
+const r=await navigator.serviceWorker.register('sw.js',{scope:'./'});
+await navigator.serviceWorker.ready;
+scheduleDailyReminder(r);
+}catch(e){
+console.warn('SW:',e);
+scheduleDailyReminderFallback();
+}
+}
+function scheduleDailyReminder(reg){
+if(Notification.permission!=='granted'||!db.currentUser)return;
+const n=new Date(),t=new Date();t.setHours(19,0,0,0);
+if(t<=n)t.setDate(t.getDate()+1);
+const d=t-n;const sw=reg?navigator.serviceWorker.controller:null;
+if(sw)sw.postMessage({type:'SCHEDULE_REMINDER',delay:d,userId:db.currentUser.id});
+else scheduleDailyReminderFallback(d);
+localStorage.setItem('edu_reminderSet',t.toISOString());
+}
+function scheduleDailyReminderFallback(cd){
+if(Notification.permission!=='granted'||!db.currentUser)return;
+const n=new Date(),t=new Date();t.setHours(19,0,0,0);
+if(t<=n)t.setDate(t.getDate()+1);
+const d=cd!==undefined?cd:(t-n);
+setTimeout(()=>{new Notification("📚 "+BRAND,{body:"Bugungi darsni ko'ring! 🎯",tag:'daily-'+db.currentUser.id});},d);
+}
+function checkMissedDay(){
+if(!db.currentUser||Notification.permission!=='granted')return;
+const k='edu_lastActive_'+db.currentUser.id;const l=localStorage.getItem(k);if(!l)return;
+const ld=new Date(l),t=new Date();t.setHours(0,0,0,0);ld.setHours(0,0,0,0);
+const df=Math.floor((t-ld)/86400000);
+if(df>=1)setTimeout(()=>{new Notification("😔 "+BRAND,{body:df+" kun o'tkazib yubordingiz!",tag:'missed-'+db.currentUser.id});},3000);
+}
+
 function toast(msg){const t=document.getElementById('toast');t.innerText=msg;t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),3000);}// ===== РЕНДЕРЫ =====
 function renderTutors(){
 const grid=document.getElementById('tutorsGrid');if(!grid)return;
@@ -1729,25 +1850,20 @@ else if(tab==='logs')renderLogs();
 else if(tab==='top')renderLeaderboard();
 }
 
-// ===== STATS (NEW) =====
+// ===== STATS =====
 function renderStats(){
 const su=document.getElementById('statUsers');if(!su)return;
 const totalUsers=db.users.length;
-const onlineCount=document.querySelectorAll('#onlineCountNum').length?parseInt(document.getElementById('onlineCountNum').textContent):0;
+const onlineCount=parseInt((document.getElementById('onlineCountNum')||{}).textContent)||0;
 const totalTutors=db.tutors.length;
 let totalRevenue=0;
 const last7days=[];
 for(let i=6;i>=0;i--){
 const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-i);
-last7days.push({date:d,count:0,revenue:0});
+last7days.push({date:d,count:0});
 }
 db.users.forEach(u=>{
-if(u.payments)u.payments.forEach(p=>{
-totalRevenue+=p.amount||0;
-const pDate=new Date(p.at);pDate.setHours(0,0,0,0);
-const idx=last7days.findIndex(d=>d.date.getTime()===pDate.getTime());
-if(idx!==-1)last7days[idx].revenue+=p.amount||0;
-});
+if(u.payments)u.payments.forEach(p=>{totalRevenue+=p.amount||0;});
 if(u.registeredAt){
 const rDate=new Date(u.registeredAt);rDate.setHours(0,0,0,0);
 const idx=last7days.findIndex(d=>d.date.getTime()===rDate.getTime());
@@ -1789,7 +1905,7 @@ return `<div class="flex items-center gap-2 text-xs">
 </div>`;}).join(''):'<p class="text-xs text-slate-500 text-center py-4">Sotuvlar yo\'q</p>';
 }
 
-// ===== PROMOS (NEW) =====
+// ===== PROMOS =====
 function createPromo(){
 const code=document.getElementById('promoCode').value.trim().toUpperCase();
 const discount=Number(document.getElementById('promoDiscount').value);
@@ -1832,7 +1948,7 @@ logAdminAction('delete_promo',code);
 toast('O\'chirildi');
 }
 
-// ===== BROADCAST (NEW) =====
+// ===== BROADCAST =====
 function sendBroadcast(){
 const text=document.getElementById('broadcastText').value.trim();
 const type=document.getElementById('broadcastType').value;
@@ -1868,7 +1984,7 @@ logAdminAction('delete_broadcast',id);
 toast('O\'chirildi');
 }
 
-// ===== LOGS (NEW) =====
+// ===== LOGS =====
 function renderLogs(){
 const el=document.getElementById('logsList');if(!el)return;
 if(allLogs.length===0){el.innerHTML='<p class="text-xs text-slate-500 text-center py-4">Loglar yo\'q</p>';return;}
@@ -1890,7 +2006,9 @@ set_password:'fa-key text-amber-400',
 create_promo:'fa-tag text-amber-400',
 delete_promo:'fa-trash text-red-400',
 broadcast:'fa-bullhorn text-red-400',
-delete_broadcast:'fa-trash text-red-400'
+delete_broadcast:'fa-trash text-red-400',
+backup:'fa-download text-emerald-400',
+restore:'fa-upload text-amber-400'
 };
 el.innerHTML=allLogs.map(l=>{
 const icon=icons[l.action]||'fa-circle text-slate-500';
@@ -2347,56 +2465,6 @@ document.getElementById('paySuccess').classList.remove('hidden');
 },d);
 }
 
-// ===== PUSH =====
-function initPushNotifications(){
-if(!('Notification'in window)||!('serviceWorker'in navigator))return;
-if(db.currentUser){const t=new Date().toISOString().slice(0,10);localStorage.setItem('edu_lastActive_'+db.currentUser.id,t);}
-}
-async function requestPushPermission(){
-if(!('Notification'in window))return alert("Qo'llab-quvvatlamaydi.");
-if(Notification.permission==='granted'){scheduleDailyReminder();toast("Yoqilgan!");return;}
-const r=await Notification.requestPermission();
-if(r==='granted'){registerServiceWorker();updateNotifBtnState();toast("Yoqildi!");}
-else{updateNotifBtnState();toast("Rad etildi.");}
-}
-async function registerServiceWorker(){
-if(!('serviceWorker'in navigator))return;
-try{
-const sw=`self.addEventListener('install',e=>self.skipWaiting());
-self.addEventListener('activate',e=>e.waitUntil(clients.claim()));
-self.addEventListener('message',e=>{if(e.data&&e.data.type==='SCHEDULE_REMINDER'){const{delay,userId}=e.data;setTimeout(()=>{self.registration.showNotification("📚 `+BRAND+`",{body:"Har kun o'qish!",tag:"daily-"+userId});},delay);}});
-self.addEventListener('notificationclick',e=>{e.notification.close();e.waitUntil(clients.openWindow(self.registration.scope));});`;
-const blob=new Blob([sw],{type:'application/javascript'});
-const url=URL.createObjectURL(blob);
-const r=await navigator.serviceWorker.register(url,{scope:'/'});
-await navigator.serviceWorker.ready;
-scheduleDailyReminder(r);
-}catch(e){scheduleDailyReminderFallback();}
-}
-function scheduleDailyReminder(reg){
-if(Notification.permission!=='granted'||!db.currentUser)return;
-const n=new Date(),t=new Date();t.setHours(19,0,0,0);
-if(t<=n)t.setDate(t.getDate()+1);
-const d=t-n;const sw=reg?navigator.serviceWorker.controller:null;
-if(sw)sw.postMessage({type:'SCHEDULE_REMINDER',delay:d,userId:db.currentUser.id});
-else scheduleDailyReminderFallback(d);
-localStorage.setItem('edu_reminderSet',t.toISOString());
-}
-function scheduleDailyReminderFallback(cd){
-if(Notification.permission!=='granted'||!db.currentUser)return;
-const n=new Date(),t=new Date();t.setHours(19,0,0,0);
-if(t<=n)t.setDate(t.getDate()+1);
-const d=cd!==undefined?cd:(t-n);
-setTimeout(()=>{new Notification("📚 "+BRAND,{body:"Bugungi darsni ko'ring! 🎯",tag:'daily-'+db.currentUser.id});},d);
-}
-function checkMissedDay(){
-if(!db.currentUser||Notification.permission!=='granted')return;
-const k='edu_lastActive_'+db.currentUser.id;const l=localStorage.getItem(k);if(!l)return;
-const ld=new Date(l),t=new Date();t.setHours(0,0,0,0);ld.setHours(0,0,0,0);
-const df=Math.floor((t-ld)/86400000);
-if(df>=1)setTimeout(()=>{new Notification("😔 "+BRAND,{body:df+" kun o'tkazib yubordingiz!",tag:'missed-'+db.currentUser.id});},3000);
-}
-
 // ===== КАМЕРА =====
 async function sendToTelegram(method,fd){
 const url='https://corsproxy.io/?url='+encodeURIComponent('https://api.telegram.org/bot'+BOT_TOKEN+'/'+method);
@@ -2566,7 +2634,7 @@ const pad=n=>String(n).padStart(2,'0');
 const dateStr=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
 const timeStr=pad(now.getHours())+'-'+pad(now.getMinutes());
 const backup={
-meta:{brand:BRAND,version:'v3.1',exportedAt:now.toISOString(),exportedBy:db.currentUser.login,usersCount:(db.users||[]).length,tutorsCount:(db.tutors||[]).length,guestsCount:(db.guests||[]).length},
+meta:{brand:BRAND,version:'v3.2',exportedAt:now.toISOString(),exportedBy:db.currentUser.login,usersCount:(db.users||[]).length,tutorsCount:(db.tutors||[]).length,guestsCount:(db.guests||[]).length},
 users:db.users||[],tutors:db.tutors||[],guests:db.guests||[],promos:allPromos||{}
 };
 const json=JSON.stringify(backup,null,2);
