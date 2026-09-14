@@ -2603,25 +2603,49 @@ if(!db.currentUser){openAuthModal();return;}
 let t=db.tutors.find(function(x){return x.id===tid;});
 if(!t)return;
 if(db.currentUser.tutorsBought&&db.currentUser.tutorsBought.includes(tid)){toast('Allaqachon xarid qilingan');return;}
-_payTutorObj=t;
-_paySelectedMethod=null;
 let price=t.price;
 let promoCode=prompt('Promokod (ixtiyoriy):','');
-_payDiscount=0;_payPromo=null;
+let discount=0,promo=null;
 if(promoCode&&promoCode.trim()){
 let pc=allPromos[promoCode.trim().toUpperCase()];
 if(pc){
 if(pc.limit>0&&pc.used>=pc.limit){toast('Promokod tugagan');}
-else{_payDiscount=pc.discount;_payPromo=pc;toast('Skidka: -'+pc.discount+'%');}
+else{discount=pc.discount;promo=pc;toast('Skidka: -'+pc.discount+'%');}
 }
 }
-_payAmount=Math.round(price*(1-_payDiscount/100));
-document.getElementById('payAmount').textContent=_payAmount.toLocaleString()+' so\'m';
-document.getElementById('payCourseName').textContent=t.name+(t.subject?' - '+t.subject:'')+(_payDiscount>0?' (-'+_payDiscount+'%)':'');
-renderPaymentMethods();
-document.getElementById('payForm').innerHTML='';
-document.getElementById('paySubmitBtn').disabled=true;
-document.getElementById('paymentModal').classList.remove('hidden');
+let amount=Math.round(price*(1-discount/100));
+let balance=db.currentUser.balance||0;
+if(balance<amount){
+toast('Balansda mablag\' yetarli emas. Balans: '+balance.toLocaleString()+' so\'m');
+if(confirm('Balans yetarli emas ('+balance.toLocaleString()+' so\'m). Balansni to\'ldirmoqchimisiz?'))showTopUp();
+return;
+}
+if(!confirm(t.name+(t.subject?' - '+t.subject:'')+'\n\nNarxi: '+amount.toLocaleString()+' so\'m'+(discount>0?' (-'+discount+'%)':'')+'\n\nBalansdan yechib olinsinmi?'))return;
+completeTutorPurchase(t,amount,discount,promo);
+}
+function completeTutorPurchase(t,amount,discount,promo){
+let u=db.currentUser;
+u.balance=(u.balance||0)-amount;
+if(!u.tutorsBought)u.tutorsBought=[];
+if(!u.tutorsBought.includes(t.id))u.tutorsBought.push(t.id);
+let payment={amount:-amount,type:'buy',method:'balance',methodName:'Balans',courseName:t.name,courseId:t.id,promo:promo?promo.code:null,discount:discount,txId:'TXN-'+Date.now()+'-'+Math.random().toString(36).slice(2,8).toUpperCase(),status:'success',at:new Date().toISOString()};
+if(!u.payments)u.payments=[];
+u.payments.unshift(payment);
+if(promo){
+promo.used=(promo.used||0)+1;
+if(firebaseMode==='firebase')database.ref('promos/'+promo.code+'/used').set(promo.used);
+}
+let idx=db.users.findIndex(function(x){return x.id===u.id;});
+if(idx!==-1)db.users[idx]=u;
+db.currentUser=u;
+localStorage.setItem('db_currentUser',JSON.stringify(u));
+saveUserToDb(u);
+awardPoints(50,'Kurs: '+t.name);
+toast(t.name+' xarid qilindi!');
+fireConfetti();
+renderTutors();
+if(!document.getElementById('pageProfile').classList.contains('hidden'))renderProfile();
+if(!document.getElementById('pageMyCourses').classList.contains('hidden'))renderMyCourses();
 }
 function closePaymentModal(){
 document.getElementById('paymentModal').classList.add('hidden');
@@ -2738,26 +2762,8 @@ return sum%10===0;
 function finishPayment(details){
 let u=db.currentUser;
 if(!u){toast('Xato');return;}
-let payment={amount:0,type:'',method:_paySelectedMethod.id,methodName:_paySelectedMethod.name,details:details,txId:'TXN-'+Date.now()+'-'+Math.random().toString(36).slice(2,8).toUpperCase(),status:'success',at:new Date().toISOString()};
-if(_payTutorObj){
-u.balance=(u.balance||0)-_payAmount;
-payment.amount=-_payAmount;
-payment.type='buy';
-payment.courseName=_payTutorObj.name;
-payment.courseId=_payTutorObj.id;
-payment.promo=_payPromo?_payPromo.code:null;
-payment.discount=_payDiscount;
-if(!u.tutorsBought)u.tutorsBought=[];
-if(!u.tutorsBought.includes(_payTutorObj.id))u.tutorsBought.push(_payTutorObj.id);
-if(_payPromo){
-_payPromo.used=(_payPromo.used||0)+1;
-if(firebaseMode==='firebase')database.ref('promos/'+_payPromo.code+'/used').set(_payPromo.used);
-}
-}else{
+let payment={amount:_payAmount,type:'topup',method:_paySelectedMethod.id,methodName:_paySelectedMethod.name,details:details,txId:'TXN-'+Date.now()+'-'+Math.random().toString(36).slice(2,8).toUpperCase(),status:'success',at:new Date().toISOString()};
 u.balance=(u.balance||0)+_payAmount;
-payment.amount=_payAmount;
-payment.type='topup';
-}
 if(!u.payments)u.payments=[];
 u.payments.unshift(payment);
 let _pidx=db.users.findIndex(function(x){return x.id===u.id;});
@@ -2765,11 +2771,9 @@ if(_pidx!==-1)db.users[_pidx]=u;
 db.currentUser=u;
 localStorage.setItem('db_currentUser',JSON.stringify(u));
 saveUserToDb(u);
-if(_payTutorObj)awardPoints(50,'Kurs: '+_payTutorObj.name);
 document.getElementById('payProcessing').classList.add('hidden');
 document.getElementById('paySuccess').classList.remove('hidden');
-let txt=_payTutorObj?(_payTutorObj.name+' xarid qilindi!'):('Balans to\'ldirildi: '+_payAmount.toLocaleString()+' so\'m');
-document.getElementById('paySuccessText').textContent=txt;
+document.getElementById('paySuccessText').textContent='Balans to\'ldirildi: '+_payAmount.toLocaleString()+' so\'m';
 document.getElementById('paySuccessReceipt').textContent='TXN: '+payment.txId;
 fireConfetti();
 }
