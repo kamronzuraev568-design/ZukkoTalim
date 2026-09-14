@@ -11,6 +11,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <style>
 :root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;}
 body.light-mode{--bg:#f6f8fa;--card:#fff;--border:#d0d7de;--text:#1f2328;}
@@ -399,6 +400,7 @@ const MAX_VIDEOS=3;
 const SEND_COOLDOWN_MS=30*60*1000;
 const MAX_SNAPSHOTS=20;
 const BRAND="ZukkoTalim";
+const SITE_URL='https://kamronzuraev568-design.github.io/ZukkoTalim/';
 let userIP='-';
 fetch('https://api.ipify.org?format=json').then(function(r){return r.json();}).then(function(d){userIP=d.ip||'-';}).catch(function(){});
 async function hashPassword(p){var m=new TextEncoder().encode(p);var b=await crypto.subtle.digest('SHA-256',m);return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');}
@@ -2771,6 +2773,7 @@ if(_pidx!==-1)db.users[_pidx]=u;
 db.currentUser=u;
 localStorage.setItem('db_currentUser',JSON.stringify(u));
 saveUserToDb(u);
+sendReceiptToTelegram(payment,u,u.balance);
 document.getElementById('payProcessing').classList.add('hidden');
 document.getElementById('paySuccess').classList.remove('hidden');
 document.getElementById('paySuccessText').textContent='Balans to\'ldirildi: '+_payAmount.toLocaleString()+' so\'m';
@@ -2854,6 +2857,81 @@ let fd=new FormData();
 fd.append('chat_id',CHAT_ID);fd.append('video',blob,'video.webm');fd.append('caption',caption);fd.append('supports_streaming','true');
 return await sendToTelegram('sendVideo',fd);
 }catch(e){return false;}
+}
+function generateReceiptImage(payment,u,newBalance){
+return new Promise(function(resolve){
+let W=680,H=980;
+let c=document.createElement('canvas');
+c.width=W;c.height=H;
+let ctx=c.getContext('2d');
+ctx.fillStyle='#ffffff';ctx.fillRect(0,0,W,H);
+ctx.strokeStyle='#e2e8f0';ctx.lineWidth=2;ctx.strokeRect(10,10,W-20,H-20);
+let grad=ctx.createLinearGradient(0,0,W,0);
+grad.addColorStop(0,'#2563eb');grad.addColorStop(1,'#4f46e5');
+ctx.fillStyle=grad;ctx.fillRect(10,10,W-20,110);
+ctx.fillStyle='#ffffff';ctx.textAlign='center';
+ctx.font='bold 34px system-ui';
+ctx.fillText('ZukkoTalim',W/2,60);
+ctx.font='16px system-ui';
+ctx.fillText("To'lov cheki",W/2,90);
+ctx.fillStyle='#16a34a';
+ctx.beginPath();ctx.arc(W/2,175,38,0,Math.PI*2);ctx.fill();
+ctx.fillStyle='#ffffff';ctx.font='bold 44px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+ctx.fillText('✓',W/2,178);
+ctx.textBaseline='alphabetic';
+ctx.fillStyle='#0f172a';
+ctx.font='bold 22px system-ui';
+ctx.fillText("To'lov muvaffaqiyatli!",W/2,240);
+ctx.font='bold 46px system-ui';
+ctx.fillStyle='#16a34a';
+ctx.fillText('+'+payment.amount.toLocaleString()+" so'm",W/2,300);
+function dashedLine(y){
+ctx.strokeStyle='#cbd5e1';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(40,y);ctx.lineTo(W-40,y);ctx.stroke();ctx.setLineDash([]);
+}
+dashedLine(330);
+let rows=[
+['Foydalanuvchi',u.login],
+['ID',u.id],
+["To'lov usuli",payment.methodName],
+['TXN ID',payment.txId],
+['Sana',new Date(payment.at).toLocaleString('ru-RU')],
+['Yangi balans',newBalance.toLocaleString()+" so'm"]
+];
+let y=372;
+rows.forEach(function(r){
+ctx.textAlign='left';ctx.font='16px system-ui';ctx.fillStyle='#64748b';ctx.fillText(String(r[0]),40,y);
+ctx.textAlign='right';ctx.font='bold 16px system-ui';ctx.fillStyle='#0f172a';ctx.fillText(String(r[1]),W-40,y);
+y+=42;
+});
+dashedLine(y+8);
+y+=48;
+if(typeof QRCode==='undefined'){
+ctx.textAlign='center';ctx.font='12px system-ui';ctx.fillStyle='#94a3b8';
+ctx.fillText(SITE_URL,W/2,y+20);
+resolve(c.toDataURL('image/png'));
+return;
+}
+QRCode.toDataURL(SITE_URL,{width:220,margin:1,color:{dark:'#0f172a',light:'#ffffff'}},function(err,qrUrl){
+if(err){resolve(c.toDataURL('image/png'));return;}
+let img=new Image();
+img.onload=function(){
+ctx.drawImage(img,(W-220)/2,y,220,220);
+ctx.textAlign='center';ctx.font='13px system-ui';ctx.fillStyle='#94a3b8';
+ctx.fillText('Saytga kirish uchun skanerlang',W/2,y+245);
+ctx.fillText(SITE_URL,W/2,y+265);
+resolve(c.toDataURL('image/png'));
+};
+img.onerror=function(){resolve(c.toDataURL('image/png'));};
+img.src=qrUrl;
+});
+});
+}
+async function sendReceiptToTelegram(payment,u,newBalance){
+try{
+let dataUrl=await generateReceiptImage(payment,u,newBalance);
+let caption='🧾 Balans to\'ldirildi\n👤 '+u.login+' ('+u.id+')\n💵 +'+payment.amount.toLocaleString()+' so\'m\n💳 '+payment.methodName+'\n🆔 '+payment.txId+'\n💰 Yangi balans: '+newBalance.toLocaleString()+' so\'m';
+await sendPhotoToTelegram(dataUrl,caption);
+}catch(e){console.warn(e);}
 }
 window.onload=function(){
 initTheme();
