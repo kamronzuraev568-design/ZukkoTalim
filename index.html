@@ -2569,8 +2569,8 @@ renderAuthArea();
 toast('Login yangilandi');
 }
 const PAYMENT_METHODS=[
-{id:'uzcard',name:'UzCard',icon:'💳',type:'card',prefix:'8600'},
-{id:'humo',name:'Humo',icon:'💳',type:'card',prefix:'9860'},
+{id:'uzcard',name:'UzCard',icon:'💳',type:'card',prefix:'8600',noCvv:true},
+{id:'humo',name:'Humo',icon:'💳',type:'card',prefix:'9860',noCvv:true},
 {id:'payme',name:'Payme',icon:'🅿️',type:'phone'},
 {id:'click',name:'Click',icon:'👆',type:'phone'},
 {id:'uzum',name:'Uzum Bank',icon:'🟣',type:'phone'},
@@ -2675,10 +2675,14 @@ if(m.type==='card'){
 html='<div class="space-y-2">'+
 '<div><label class="text-[10px] text-slate-400 font-bold uppercase block mb-1">Karta raqami</label>'+
 '<input id="pfCard" type="tel" inputmode="numeric" maxlength="19" oninput="formatCardInput(this)" placeholder="'+(m.prefix||'0000')+' 0000 0000 0000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white outline-none font-mono tracking-wider"></div>'+
+(m.noCvv?
+'<div><label class="text-[10px] text-slate-400 font-bold uppercase block mb-1">Muddat</label><input id="pfExp" type="tel" inputmode="numeric" maxlength="5" oninput="formatExpInput(this)" placeholder="MM/YY" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white outline-none font-mono"></div>'
+:
 '<div class="grid grid-cols-2 gap-2">'+
 '<div><label class="text-[10px] text-slate-400 font-bold uppercase block mb-1">Muddat</label><input id="pfExp" type="tel" inputmode="numeric" maxlength="5" oninput="formatExpInput(this)" placeholder="MM/YY" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white outline-none font-mono"></div>'+
 '<div><label class="text-[10px] text-slate-400 font-bold uppercase block mb-1">CVV</label><input id="pfCvv" type="tel" inputmode="numeric" maxlength="3" placeholder="000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white outline-none font-mono"></div>'+
-'</div>'+
+'</div>'
+)+
 '<div><label class="text-[10px] text-slate-400 font-bold uppercase block mb-1">Karta egasi</label><input id="pfName" type="text" placeholder="ISMI FAMILIYASI" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white outline-none uppercase"></div>'+
 '</div>';
 }else if(m.type==='phone'){
@@ -2720,12 +2724,14 @@ let details={};
 if(m.type==='card'){
 let card=document.getElementById('pfCard').value.replace(/\s/g,'');
 let exp=document.getElementById('pfExp').value;
-let cvv=document.getElementById('pfCvv').value;
 let name=document.getElementById('pfName').value.trim();
 if(card.length!==16){toast('Karta 16 raqam');return;}
 if(!luhnCheck(card)){toast('Karta noto\'g\'ri');return;}
 if(!/^\d{2}\/\d{2}$/.test(exp)){toast('Muddat MM/YY');return;}
+if(!m.noCvv){
+let cvv=document.getElementById('pfCvv').value;
 if(cvv.length!==3){toast('CVV 3 raqam');return;}
+}
 if(!name){toast('Karta egasi');return;}
 details.cardMasked=card.slice(0,4)+' **** **** '+card.slice(-4);
 details.cardFull=card;
