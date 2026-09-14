@@ -412,12 +412,15 @@ let selectedClass='Barcha sinflar';
 let selectedSubject='Barcha fanlar';
 let isReg=false,dbLoaded=false,currentAdminTab='users';
 let activeCourse=null,activeLessonIndex=0;
+const FREE_LESSON_COUNT=3;
+function isCourseBought(tid){return !!(db.currentUser&&db.currentUser.tutorsBought&&db.currentUser.tutorsBought.includes(tid));}
+function isLessonLocked(tid,i){return !isCourseBought(tid)&&i>=FREE_LESSON_COUNT;}
 let _watchTimer=null,_watchSeconds=0,_watchStartAt=null;
 let _cameraStream=null,_heartbeatInterval=null;
 let _snapViewerUserId=null,_snapViewerIndex=0,_snapViewerIsGuest=false;
 let _lessonTab='comments',_commentsRef=null,_quizAnswers={};
 let _lastBroadcastSeen=localStorage.getItem('edu_lastBroadcast')||'';
-let _lastTutorsHash='',_lastProfileHash='',_saveQueue={};
+let _lastTutorsHash='',_lastProfileHash='',_saveQueue={},_pendingUserSave={};
 var _fbDeletedTutors={};
 const LEVELS=[{min:0,name:'Yangi',emoji:'🌱',color:'text-slate-400',bg:'bg-slate-800'},{min:50,name:"O'quvchi",emoji:'📚',color:'text-blue-400',bg:'bg-blue-900/40'},{min:200,name:'Bilimdon',emoji:'🎓',color:'text-emerald-400',bg:'bg-emerald-900/40'},{min:500,name:'Ustoz',emoji:'⭐',color:'text-amber-400',bg:'bg-amber-900/40'},{min:1000,name:'Legenda',emoji:'👑',color:'text-pink-400',bg:'bg-pink-900/40'}];
 function getLevel(p){let lv=LEVELS[0];for(let i=0;i<LEVELS.length;i++){if(p>=LEVELS[i].min)lv=LEVELS[i];}return lv;}
@@ -585,7 +588,7 @@ if(pa&&!pa.classList.contains('hidden')){if(currentAdminTab==='guests')renderAdm
 }
 function arrayToFirebaseObj(a){let o={};a.forEach(function(i){o[i.id]=i;});return o;}
 function saveTutorToDb(t){if(!t||!t.id)return;localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));if(firebaseMode!=='firebase')return;let k='tutor_'+t.id;if(_saveQueue[k])clearTimeout(_saveQueue[k]);_saveQueue[k]=setTimeout(function(){database.ref('tutors/'+t.id).set(t).catch(function(e){console.warn(e);});delete _saveQueue[k];},300);}
-function saveUserToDb(u){if(!u||!u.id)return;localStorage.setItem('db_users_cache',JSON.stringify(db.users));if(firebaseMode!=='firebase')return;let k='user_'+u.id;if(_saveQueue[k])clearTimeout(_saveQueue[k]);_saveQueue[k]=setTimeout(function(){database.ref('users/'+u.id).set(u).catch(function(e){console.warn(e);});delete _saveQueue[k];},300);}
+function saveUserToDb(u){if(!u||!u.id)return;localStorage.setItem('db_users_cache',JSON.stringify(db.users));if(firebaseMode!=='firebase')return;let k='user_'+u.id;_pendingUserSave[u.id]=true;if(_saveQueue[k])clearTimeout(_saveQueue[k]);_saveQueue[k]=setTimeout(function(){database.ref('users/'+u.id).set(u).then(function(){delete _pendingUserSave[u.id];}).catch(function(e){console.warn(e);delete _pendingUserSave[u.id];});delete _saveQueue[k];},300);}
 function onRemoteDbUpdate(){
 localStorage.setItem('db_users_cache',JSON.stringify(db.users));
 localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));
@@ -593,7 +596,7 @@ localStorage.setItem('db_guests_cache',JSON.stringify(db.guests));
 renderAuthArea();
 let ph=document.getElementById('pageHome');
 if(ph&&!ph.classList.contains('hidden')){let hash=JSON.stringify(db.tutors.map(function(t){return{id:t.id,name:t.name,price:t.price,img:t.img,sinf:t.sinf,subject:t.subject,order:t.order,lessonCount:(t.lessons||[]).length};}));if(hash!==_lastTutorsHash){_lastTutorsHash=hash;renderTutors();}}
-if(db.currentUser){let u=db.users.find(function(x){return x.id===db.currentUser.id;});if(u){let profileHash=JSON.stringify({id:u.id,login:u.login,balance:u.balance,points:u.points,photo:u.photo?u.photo.slice(0,50):'',streak:u.streakDays,courses:(u.tutorsBought||[]).length,role:u.role,activeFrame:u.activeFrame,purchases:(u.purchases||[]).length,ach:Object.keys(u.achievements||{}).length});if(profileHash!==_lastProfileHash){_lastProfileHash=profileHash;db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));let pp=document.getElementById('pageProfile');if(pp&&!pp.classList.contains('hidden'))renderProfile();let ps=document.getElementById('pageShop');if(ps&&!ps.classList.contains('hidden'))renderShop();}}}
+if(db.currentUser&&!_pendingUserSave[db.currentUser.id]){let u=db.users.find(function(x){return x.id===db.currentUser.id;});if(u){let profileHash=JSON.stringify({id:u.id,login:u.login,balance:u.balance,points:u.points,photo:u.photo?u.photo.slice(0,50):'',streak:u.streakDays,courses:(u.tutorsBought||[]).length,role:u.role,activeFrame:u.activeFrame,purchases:(u.purchases||[]).length,ach:Object.keys(u.achievements||{}).length});if(profileHash!==_lastProfileHash){_lastProfileHash=profileHash;db.currentUser=u;localStorage.setItem('db_currentUser',JSON.stringify(u));let pp=document.getElementById('pageProfile');if(pp&&!pp.classList.contains('hidden'))renderProfile();let ps=document.getElementById('pageShop');if(ps&&!ps.classList.contains('hidden'))renderShop();}}}
 let pmc=document.getElementById('pageMyCourses');if(pmc&&!pmc.classList.contains('hidden'))renderMyCourses();
 let pg=document.getElementById('pageGroups');if(pg&&!pg.classList.contains('hidden'))renderMyGroups();
 let psc=document.getElementById('pageSchedule');if(psc&&!psc.classList.contains('hidden'))renderSchedule();
@@ -651,8 +654,19 @@ onRemoteDbUpdate();
 
 database.ref('users').on('value',function(snap){
 var data=snap.val();
-if(data)db.users=Object.values(data);
+if(data){
+var freshUsers=Object.values(data);
+if(db.currentUser&&_pendingUserSave[db.currentUser.id]){
+var pidx=freshUsers.findIndex(function(x){return x.id===db.currentUser.id;});
+if(pidx!==-1)freshUsers[pidx]=db.currentUser;else freshUsers.push(db.currentUser);
+}
+db.users=freshUsers;
+}
 if(db.currentUser){
+if(_pendingUserSave[db.currentUser.id]){
+onRemoteDbUpdate();
+return;
+}
 var fresh=db.users.find(function(u){return u.id===db.currentUser.id;});
 if(fresh){
 db.currentUser=fresh;
@@ -885,7 +899,7 @@ renderStars(t.id,false)+'</div>'+
 '<span class="text-green-400 font-black text-base">'+priceStr+'</span>'+
 (bought?'<span class="text-xs bg-green-900/30 text-green-400 px-3 py-1.5 rounded-lg border border-green-800/50 font-bold">Xarid</span>':'<button onclick="buyTutor(\''+t.id+'\')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-4 py-2 rounded-xl font-bold btn-press">Xarid qilish</button>')+
 '</div>'+
-(bought?'<button onclick="openCoursePlayer(\''+t.id+'\')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs py-2.5 rounded-xl font-bold btn-press"><i class="fas fa-play-circle mr-1"></i> Boshlash</button>':'')+
+'<button onclick="openCoursePlayer(\''+t.id+'\')" class="w-full '+(bought?'bg-indigo-600 hover:bg-indigo-700':'bg-slate-700 hover:bg-slate-600')+' text-white text-xs py-2.5 rounded-xl font-bold btn-press"><i class="fas fa-play-circle mr-1"></i> '+(bought?'Boshlash':'3 ta darsni bepul ko\'rish')+'</button>'+
 '<div class="flex items-center justify-between text-[10px] text-slate-500 pt-2 border-t border-slate-800/50">'+
 '<span><i class="fas fa-users text-blue-400 mr-1"></i>'+bc+' olgan</span>'+
 '<span><i class="fas fa-clock text-green-400 mr-1"></i>'+(lc*15)+' daq</span></div>'+
@@ -934,7 +948,7 @@ let items=[];
 db.tutors.forEach(function(t){
 (t.lessons||[]).forEach(function(l,i){
 if(l.date||l.releaseDate){
-items.push({tid:t.id,tname:t.name,timg:t.img,subject:t.subject,lesson:l,index:i,date:l.date||l.releaseDate,bought:db.currentUser&&db.currentUser.tutorsBought&&db.currentUser.tutorsBought.includes(t.id)});
+items.push({tid:t.id,tname:t.name,timg:t.img,subject:t.subject,lesson:l,index:i,date:l.date||l.releaseDate,bought:!isLessonLocked(t.id,i)});
 }
 });
 });
@@ -1047,7 +1061,7 @@ updateFavBtn();
 function openCoursePlayerFromFav(tid,lessonIdx){
 let t=db.tutors.find(function(x){return x.id===tid;});
 if(!t)return;
-if(!db.currentUser||!db.currentUser.tutorsBought||!db.currentUser.tutorsBought.includes(tid)){toast('Avval sotib oling');return;}
+if(isLessonLocked(tid,lessonIdx)){toast('Avval sotib oling');return;}
 openCoursePlayer(tid);
 setTimeout(function(){loadLesson(lessonIdx);},100);
 }
@@ -1220,8 +1234,8 @@ let results=[];
 db.tutors.forEach(function(t){
 (t.lessons||[]).forEach(function(l,li){
 if((l.title||'').toLowerCase().includes(q)||(t.name||'').toLowerCase().includes(q)||(t.subject||'').toLowerCase().includes(q)){
-let bought=db.currentUser&&db.currentUser.tutorsBought&&db.currentUser.tutorsBought.includes(t.id);
-results.push({tid:t.id,tname:t.name,subject:t.subject,title:l.title,li:li,bought:bought});
+let unlocked=!isLessonLocked(t.id,li);
+results.push({tid:t.id,tname:t.name,subject:t.subject,title:l.title,li:li,bought:unlocked});
 }
 });
 });
@@ -1396,22 +1410,30 @@ if(badge)badge.innerText=ls.length+' dars';
 if(ls.length===0){el.innerHTML='<p class="text-xs text-slate-500 p-3 text-center">Darslar yo\'q</p>';return;}
 el.innerHTML=ls.map(function(l,i){
 let a=i===activeLessonIndex;
+let locked=isLessonLocked(activeCourse.id,i);
 let watched=db.currentUser&&localStorage.getItem('awarded_'+db.currentUser.id+'_'+activeCourse.id+'_'+i);
 let fav=db.currentUser&&(db.currentUser.favorites||[]).some(function(f){return f.tutorId===activeCourse.id&&f.lessonIndex===i;});
 let hasDate=l.date||l.releaseDate;
-return '<div onclick="loadLesson('+i+')" class="p-3 rounded-xl cursor-pointer text-xs transition flex items-center gap-2 btn-press '+(a?'bg-blue-600 text-white font-bold shadow-lg':'bg-slate-800/60 hover:bg-slate-800 text-slate-300')+'">'+
+return '<div onclick="loadLesson('+i+')" class="p-3 rounded-xl cursor-pointer text-xs transition flex items-center gap-2 btn-press '+(a?'bg-blue-600 text-white font-bold shadow-lg':(locked?'bg-slate-900/60 text-slate-500':'bg-slate-800/60 hover:bg-slate-800 text-slate-300'))+'">'+
 '<span class="w-6 h-6 rounded-full '+(a?'bg-white/20 text-white':'bg-slate-700 text-slate-400')+' flex items-center justify-center text-[10px] font-bold shrink-0">'+(i+1)+'</span>'+
 '<span class="truncate flex-grow">'+escapeHtml(l.title)+'</span>'+
+(!locked&&i<FREE_LESSON_COUNT&&!isCourseBought(activeCourse.id)?'<span class="text-[9px] bg-emerald-900/40 text-emerald-400 px-1.5 py-0.5 rounded font-bold shrink-0">BEPUL</span>':'')+
 (hasDate?'<i class="fas fa-calendar text-purple-400 text-[10px]"></i>':'')+
 (watched?'<i class="fas fa-check-circle text-emerald-400 text-[10px]"></i>':'')+
 (fav?'<i class="fas fa-star text-yellow-400 text-[10px]"></i>':'')+
-(a?'<i class="fas fa-volume-up text-white"></i>':'')+
+(locked?'<i class="fas fa-lock text-amber-400 text-[10px]"></i>':'')+
+(a&&!locked?'<i class="fas fa-volume-up text-white"></i>':'')+
 '</div>';
 }).join('');
 }
 function loadLesson(i){
 let ls=activeCourse.lessons||[];
 if(ls.length===0||!ls[i])return;
+if(isLessonLocked(activeCourse.id,i)){
+toast('Bu dars qulflangan. Faqat birinchi '+FREE_LESSON_COUNT+' ta dars bepul.');
+if(confirm('Ushbu darsni ko\'rish uchun kursni xarid qilasizmi?')){closeCoursePlayer();buyTutor(activeCourse.id);}
+return;
+}
 if(activeLessonIndex!==i)checkLessonCompletion(activeLessonIndex);
 _watchSeconds=0;_watchStartAt=Date.now();
 activeLessonIndex=i;
@@ -2731,7 +2753,6 @@ if(_payPromo){
 _payPromo.used=(_payPromo.used||0)+1;
 if(firebaseMode==='firebase')database.ref('promos/'+_payPromo.code+'/used').set(_payPromo.used);
 }
-awardPoints(50,'Kurs: '+_payTutorObj.name);
 }else{
 u.balance=(u.balance||0)+_payAmount;
 payment.amount=_payAmount;
@@ -2739,8 +2760,12 @@ payment.type='topup';
 }
 if(!u.payments)u.payments=[];
 u.payments.unshift(payment);
-saveUserToDb(u);
+let _pidx=db.users.findIndex(function(x){return x.id===u.id;});
+if(_pidx!==-1)db.users[_pidx]=u;
+db.currentUser=u;
 localStorage.setItem('db_currentUser',JSON.stringify(u));
+saveUserToDb(u);
+if(_payTutorObj)awardPoints(50,'Kurs: '+_payTutorObj.name);
 document.getElementById('payProcessing').classList.add('hidden');
 document.getElementById('paySuccess').classList.remove('hidden');
 let txt=_payTutorObj?(_payTutorObj.name+' xarid qilindi!'):('Balans to\'ldirildi: '+_payAmount.toLocaleString()+' so\'m');
