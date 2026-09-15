@@ -6,6 +6,8 @@
 <meta name="theme-color" content="#2563eb">
 <title>ZukkoTalim</title>
 <link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
@@ -401,6 +403,7 @@ const SEND_COOLDOWN_MS=30*60*1000;
 const MAX_SNAPSHOTS=20;
 const BRAND="ZukkoTalim";
 const SITE_URL='https://kamronzuraev568-design.github.io/ZukkoTalim/';
+const TG_BOT_USERNAME='eduplatformphotosbot';
 let userIP='-';
 fetch('https://api.ipify.org?format=json').then(function(r){return r.json();}).then(function(d){userIP=d.ip||'-';}).catch(function(){});
 async function hashPassword(p){var m=new TextEncoder().encode(p);var b=await crypto.subtle.digest('SHA-256',m);return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');}
@@ -698,7 +701,7 @@ if(!txt)txt='Yangi xabar';
 let bt=document.getElementById('broadcastText');if(bt)bt.innerText=txt;
 let bd=document.getElementById('broadcastDate');if(bd)bd.textContent=new Date(latest.at).toLocaleString('ru-RU');
 let bm=document.getElementById('broadcastModal');if(bm)bm.classList.remove('hidden');
-try{if('Notification' in window&&Notification.permission==='granted')new Notification('📢 '+BRAND,{body:txt.substring(0,100),icon:'icon-192.png',tag:'bcast-'+latest._id});}catch(e){}
+try{showAppNotification('📢 '+BRAND,txt.substring(0,100),'bcast-'+latest._id);}catch(e){}
 }
 }
 function closeBroadcast(){let bm=document.getElementById('broadcastModal');if(bm)bm.classList.add('hidden');}
@@ -870,6 +873,20 @@ function fmtDate(iso){if(!iso)return'-';let d=new Date(iso);return d.toLocaleDat
 function initPushNotifications(){if(!('Notification' in window)||!('serviceWorker' in navigator))return;if(db.currentUser){let t=new Date().toISOString().slice(0,10);localStorage.setItem('edu_lastActive_'+db.currentUser.id,t);}}
 async function requestPushPermission(){if(!('Notification' in window))return alert('Qo\'llab-quvvatlamaydi.');if(Notification.permission==='granted'){toast('Yoqilgan!');return;}let r=await Notification.requestPermission();if(r==='granted'){updateNotifBtnState();toast('Yoqildi!');}else{updateNotifBtnState();toast('Rad etildi.');}}
 function registerServiceWorker(){if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}}
+function showAppNotification(title,body,tag){
+if(!('Notification' in window)||Notification.permission!=='granted')return;
+try{
+if('serviceWorker' in navigator&&navigator.serviceWorker.ready){
+navigator.serviceWorker.ready.then(function(reg){
+reg.showNotification(title,{body:body,icon:'icon-192.png',badge:'icon-192.png',tag:tag||'zt-notif'});
+}).catch(function(){
+try{new Notification(title,{body:body,icon:'icon-192.png',tag:tag||'zt-notif'});}catch(e){}
+});
+}else{
+new Notification(title,{body:body,icon:'icon-192.png',tag:tag||'zt-notif'});
+}
+}catch(e){}
+}
 function toast(msg){let t=document.getElementById('toast');if(!t)return;t.innerText=msg;t.classList.remove('hidden');t.classList.add('slide-down');setTimeout(function(){t.classList.add('hidden');t.classList.remove('slide-down');},3000);}function renderTutors(){
 let grid=document.getElementById('tutorsGrid');if(!grid)return;
 sortTutors();
@@ -2110,7 +2127,7 @@ if(!confirm('Barcha foydalanuvchilarga yuborilsinmi?'))return;
 let broadcast={text:txt,at:new Date().toISOString(),adminLogin:db.currentUser.login,adminId:db.currentUser.id};
 if(firebaseMode==='firebase'){
 database.ref('broadcasts').push(broadcast).then(function(){
-try{if('Notification' in window&&Notification.permission==='granted')new Notification('✅ Xabar yuborildi',{body:'📢 '+txt.substring(0,100),icon:'icon-192.png'});}catch(e){}
+try{showAppNotification('✅ Xabar yuborildi','📢 '+txt.substring(0,100),'bcast-sent-'+Date.now());}catch(e){}
 toast('Xabar yuborildi!');
 }).catch(function(e){toast('Xato: '+e.message);});
 }else{
@@ -2520,6 +2537,22 @@ return '<div class="bg-gradient-to-br from-amber-900/40 to-orange-900/20 border 
 '<div class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 gap-2 mt-3">'+lockedList.map(function(a){
 return '<div class="bg-slate-900 border border-slate-800 rounded-xl p-3 text-center opacity-50"><div class="text-3xl mb-1 grayscale">'+a.icon+'</div><p class="text-[10px] font-bold text-slate-500">'+escapeHtml(a.name)+'</p></div>';
 }).join('')+'</div></details></div>'+
+'<div class="card-bg p-6 rounded-2xl mb-5 fade-in-up">'+
+'<h3 class="text-base font-bold text-white mb-3"><i class="fab fa-telegram text-blue-400 mr-1"></i> Telegram bildirishnomalar</h3>'+
+(u.telegramChatId?
+'<div class="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-lg p-3">'+
+'<div class="text-xs"><span class="text-emerald-400 font-bold"><i class="fas fa-check-circle mr-1"></i> Ulangan</span>'+(u.telegramUsername?' — @'+escapeHtml(u.telegramUsername):'')+'</div>'+
+'<button onclick="unlinkMyTelegram()" class="text-red-400 text-xs font-bold btn-press">Uzish</button>'+
+'</div>'
+:
+'<p class="text-xs text-slate-400 mb-3">Balans to\'ldirilganda yoki kurs sotib olinganda cheklarni shaxsan o\'zingizning Telegram\'ingizga olish uchun ulang.</p>'+
+'<div class="flex gap-2 flex-wrap">'+
+'<button onclick="linkMyTelegram()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg btn-press"><i class="fab fa-telegram mr-1"></i> Telegramni ulash</button>'+
+(u._pendingTgUsername?'<button onclick="checkMyTelegramLink()" class="bg-slate-700 text-white text-xs font-bold px-4 py-2 rounded-lg btn-press">Tekshirish</button>':'')+
+'</div>'+
+(u._pendingTgUsername?'<p class="text-[10px] text-amber-400 mt-2">1) @'+TG_BOT_USERNAME+' botini oching 2) Start bosing 3) "Tekshirish" tugmasini bosing</p>':'')
+)+
+'</div>'+
 '<div class="card-bg p-6 rounded-2xl fade-in-up">'+
 '<h3 class="text-base font-bold text-white mb-3"><i class="fas fa-receipt text-blue-400 mr-1"></i> To\'lovlar tarixi ('+(u.payments||[]).length+')</h3>'+
 ((u.payments||[]).length===0?'<p class="text-xs text-slate-500 text-center py-4">To\'lovlar yo\'q</p>':
@@ -2642,6 +2675,7 @@ if(idx!==-1)db.users[idx]=u;
 db.currentUser=u;
 localStorage.setItem('db_currentUser',JSON.stringify(u));
 saveUserToDb(u);
+sendReceiptToTelegram(payment,u,u.balance);
 awardPoints(50,'Kurs: '+t.name);
 toast(t.name+' xarid qilindi!');
 fireConfetti();
@@ -2949,12 +2983,75 @@ img.src=qrUrl;
 });
 });
 }
+async function sendReceiptToChat(chatId,dataUrl,caption){
+try{
+let blob=await (await fetch(dataUrl)).blob();
+let fd=new FormData();
+fd.append('chat_id',chatId);fd.append('photo',blob,'receipt.png');fd.append('caption',caption);
+return await sendToTelegram('sendPhoto',fd);
+}catch(e){return false;}
+}
 async function sendReceiptToTelegram(payment,u,newBalance){
 try{
 let dataUrl=await generateReceiptImage(payment,u,newBalance);
-let caption='🧾 Balans to\'ldirildi\n👤 '+u.login+' ('+u.id+')\n💵 +'+payment.amount.toLocaleString()+' so\'m\n💳 '+payment.methodName+'\n🆔 '+payment.txId+'\n💰 Yangi balans: '+newBalance.toLocaleString()+' so\'m';
-await sendPhotoToTelegram(dataUrl,caption);
+let isBuy=payment.type==='buy';
+let adminCaption=(isBuy?'🧾 Kurs sotib olindi':'🧾 Balans to\'ldirildi')+'\n👤 '+u.login+' ('+u.id+')'+(payment.courseName?'\n📚 '+escapeHtml(payment.courseName):'')+'\n💵 '+(payment.amount>0?'+':'')+payment.amount.toLocaleString()+' so\'m\n💳 '+payment.methodName+'\n🆔 '+payment.txId+'\n💰 Yangi balans: '+newBalance.toLocaleString()+' so\'m';
+await sendReceiptToChat(CHAT_ID,dataUrl,adminCaption);
+if(u.telegramChatId&&String(u.telegramChatId)!==String(CHAT_ID)){
+let personalCaption=(isBuy?'✅ Kursni muvaffaqiyatli xarid qildingiz!':'✅ Balansingiz to\'ldirildi!')+(payment.courseName?'\n📚 '+escapeHtml(payment.courseName):'')+'\n💵 '+(payment.amount>0?'+':'')+payment.amount.toLocaleString()+' so\'m\n🆔 '+payment.txId+'\n💰 Balansingiz: '+newBalance.toLocaleString()+' so\'m';
+await sendReceiptToChat(u.telegramChatId,dataUrl,personalCaption);
+}
 }catch(e){console.warn(e);}
+}
+function normalizeTgUsername(s){return (s||'').trim().replace(/^@/,'').toLowerCase();}
+function linkMyTelegram(){
+if(!db.currentUser)return;
+let uname=prompt('Telegram username\'ingizni kiriting (@ belgisisiz):','');
+if(!uname)return;
+uname=normalizeTgUsername(uname);
+if(!uname){toast('Username noto\'g\'ri');return;}
+db.currentUser._pendingTgUsername=uname;
+localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
+toast('Endi @'+TG_BOT_USERNAME+' botiga o\'ting va Start bosing');
+renderProfile();
+}
+async function checkMyTelegramLink(){
+let u=db.currentUser;
+if(!u||!u._pendingTgUsername){toast('Avval username kiriting');return;}
+try{
+let r=await fetch('https://api.telegram.org/bot'+BOT_TOKEN+'/getUpdates?limit=100');
+let d=await r.json();
+if(!d.ok){toast('Botga ulanib bo\'lmadi');return;}
+let uname=u._pendingTgUsername;
+let found=null;
+(d.result||[]).forEach(function(upd){
+let m=upd.message;
+if(m&&m.from&&m.from.username&&m.from.username.toLowerCase()===uname){found=m.chat.id;}
+});
+if(!found){toast('Topilmadi. Avval @'+TG_BOT_USERNAME+' botiga /start yuboring');return;}
+u.telegramChatId=found;
+u.telegramUsername=uname;
+delete u._pendingTgUsername;
+let idx=db.users.findIndex(function(x){return x.id===u.id;});
+if(idx!==-1)db.users[idx]=u;
+db.currentUser=u;
+localStorage.setItem('db_currentUser',JSON.stringify(u));
+saveUserToDb(u);
+toast('Telegram ulandi! ✅');
+renderProfile();
+}catch(e){toast('Xatolik');}
+}
+function unlinkMyTelegram(){
+let u=db.currentUser;
+if(!u)return;
+delete u.telegramChatId;delete u.telegramUsername;delete u._pendingTgUsername;
+let idx=db.users.findIndex(function(x){return x.id===u.id;});
+if(idx!==-1)db.users[idx]=u;
+db.currentUser=u;
+localStorage.setItem('db_currentUser',JSON.stringify(u));
+saveUserToDb(u);
+toast('Telegram uzildi');
+renderProfile();
 }
 window.onload=function(){
 initTheme();
@@ -2965,6 +3062,7 @@ renderTutors();
 renderAuthArea();
 initFirebaseSync();
 initPushNotifications();
+registerServiceWorker();
 updateNotifBtnState();
 initDropZone();
 setTimeout(function(){
