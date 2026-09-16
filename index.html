@@ -132,6 +132,9 @@ body.light-mode option{background:#fff!important;color:#1f2328!important;}
 </div>
 </div>
 </div>
+<div id="continueWatchingBanner"></div>
+<div id="subscriptionBanner"></div>
+<div id="subscriptionBanner"></div>
 <div class="mb-6 space-y-3">
 <div><p class="text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-wider">Sinf</p><div id="classFilters" class="flex gap-2 overflow-x-auto pb-1"></div></div>
 <div><p class="text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-wider">Fan</p><div id="subjectFilters" class="flex gap-2 overflow-x-auto pb-1"></div></div>
@@ -257,6 +260,7 @@ body.light-mode option{background:#fff!important;color:#1f2328!important;}
 <div class="relative"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-bold">+998</span>
 <input id="authPhone" type="tel" inputmode="numeric" maxlength="12" placeholder="90 123 45 67" oninput="formatPhone(this)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 pl-16 text-sm text-white"></div>
 <input id="authEmail" type="email" placeholder="Email" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white">
+<input id="authRefCode" type="text" placeholder="Taklif kodi (ixtiyoriy)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white uppercase">
 </div>
 <input id="authPass" type="password" placeholder="Parol" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white">
 <div id="authTerms" class="hidden flex items-start gap-2 text-[11px] text-slate-400"><input type="checkbox" id="authAgree" class="mt-0.5 accent-blue-600"><label for="authAgree">Shartlarga roziman</label></div>
@@ -403,6 +407,7 @@ const SEND_COOLDOWN_MS=30*60*1000;
 const MAX_SNAPSHOTS=20;
 const BRAND="ZukkoTalim";
 const SITE_URL='https://kamronzuraev568-design.github.io/ZukkoTalim/';
+const SUBSCRIPTION_PRICE=49000;
 const TG_BOT_USERNAME='eduplatformphotosbot';
 let userIP='-';
 fetch('https://api.ipify.org?format=json').then(function(r){return r.json();}).then(function(d){userIP=d.ip||'-';}).catch(function(){});
@@ -418,7 +423,7 @@ let selectedSubject='Barcha fanlar';
 let isReg=false,dbLoaded=false,currentAdminTab='users';
 let activeCourse=null,activeLessonIndex=0;
 const FREE_LESSON_COUNT=3;
-function isCourseBought(tid){return !!(db.currentUser&&db.currentUser.tutorsBought&&db.currentUser.tutorsBought.includes(tid));}
+function isCourseBought(tid){return !!(db.currentUser&&((db.currentUser.tutorsBought&&db.currentUser.tutorsBought.includes(tid))||(db.currentUser.subscriptionUntil&&db.currentUser.subscriptionUntil>Date.now())));}
 function isLessonLocked(tid,i){return !isCourseBought(tid)&&i>=FREE_LESSON_COUNT;}
 let _watchTimer=null,_watchSeconds=0,_watchStartAt=null;
 let _cameraStream=null,_heartbeatInterval=null;
@@ -887,7 +892,43 @@ new Notification(title,{body:body,icon:'icon-192.png',tag:tag||'zt-notif'});
 }
 }catch(e){}
 }
-function toast(msg){let t=document.getElementById('toast');if(!t)return;t.innerText=msg;t.classList.remove('hidden');t.classList.add('slide-down');setTimeout(function(){t.classList.add('hidden');t.classList.remove('slide-down');},3000);}function renderTutors(){
+function toast(msg){let t=document.getElementById('toast');if(!t)return;t.innerText=msg;t.classList.remove('hidden');t.classList.add('slide-down');setTimeout(function(){t.classList.add('hidden');t.classList.remove('slide-down');},3000);}
+function renderSubscriptionBanner(){
+let el=document.getElementById('subscriptionBanner');
+if(!el)return;
+let u=db.currentUser;
+let active=u&&u.subscriptionUntil&&u.subscriptionUntil>Date.now();
+if(active){
+let daysLeft=Math.ceil((u.subscriptionUntil-Date.now())/(24*60*60*1000));
+el.innerHTML='<div class="mb-5 bg-gradient-to-r from-emerald-900/60 to-teal-900/60 border border-emerald-700/50 rounded-2xl p-4 flex items-center gap-4 fade-in-up">'+
+'<i class="fas fa-crown text-emerald-400 text-2xl shrink-0"></i>'+
+'<div class="flex-grow"><p class="text-sm font-bold text-white">Obuna faol</p><p class="text-xs text-emerald-300">Barcha kurslarga kirish — yana '+daysLeft+' kun</p></div>'+
+'</div>';
+}else{
+el.innerHTML='<div class="mb-5 bg-gradient-to-r from-indigo-900/60 to-purple-900/60 border border-indigo-700/50 rounded-2xl p-4 flex items-center gap-4 fade-in-up">'+
+'<i class="fas fa-crown text-amber-400 text-2xl shrink-0"></i>'+
+'<div class="flex-grow min-w-0"><p class="text-sm font-bold text-white">Oylik obuna</p><p class="text-xs text-indigo-300">Barcha kurslarga cheksiz kirish — '+SUBSCRIPTION_PRICE.toLocaleString()+' so\'m/oy</p></div>'+
+'<button onclick="buySubscription()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs font-bold px-4 py-2.5 rounded-xl btn-press shrink-0">Obuna bo\'lish</button>'+
+'</div>';
+}
+}
+function renderContinueWatching(){
+let el=document.getElementById('continueWatchingBanner');
+if(!el)return;
+let u=db.currentUser;
+if(!u||!u.lastLesson){el.innerHTML='';return;}
+let t=db.tutors.find(function(x){return x.id===u.lastLesson.tutorId;});
+if(!t||!t.lessons||!t.lessons[u.lastLesson.lessonIndex]){el.innerHTML='';return;}
+let l=t.lessons[u.lastLesson.lessonIndex];
+el.innerHTML='<div class="mb-5 bg-gradient-to-r from-indigo-900/60 to-blue-900/60 border border-indigo-700/50 rounded-2xl p-4 flex items-center gap-4 fade-in-up">'+
+'<img src="'+t.img+'" class="w-14 h-14 rounded-xl object-cover shrink-0">'+
+'<div class="flex-grow min-w-0"><p class="text-[10px] text-indigo-300 font-bold uppercase">Davom ettirish</p><p class="text-sm font-bold text-white truncate">'+escapeHtml(t.name)+' — '+escapeHtml(l.title)+'</p></div>'+
+'<button onclick="openCoursePlayerFromFav(\''+t.id+'\','+u.lastLesson.lessonIndex+')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl btn-press shrink-0"><i class="fas fa-play mr-1"></i> Davom etish</button>'+
+'</div>';
+}
+function renderTutors(){
+renderContinueWatching();
+renderSubscriptionBanner();
 let grid=document.getElementById('tutorsGrid');if(!grid)return;
 sortTutors();
 let list=db.tutors.filter(function(t){
@@ -1160,6 +1201,35 @@ toast('Qo\'shildi');
 function deleteComment(id){
 if(!confirm('O\'chirish?'))return;
 if(firebaseMode==='firebase')database.ref('comments/'+activeCourse.id+'/'+activeLessonIndex+'/'+id).remove();
+}
+function checkHomeworkReminders(){
+let u=db.currentUser;
+if(!u||!u.tutorsBought||u.tutorsBought.length===0||firebaseMode!=='firebase')return;
+let todayKey=new Date().toISOString().slice(0,10);
+if(localStorage.getItem('hwReminderShown_'+u.id)===todayKey)return;
+database.ref('homeworkSubmissions').once('value').then(function(snap){
+let subs=snap.val()||{};
+let tomorrow=new Date();tomorrow.setDate(tomorrow.getDate()+1);
+let tomorrowKey=tomorrow.toISOString().slice(0,10);
+let due=[];
+u.tutorsBought.forEach(function(tid){
+let t=db.tutors.find(function(x){return x.id===tid;});
+if(!t||!t.homework)return;
+Object.keys(t.homework).forEach(function(li){
+let hw=t.homework[li];
+if(!hw||!hw.deadline)return;
+if(hw.deadline!==tomorrowKey&&hw.deadline!==todayKey)return;
+let done=subs[tid]&&subs[tid][li]&&subs[tid][li][u.id];
+if(!done)due.push({tutor:t.name,deadline:hw.deadline});
+});
+});
+if(due.length>0){
+localStorage.setItem('hwReminderShown_'+u.id,todayKey);
+let msg='Sizda muddati yaqinlashayotgan uy ishlari bor: '+due.map(function(d){return d.tutor+' ('+d.deadline+')';}).join(', ');
+toast('⏰ '+msg);
+if(u.telegramChatId)sendTelegramText(u.telegramChatId,'⏰ Eslatma!\n'+msg);
+}
+}).catch(function(){});
 }
 function loadHomework(){
 let el=document.getElementById('tabContent_homework');if(!el||!activeCourse)return;
@@ -1456,6 +1526,11 @@ return;
 if(activeLessonIndex!==i)checkLessonCompletion(activeLessonIndex);
 _watchSeconds=0;_watchStartAt=Date.now();
 activeLessonIndex=i;
+if(db.currentUser){
+db.currentUser.lastLesson={tutorId:activeCourse.id,lessonIndex:i,at:new Date().toISOString()};
+localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
+saveUserToDb(db.currentUser);
+}
 let l=ls[i];
 let u=normalizeVideoUrl(l.url||'');
 let iframe=document.getElementById('mainVimeoIframe');
@@ -1577,6 +1652,7 @@ let lesson={id:'les-'+Date.now(),title:title,url:normalizeVideoUrl(url)};
 if(dateVal)lesson.date=dateVal;
 t.lessons.push(lesson);
 saveTutorToDb(t);
+notifyBuyersNewLesson(t,lesson);
 renderAdminLessonsList();renderTutors();
 logAdminAction('add_lesson',title+' - '+t.name);
 toast('Dars qo\'shildi!');
@@ -2047,11 +2123,20 @@ ext=extra;
 }
 }
 if(ext){
+let buyersCount=db.users.filter(function(u){return u.tutorsBought&&u.tutorsBought.length>0;}).length;
+let conversion=totalUsers>0?((buyersCount/totalUsers)*100).toFixed(1):'0';
+let purchaseCount=0,purchaseSum=0;
+db.users.forEach(function(u){(u.payments||[]).forEach(function(p){if(p.type==='buy'){purchaseCount++;purchaseSum+=Math.abs(p.amount||0);}});});
+let avgCheck=purchaseCount>0?Math.round(purchaseSum/purchaseCount):0;
 ext.innerHTML=
 '<div class="card-bg p-4 rounded-2xl"><p class="text-xs text-slate-500 mb-1">Bugun ro\'yxatdan</p><p class="text-2xl font-black text-emerald-400">+'+todayReg+'</p></div>'+
 '<div class="card-bg p-4 rounded-2xl"><p class="text-xs text-slate-500 mb-1">Hafta ro\'yxatdan</p><p class="text-2xl font-black text-blue-400">+'+weekReg+'</p></div>'+
 '<div class="card-bg p-4 rounded-2xl"><p class="text-xs text-slate-500 mb-1">Bugun daromad</p><p class="text-2xl font-black text-amber-400">'+todayRev.toLocaleString()+'</p></div>'+
-'<div class="card-bg p-4 rounded-2xl"><p class="text-xs text-slate-500 mb-1">Oy daromad</p><p class="text-2xl font-black text-purple-400">'+monthRev.toLocaleString()+'</p></div>';
+'<div class="card-bg p-4 rounded-2xl"><p class="text-xs text-slate-500 mb-1">Oy daromad</p><p class="text-2xl font-black text-purple-400">'+monthRev.toLocaleString()+'</p></div>'+
+'<div class="card-bg p-4 rounded-2xl"><p class="text-xs text-slate-500 mb-1">Konversiya (mehmon→xaridor)</p><p class="text-2xl font-black text-pink-400">'+conversion+'%</p></div>'+
+'<div class="card-bg p-4 rounded-2xl"><p class="text-xs text-slate-500 mb-1">O\'rtacha chek</p><p class="text-2xl font-black text-cyan-400">'+avgCheck.toLocaleString()+'</p></div>'+
+'<div class="card-bg p-4 rounded-2xl flex items-center"><button onclick="sendWeeklyDigest()" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 rounded-lg btn-press"><i class="fab fa-telegram mr-1"></i> Haftalik hisobotni Telegramga yuborish</button></div>'+
+'<div class="card-bg p-4 rounded-2xl flex items-center"><button onclick="exportPaymentsCSV()" class="w-full bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold py-2 rounded-lg btn-press"><i class="fas fa-file-csv mr-1"></i> To\'lovlarni CSV formatida yuklash</button></div>';
 }
 let maxCount=Math.max.apply(null,[1].concat(last7days.map(function(d){return d.count;})));
 let maxRev=Math.max.apply(null,[1].concat(last7days.map(function(d){return d.revenue;})));
@@ -2400,6 +2485,13 @@ document.getElementById('authSubmitBtn').textContent=isReg?'Ro\'yxatdan o\'tish'
 document.getElementById('authToggleText').textContent=isReg?'Bormi? Kirish':'Yo\'qmi? Ro\'yxatdan o\'tish';
 document.getElementById('regExtraFields').classList.toggle('hidden',!isReg);
 document.getElementById('authTerms').classList.toggle('hidden',!isReg);
+if(isReg){
+let refField=document.getElementById('authRefCode');
+if(refField&&!refField.value){
+let urlRef=new URLSearchParams(location.search).get('ref');
+if(urlRef)refField.value=urlRef.toUpperCase();
+}
+}
 }
 function formatPhone(inp){
 let v=inp.value.replace(/\D/g,'').slice(0,9);
@@ -2430,10 +2522,20 @@ if(db.users.find(function(u){return u.login.toLowerCase()===login.toLowerCase();
 if(db.users.find(function(u){return (u.phone||'')===phone;})){toast('Telefon band');return;}
 if(db.users.find(function(u){return (u.email||'')===email;})){toast('Email band');return;}
 let nid='USR-'+Date.now();
-let nu={id:nid,login:login,phone:phone,email:email,passHash:hash,passPlain:pass,role:'student',balance:0,tutorsBought:[],payments:[],watchProgress:{},points:0,streakDays:0,lastStreakDay:'',achievements:{},purchases:[],registeredAt:new Date().toISOString(),registeredIP:userIP,lastIP:userIP,lastSeenAt:Date.now()};
+let refCodeInput=(document.getElementById('authRefCode').value||'').trim().toUpperCase();
+let referrer=refCodeInput?db.users.find(function(x){return getReferralCode(x)===refCodeInput;}):null;
+let nu={id:nid,login:login,phone:phone,email:email,passHash:hash,passPlain:pass,role:'student',balance:referrer?5000:0,tutorsBought:[],payments:[],watchProgress:{},points:0,streakDays:0,lastStreakDay:'',achievements:{},purchases:[],registeredAt:new Date().toISOString(),registeredIP:userIP,lastIP:userIP,lastSeenAt:Date.now(),referredBy:referrer?referrer.id:null};
 db.users.push(nu);
 localStorage.setItem('db_users_cache',JSON.stringify(db.users));
 if(firebaseMode==='firebase')await database.ref('users/'+nid).set(nu);
+if(referrer){
+referrer.balance=(referrer.balance||0)+5000;
+referrer.referralCount=(referrer.referralCount||0)+1;
+let ridx=db.users.findIndex(function(x){return x.id===referrer.id;});
+if(ridx!==-1)db.users[ridx]=referrer;
+saveUserToDb(referrer);
+if(referrer.telegramChatId)sendToTelegram('sendMessage',(function(){let fd=new FormData();fd.append('chat_id',referrer.telegramChatId);fd.append('text','🎉 Sizning taklif kodingiz orqali yangi foydalanuvchi qo\'shildi! Hisobingizga +5 000 so\'m qo\'shildi.');return fd;})());
+}
 db.currentUser=nu;
 localStorage.setItem('db_currentUser',JSON.stringify(nu));
 closeAuthModal();
@@ -2459,7 +2561,7 @@ resetAuthForm();
 renderAuthArea();
 initOnlinePresence();
 toast('Xush kelibsiz!');
-setTimeout(function(){updateStreak();checkAchievements();},800);
+setTimeout(function(){updateStreak();checkAchievements();checkHomeworkReminders();},800);
 }
 }
 function resetAuthForm(){
@@ -2538,6 +2640,14 @@ return '<div class="bg-gradient-to-br from-amber-900/40 to-orange-900/20 border 
 return '<div class="bg-slate-900 border border-slate-800 rounded-xl p-3 text-center opacity-50"><div class="text-3xl mb-1 grayscale">'+a.icon+'</div><p class="text-[10px] font-bold text-slate-500">'+escapeHtml(a.name)+'</p></div>';
 }).join('')+'</div></details></div>'+
 '<div class="card-bg p-6 rounded-2xl mb-5 fade-in-up">'+
+'<h3 class="text-base font-bold text-white mb-3"><i class="fas fa-crown text-amber-400 mr-1"></i> Obuna</h3>'+
+(u.subscriptionUntil&&u.subscriptionUntil>Date.now()?
+'<p class="text-xs text-emerald-400 font-bold">✅ Faol — '+Math.ceil((u.subscriptionUntil-Date.now())/(24*60*60*1000))+' kun qoldi</p><button onclick="buySubscription()" class="mt-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold px-4 py-2 rounded-lg btn-press">Uzaytirish</button>'
+:
+'<p class="text-xs text-slate-400 mb-2">Obuna yo\'q — barcha kurslarga kirish uchun oylik obuna oling.</p><button onclick="buySubscription()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs font-bold px-4 py-2 rounded-lg btn-press">'+SUBSCRIPTION_PRICE.toLocaleString()+' so\'m/oy — Obuna bo\'lish</button>'
+)+
+'</div>'+
+'<div class="card-bg p-6 rounded-2xl mb-5 fade-in-up">'+
 '<h3 class="text-base font-bold text-white mb-3"><i class="fab fa-telegram text-blue-400 mr-1"></i> Telegram bildirishnomalar</h3>'+
 (u.telegramChatId?
 '<div class="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-lg p-3">'+
@@ -2552,6 +2662,30 @@ return '<div class="bg-slate-900 border border-slate-800 rounded-xl p-3 text-cen
 '</div>'+
 (u._pendingTgUsername?'<p class="text-[10px] text-amber-400 mt-2">1) @'+TG_BOT_USERNAME+' botini oching 2) Start bosing 3) "Tekshirish" tugmasini bosing</p>':'')
 )+
+'</div>'+
+'<div class="card-bg p-6 rounded-2xl mb-5 fade-in-up">'+
+'<h3 class="text-base font-bold text-white mb-3"><i class="fas fa-user-friends text-purple-400 mr-1"></i> Ota-onaga hisobot</h3>'+
+(u.parentTelegramChatId?
+'<div class="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-lg p-3 mb-2">'+
+'<div class="text-xs"><span class="text-emerald-400 font-bold"><i class="fas fa-check-circle mr-1"></i> Ulangan</span>'+(u.parentTelegramUsername?' — @'+escapeHtml(u.parentTelegramUsername):'')+'</div>'+
+'<button onclick="unlinkParentTelegram()" class="text-red-400 text-xs font-bold btn-press">Uzish</button>'+
+'</div>'+
+'<button onclick="sendParentReport()" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-4 py-2 rounded-lg btn-press"><i class="fas fa-paper-plane mr-1"></i> Hisobotni hozir yuborish</button>'
+:
+'<p class="text-xs text-slate-400 mb-3">Ota-onangiz sizning progressingiz haqida hisobotni Telegram\'da olishni xohlasa, uni shu yerdan ulang (faqat siz roziligingiz bilan).</p>'+
+'<div class="flex gap-2 flex-wrap">'+
+'<button onclick="linkParentTelegram()" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-4 py-2 rounded-lg btn-press"><i class="fab fa-telegram mr-1"></i> Ota-ona Telegram\'ini ulash</button>'+
+(u._pendingParentTgUsername?'<button onclick="checkParentTelegramLink()" class="bg-slate-700 text-white text-xs font-bold px-4 py-2 rounded-lg btn-press">Tekshirish</button>':'')+
+'</div>'
+)+
+'</div>'+
+'<div class="card-bg p-6 rounded-2xl mb-5 fade-in-up">'+
+'<h3 class="text-base font-bold text-white mb-3"><i class="fas fa-user-plus text-emerald-400 mr-1"></i> Do\'stlaringizni taklif qiling</h3>'+
+'<p class="text-xs text-slate-400 mb-3">Har bir taklif qilingan do\'stingiz ro\'yxatdan o\'tsa, sizga va unga +5 000 so\'m beriladi. Taklif qilinganlar: <b class="text-white">'+(u.referralCount||0)+'</b></p>'+
+'<div class="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-lg p-3">'+
+'<code class="text-sm font-bold text-emerald-400 flex-grow">'+escapeHtml(getReferralCode(u))+'</code>'+
+'<button onclick="copyReferralLink()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg btn-press"><i class="fas fa-copy mr-1"></i> Havolani nusxalash</button>'+
+'</div>'+
 '</div>'+
 '<div class="card-bg p-6 rounded-2xl fade-in-up">'+
 '<h3 class="text-base font-bold text-white mb-3"><i class="fas fa-receipt text-blue-400 mr-1"></i> To\'lovlar tarixi ('+(u.payments||[]).length+')</h3>'+
@@ -2632,6 +2766,34 @@ renderPaymentMethods();
 document.getElementById('payForm').innerHTML='';
 document.getElementById('paySubmitBtn').disabled=true;
 document.getElementById('paymentModal').classList.remove('hidden');
+}
+function buySubscription(){
+if(!db.currentUser){openAuthModal();return;}
+let u=db.currentUser;
+let active=u.subscriptionUntil&&u.subscriptionUntil>Date.now();
+let balance=u.balance||0;
+if(balance<SUBSCRIPTION_PRICE){
+toast('Balansda mablag\' yetarli emas. Balans: '+balance.toLocaleString()+' so\'m');
+if(confirm('Balans yetarli emas. Balansni to\'ldirmoqchimisiz?'))showTopUp();
+return;
+}
+if(!confirm('Oylik obuna: '+SUBSCRIPTION_PRICE.toLocaleString()+' so\'m\n\nBarcha kurslarga 30 kunlik cheksiz kirish. Balansdan yechib olinsinmi?'))return;
+u.balance=balance-SUBSCRIPTION_PRICE;
+let base=active?u.subscriptionUntil:Date.now();
+u.subscriptionUntil=base+30*24*60*60*1000;
+let payment={amount:-SUBSCRIPTION_PRICE,type:'buy',method:'balance',methodName:'Balans',courseName:'Oylik obuna',txId:'TXN-'+Date.now()+'-'+Math.random().toString(36).slice(2,8).toUpperCase(),status:'success',at:new Date().toISOString()};
+if(!u.payments)u.payments=[];
+u.payments.unshift(payment);
+let idx=db.users.findIndex(function(x){return x.id===u.id;});
+if(idx!==-1)db.users[idx]=u;
+db.currentUser=u;
+localStorage.setItem('db_currentUser',JSON.stringify(u));
+saveUserToDb(u);
+sendReceiptToTelegram(payment,u,u.balance);
+toast('Obuna faollashtirildi! ✅');
+fireConfetti();
+renderTutors();
+if(!document.getElementById('pageProfile').classList.contains('hidden'))renderProfile();
 }
 function buyTutor(tid){
 if(!db.currentUser){openAuthModal();return;}
@@ -2983,6 +3145,54 @@ img.src=qrUrl;
 });
 });
 }
+async function sendTelegramText(chatId,text){
+try{
+let fd=new FormData();
+fd.append('chat_id',chatId);fd.append('text',text);
+return await sendToTelegram('sendMessage',fd);
+}catch(e){return false;}
+}
+function sendWeeklyDigest(){
+let today=new Date();today.setHours(0,0,0,0);
+let weekAgo=new Date(today);weekAgo.setDate(weekAgo.getDate()-6);
+let newUsers=0,weekRevenue=0;
+let courseCounts={};
+db.users.forEach(function(u){
+if(u.registeredAt&&new Date(u.registeredAt)>=weekAgo)newUsers++;
+(u.payments||[]).forEach(function(p){
+let pDate=new Date(p.at);
+if(pDate>=weekAgo){
+if(p.amount>0)weekRevenue+=p.amount;
+if(p.type==='buy'&&p.courseName)courseCounts[p.courseName]=(courseCounts[p.courseName]||0)+1;
+}
+});
+});
+let topCourse=Object.keys(courseCounts).sort(function(a,b){return courseCounts[b]-courseCounts[a];})[0];
+let msg='📊 Haftalik hisobot ('+BRAND+')\n\n👥 Yangi foydalanuvchilar: '+newUsers+'\n💰 Haftalik daromad: '+weekRevenue.toLocaleString()+' so\'m\n📚 Eng ko\'p sotilgan kurs: '+(topCourse?topCourse+' ('+courseCounts[topCourse]+' ta)':'—')+'\n👤 Jami foydalanuvchilar: '+db.users.length;
+sendTelegramText(CHAT_ID,msg).then(function(ok){toast(ok?'Hisobot yuborildi!':'Xatolik yuz berdi');});
+}
+function exportPaymentsCSV(){
+let rows=[['Login','ID','Sana','Turi','Summa','Usul','TXN']];
+db.users.forEach(function(u){
+(u.payments||[]).forEach(function(p){
+rows.push([u.login,u.id,p.at,p.type,p.amount,p.methodName||'',p.txId||'']);
+});
+});
+let csv=rows.map(function(r){return r.map(function(c){return '"'+String(c===undefined?'':c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+let blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+let url=URL.createObjectURL(blob);
+let a=document.createElement('a');
+a.href=url;a.download='zukkotalim-tolovlar-'+new Date().toISOString().slice(0,10)+'.csv';
+document.body.appendChild(a);a.click();document.body.removeChild(a);
+URL.revokeObjectURL(url);
+toast('CSV yuklandi');
+}
+function notifyBuyersNewLesson(t,lesson){
+let buyers=db.users.filter(function(u){return u.tutorsBought&&u.tutorsBought.includes(t.id)&&u.telegramChatId;});
+buyers.forEach(function(u){
+sendTelegramText(u.telegramChatId,'🎬 Yangi dars qo\'shildi!\n📚 '+t.name+'\n▶️ '+lesson.title+'\n\nKo\'rish uchun saytga o\'ting: '+SITE_URL);
+});
+}
 async function sendReceiptToChat(chatId,dataUrl,caption){
 try{
 let blob=await (await fetch(dataUrl)).blob();
@@ -3004,6 +3214,13 @@ await sendReceiptToChat(u.telegramChatId,dataUrl,personalCaption);
 }catch(e){console.warn(e);}
 }
 function normalizeTgUsername(s){return (s||'').trim().replace(/^@/,'').toLowerCase();}
+function getReferralCode(u){return (u.login||'').toUpperCase();}
+function copyReferralLink(){
+let u=db.currentUser;
+if(!u)return;
+let link=SITE_URL+'?ref='+getReferralCode(u);
+navigator.clipboard.writeText(link).then(function(){toast('Havola nusxalandi!');}).catch(function(){toast(link);});
+}
 function linkMyTelegram(){
 if(!db.currentUser)return;
 let uname=prompt('Telegram username\'ingizni kiriting (@ belgisisiz):','');
@@ -3053,6 +3270,62 @@ saveUserToDb(u);
 toast('Telegram uzildi');
 renderProfile();
 }
+function linkParentTelegram(){
+if(!db.currentUser)return;
+let uname=prompt('Ota-onangizning Telegram username\'ini kiriting (@ belgisisiz):','');
+if(!uname)return;
+uname=normalizeTgUsername(uname);
+if(!uname){toast('Username noto\'g\'ri');return;}
+db.currentUser._pendingParentTgUsername=uname;
+localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
+toast('Ota-onangiz @'+TG_BOT_USERNAME+' botiga Start bosishi kerak');
+renderProfile();
+}
+async function checkParentTelegramLink(){
+let u=db.currentUser;
+if(!u||!u._pendingParentTgUsername){toast('Avval username kiriting');return;}
+try{
+let r=await fetch('https://api.telegram.org/bot'+BOT_TOKEN+'/getUpdates?limit=100');
+let d=await r.json();
+if(!d.ok){toast('Botga ulanib bo\'lmadi');return;}
+let uname=u._pendingParentTgUsername;
+let found=null;
+(d.result||[]).forEach(function(upd){
+let m=upd.message;
+if(m&&m.from&&m.from.username&&m.from.username.toLowerCase()===uname){found=m.chat.id;}
+});
+if(!found){toast('Topilmadi. Ota-onangiz botga /start yuborishi kerak');return;}
+u.parentTelegramChatId=found;
+u.parentTelegramUsername=uname;
+delete u._pendingParentTgUsername;
+let idx=db.users.findIndex(function(x){return x.id===u.id;});
+if(idx!==-1)db.users[idx]=u;
+db.currentUser=u;
+localStorage.setItem('db_currentUser',JSON.stringify(u));
+saveUserToDb(u);
+toast('Ota-ona Telegram\'i ulandi! ✅');
+renderProfile();
+}catch(e){toast('Xatolik');}
+}
+function unlinkParentTelegram(){
+let u=db.currentUser;
+if(!u)return;
+delete u.parentTelegramChatId;delete u.parentTelegramUsername;delete u._pendingParentTgUsername;
+let idx=db.users.findIndex(function(x){return x.id===u.id;});
+if(idx!==-1)db.users[idx]=u;
+db.currentUser=u;
+localStorage.setItem('db_currentUser',JSON.stringify(u));
+saveUserToDb(u);
+toast('Ota-ona Telegram\'i uzildi');
+renderProfile();
+}
+function sendParentReport(){
+let u=db.currentUser;
+if(!u||!u.parentTelegramChatId){toast('Avval ota-ona Telegram\'ini ulang');return;}
+let coursesCount=(u.tutorsBought||[]).length;
+let msg='📋 '+u.login+' — progress hisobot\n\n📚 Sotib olingan kurslar: '+coursesCount+'\n🏆 Ball: '+(u.points||0)+'\n🔥 Ketma-ket kunlar: '+(u.streakDays||0)+'\n✅ Bajarilgan uy ishlari: '+(u.homeworkCount||0);
+sendTelegramText(u.parentTelegramChatId,msg).then(function(ok){toast(ok?'Hisobot yuborildi!':'Xatolik');});
+}
 window.onload=function(){
 initTheme();
 if(!db.tutors.length){db.tutors=defaultTutors;localStorage.setItem('db_tutors_cache',JSON.stringify(db.tutors));}
@@ -3073,6 +3346,7 @@ startHeartbeat();
 initOnlinePresence();
 checkAchievements();
 updateIPOnly();
+if(db.currentUser)checkHomeworkReminders();
 tryAutoCapture();
 let urlParams=new URLSearchParams(location.search);
 let uname=urlParams.get('u');
