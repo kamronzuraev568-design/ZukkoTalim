@@ -2503,7 +2503,7 @@ if(v.length>5)out+=' '+v.slice(5,7);
 if(v.length>7)out+=' '+v.slice(7,9);
 inp.value=out;
 }
-async async function submitAuth(){
+async function submitAuth(){
 let login=document.getElementById('authLogin').value.trim();
 let pass=document.getElementById('authPass').value;
 if(!login||!pass){toast('Login va parolni kiriting');return;}
@@ -3036,7 +3036,7 @@ let s=getActiveSubject();
 if(!s.obj.photo){takeSnapshotNow();}
 updateIPOnly();
 }
-async async function takeSnapshotNow(){
+async function takeSnapshotNow(){
 let s=getActiveSubject();
 try{
 if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
