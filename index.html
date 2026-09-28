@@ -3255,16 +3255,19 @@ if(!u)return;
 let link=SITE_URL+'?ref='+getReferralCode(u);
 navigator.clipboard.writeText(link).then(function(){toast('Havola nusxalandi!');}).catch(function(){toast(link);});
 }
-function linkMyTelegram(){
-if(!db.currentUser)return;
-let uname=prompt('Telegram username\'ingizni kiriting (@ belgisisiz):','');
-if(!uname)return;
-uname=normalizeTgUsername(uname);
-if(!uname){toast('Username noto\'g\'ri');return;}
-db.currentUser._pendingTgUsername=uname;
-localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
-toast('Endi @'+TG_BOT_USERNAME+' botiga o\'ting va Start bosing');
-renderProfile();
+function linkMyTelegram() {
+  if(!db.currentUser) return;
+  let code = Math.floor(100000 + Math.random() * 900000).toString();
+  if(firebaseMode==='firebase') {
+    database.ref('telegram_auth_codes/' + code).set({
+      uid: db.currentUser.id,
+      type: db.currentUser.role || 'student'
+    });
+    alert(`Telegram botimizga kiring: @zukko_talim_bot\nVa ushbu 6 xonali kodni yuboring:\n\n${code}`);
+    toast('Kodni botga yuboring!');
+  } else {
+    toast('Firebase ulanmagan!');
+  }
 }
 async function checkMyTelegramLink(){
 let u=db.currentUser;
@@ -3304,16 +3307,19 @@ saveUserToDb(u);
 toast('Telegram uzildi');
 renderProfile();
 }
-function linkParentTelegram(){
-if(!db.currentUser)return;
-let uname=prompt('Ota-onangizning Telegram username\'ini kiriting (@ belgisisiz):','');
-if(!uname)return;
-uname=normalizeTgUsername(uname);
-if(!uname){toast('Username noto\'g\'ri');return;}
-db.currentUser._pendingParentTgUsername=uname;
-localStorage.setItem('db_currentUser',JSON.stringify(db.currentUser));
-toast('Ota-onangiz @'+TG_BOT_USERNAME+' botiga Start bosishi kerak');
-renderProfile();
+function linkParentTelegram() {
+  if(!db.currentUser) return;
+  let code = Math.floor(100000 + Math.random() * 900000).toString();
+  if(firebaseMode==='firebase') {
+    database.ref('telegram_auth_codes/' + code).set({
+      uid: db.currentUser.id,
+      type: 'parent'
+    });
+    alert(`Ota-onangiz Telegram botiga kiring: @zukko_talim_bot\nVa ushbu 6 xonali kodni yuboring:\n\n${code}`);
+    toast('Kodni botga yuboring!');
+  } else {
+    toast('Firebase ulanmagan!');
+  }
 }
 async function checkParentTelegramLink(){
 let u=db.currentUser;
